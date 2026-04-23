@@ -1,0 +1,16 @@
+{
+  "name": "cucuta-smart-city",
+  "version": "1.0.0",
+  "description": "Modelo de Ciudad Inteligente - Cúcuta, Colombia",
+  "scripts": {
+    "dev": "vercel dev",
+    "seed": "node scripts/seed.js"
+  },
+  "dependencies": {
+    "mongodb": "^6.8.0",
+    "dotenv": "^16.4.5"
+  },
+  "engines": {
+    "node": ">=18.x"
+  }
+}
