@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:cucuta-smart-city.vercel.app)",
+      "Bash(git add *)"
+    ]
+  }
+}
