@@ -83,6 +83,13 @@
       </div>
     </div>
 
+    <div id="interp-card" class="hidden bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden mt-6">
+      <div class="px-5 py-3 border-b border-stone-100 bg-stone-50">
+        <h3 class="text-sm font-bold text-stone-700">&#x1F4CB; Tabla de Interpretación del Índice Compuesto</h3>
+      </div>
+      <div class="overflow-x-auto tbl" id="interp-body"></div>
+    </div>
+
     <div class="h-10"></div>
   </div>
 </main>
@@ -183,6 +190,15 @@ const DESC = {
   'Medio Ambiente':'Métricas de sensores IoT, agua y sostenibilidad urbana (Peso: 15%).'
 };
 
+const BANDS = [
+  {range:'0.0 – 3.9', level:'Bajo',       desc:'Ciudad con desafíos críticos en múltiples dimensiones.',  bg:'bg-red-50',    text:'text-red-700',    border:'border-red-400',    dot:'bg-red-500'},
+  {range:'4.0 – 5.9', level:'Medio-Bajo', desc:'Avances parciales; requiere mejoras sustanciales.',       bg:'bg-orange-50', text:'text-orange-700', border:'border-orange-400', dot:'bg-orange-500'},
+  {range:'6.0 – 7.4', level:'Medio',      desc:'Ciudad en desarrollo con fortalezas sectoriales.',        bg:'bg-amber-50',  text:'text-amber-700',  border:'border-amber-400',  dot:'bg-amber-500'},
+  {range:'7.5 – 8.9', level:'Alto',       desc:'Ciudad inteligente consolidada con buenas prácticas.',    bg:'bg-emerald-50',text:'text-emerald-700',border:'border-emerald-500',dot:'bg-emerald-500'},
+  {range:'9.0 – 10.0',level:'Muy Alto',   desc:'Ciudad de referencia global en inteligencia urbana.',     bg:'bg-green-50',  text:'text-green-800',  border:'border-green-600',  dot:'bg-green-600'},
+];
+function interpretBand(s) { return s < 4 ? 0 : s < 6 ? 1 : s < 7.5 ? 2 : s < 9 ? 3 : 4; }
+
 // ═══════════════════════════════════════════════════════════════════
 // SCORING
 // ═══════════════════════════════════════════════════════════════════
@@ -211,14 +227,14 @@ function composite(inds) {
 const st = { tab:'Resumen', cityIdx:0, cmpA:0, cmpB:1, barChart:null, radarChart:null };
 
 // ═══════════════════════════════════════════════════════════════════
-// INIT
+// INIT — usa DOMContentLoaded para evitar TDZ con ALL_CLS
 // ═══════════════════════════════════════════════════════════════════
-(function init() {
+document.addEventListener('DOMContentLoaded', function() {
   const sel = document.getElementById('city-selector');
   CITIES.forEach((c, i) => {
     const o = document.createElement('option');
     o.value = i;
-    o.textContent = `${c.flag} ${c.name} (${c.country})`;
+    o.textContent = `${c.name} (${c.country})`;
     sel.appendChild(o);
   });
   sel.addEventListener('change', e => { st.cityIdx = +e.target.value; render(); });
@@ -234,7 +250,7 @@ const st = { tab:'Resumen', cityIdx:0, cmpA:0, cmpB:1, barChart:null, radarChart
 
   setActive();
   render();
-})();
+});
 
 // ═══════════════════════════════════════════════════════════════════
 // NAV ACTIVE
@@ -372,7 +388,41 @@ function renderTable() {
       <td class="px-6 py-5 text-right font-mono text-emerald-400 text-3xl">${total.toFixed(4)}</td>
     </tr></tbody></table>`;
     container.innerHTML = html;
+
+    const activeBand = interpretBand(total);
+    let interpHtml = `<table class="w-full text-left border-collapse min-w-[500px]">
+      <thead><tr class="bg-stone-100 text-stone-500 text-[11px] uppercase tracking-wider font-semibold border-b border-stone-200">
+        <th class="px-6 py-3">Rango</th><th class="px-5 py-3">Nivel</th><th class="px-5 py-3">Interpretación</th>
+      </tr></thead><tbody class="text-sm">`;
+    BANDS.forEach((b, i) => {
+      if (i === activeBand) {
+        interpHtml += `<tr class="${b.bg} border-l-4 ${b.border}">
+          <td class="px-6 py-3.5 font-mono font-semibold text-stone-700 whitespace-nowrap">${b.range}</td>
+          <td class="px-5 py-3.5 whitespace-nowrap">
+            <span class="${b.text} font-bold flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full ${b.dot} flex-shrink-0"></span>${b.level}
+              <span class="text-[10px] font-bold bg-stone-800 text-white px-2 py-0.5 rounded-full ml-1">&#x2190; Ciudad actual</span>
+            </span>
+          </td>
+          <td class="px-5 py-3.5 ${b.text} font-medium">${b.desc}</td>
+        </tr>`;
+      } else {
+        interpHtml += `<tr class="border-b border-stone-100 hover:bg-stone-50">
+          <td class="px-6 py-3 font-mono text-stone-500 whitespace-nowrap">${b.range}</td>
+          <td class="px-5 py-3 whitespace-nowrap">
+            <span class="${b.text} font-medium flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full ${b.dot} flex-shrink-0"></span>${b.level}
+            </span>
+          </td>
+          <td class="px-5 py-3 text-stone-500">${b.desc}</td>
+        </tr>`;
+      }
+    });
+    interpHtml += `</tbody></table>`;
+    document.getElementById('interp-body').innerHTML = interpHtml;
+    document.getElementById('interp-card').classList.remove('hidden');
   } else {
+    document.getElementById('interp-card').classList.add('hidden');
     titleEl.innerHTML = `Indicadores: ${st.tab}`;
     const items = inds.filter(i => i.dim === st.tab);
     let html = `<table class="w-full text-left border-collapse min-w-[820px]">
@@ -409,6 +459,7 @@ function renderTable() {
 // ═══════════════════════════════════════════════════════════════════
 function renderRanking() {
   document.getElementById('table-header').style.display = 'none';
+  document.getElementById('interp-card').classList.add('hidden');
   const container = document.getElementById('data-container');
 
   const ranked = CITIES
@@ -472,6 +523,7 @@ function renderRanking() {
 // ═══════════════════════════════════════════════════════════════════
 function renderComparar() {
   document.getElementById('table-header').style.display = 'none';
+  document.getElementById('interp-card').classList.add('hidden');
   const container = document.getElementById('data-container');
   const opts = CITIES.map((c,i) => `<option value="${i}">${c.flag} ${c.name}</option>`).join('');
 
@@ -565,6 +617,7 @@ function updateComparar() {
 // ═══════════════════════════════════════════════════════════════════
 function renderFormulas() {
   document.getElementById('table-header').style.display = 'none';
+  document.getElementById('interp-card').classList.add('hidden');
   const container = document.getElementById('data-container');
   let body = '';
   DIMS.forEach(dim => {
