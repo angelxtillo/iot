@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Smart City Frontera — Índice Regional</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <style>
     .chart-container{position:relative;width:100%;max-width:1000px;margin:0 auto;height:40vh;max-height:400px;}
     @media(min-width:768px){.chart-container{height:350px;}}
@@ -294,7 +294,7 @@ function render() {
     cs.style.display = 'none';
   } else {
     cs.style.display = 'block';
-    renderBar();
+    try { renderBar(); } catch(e) { cs.style.display = 'none'; console.error('Chart error:', e); }
   }
   switch (st.tab) {
     case 'Ranking':  renderRanking();  break;
@@ -541,7 +541,7 @@ function updateComparar() {
   </div>`;
 
   if (st.radarChart) { st.radarChart.destroy(); st.radarChart = null; }
-  st.radarChart = new Chart(document.getElementById('radar-cv').getContext('2d'), {
+  try { st.radarChart = new Chart(document.getElementById('radar-cv').getContext('2d'), {
     type: 'radar',
     data: {
       labels: DIMS,
@@ -557,7 +557,7 @@ function updateComparar() {
       scales:{ r:{ min:0, max:10, ticks:{ stepSize:2, font:{size:9} }, pointLabels:{ font:{size:10} } } },
       plugins:{ legend:{ position:'bottom', labels:{ font:{size:11}, padding:12 } } }
     }
-  });
+  }); } catch(e) { console.error('Radar error:', e); }
 }
 
 // ═══════════════════════════════════════════════════════════════════
