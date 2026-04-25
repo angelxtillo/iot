@@ -41,11 +41,11 @@
     <button data-tab="Formulas"        class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F4D0; Catálogo de Fórmulas</button>
     <p class="text-[10px] uppercase font-bold text-stone-400 tracking-wider mt-3 mb-1.5 px-2">Dimensiones</p>
     <button data-tab="Frontera"        class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-bold  flex items-center gap-2">&#x1F6A7; Frontera (20%)</button>
-    <button data-tab="Economía"        class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F4B9; Economía (17%)</button>
+    <button data-tab="Economía"        class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F4B9; Economía (16%)</button>
     <button data-tab="Capital Humano"  class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F393; Capital Humano (16%)</button>
     <button data-tab="Cohesión Social" class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F91D; Cohesión Social (16%)</button>
     <button data-tab="Gobernanza"      class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F3DB; Gobernanza (16%)</button>
-    <button data-tab="Medio Ambiente"  class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F33F; Medio Ambiente (15%)</button>
+    <button data-tab="Medio Ambiente"  class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F33F; Medio Ambiente (16%)</button>
   </nav>
 
   <div class="px-4 py-3 bg-stone-50 border-t border-stone-200 text-xs text-stone-500 text-center flex-shrink-0">
@@ -192,7 +192,7 @@ const CITIES = CITIES_META.map(m => ({
 // CONSTANTS
 // ═══════════════════════════════════════════════════════════════════
 const DIMS = ['Frontera','Economía','Capital Humano','Cohesión Social','Gobernanza','Medio Ambiente'];
-const W    = {Frontera:0.20,Economía:0.17,'Capital Humano':0.16,'Cohesión Social':0.16,Gobernanza:0.16,'Medio Ambiente':0.15};
+const W    = {Frontera:0.20,Economía:0.16,'Capital Humano':0.16,'Cohesión Social':0.16,Gobernanza:0.16,'Medio Ambiente':0.16};
 const C    = {
   Frontera:         {bg:'bg-rose-50',    text:'text-rose-700',    border:'border-rose-200',    hex:'#e11d48'},
   Economía:         {bg:'bg-blue-50',    text:'text-blue-700',    border:'border-blue-200',    hex:'#2563eb'},
@@ -207,11 +207,11 @@ const DESC = {
   Comparar:'Compara el desempeño por dimensiones de dos ciudades en un radar.',
   Formulas:'Catálogo exhaustivo con fórmulas, variables y fuentes.',
   Frontera:'Métricas de comercio binacional, flujo migratorio e integración (Peso: 20%).',
-  Economía:'Competitividad, startups y digitalización del ecosistema local (Peso: 17%).',
+  Economía:'Competitividad, startups y digitalización del ecosistema local (Peso: 16%).',
   'Capital Humano':'Educación, brecha digital e inversión en talento (Peso: 16%).',
   'Cohesión Social':'Seguridad, inclusión, salud y acceso a redes TIC (Peso: 16%).',
   Gobernanza:'Eficiencia gubernamental, transparencia e instituciones (Peso: 16%).',
-  'Medio Ambiente':'Métricas de sensores IoT, agua y sostenibilidad urbana (Peso: 15%).'
+  'Medio Ambiente':'Métricas de sensores IoT, agua y sostenibilidad urbana (Peso: 16%).'
 };
 
 const BANDS = [
