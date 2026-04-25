@@ -3,144 +3,247 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart City Frontera - Índice Regional</title>
+  <title>Smart City Frontera — Índice Regional</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    .chart-container { position:relative; width:100%; max-width:1000px; margin:0 auto; height:40vh; max-height:400px; }
-    @media (min-width:768px) { .chart-container { height:350px; } }
-    body { background-color:#fafaf9; color:#292524; }
-    .table-container::-webkit-scrollbar { height:8px; width:8px; }
-    .table-container::-webkit-scrollbar-track { background:#f5f5f4; }
-    .table-container::-webkit-scrollbar-thumb { background:#d6d3d1; border-radius:4px; }
-    #save-toast { transition: opacity 0.35s ease; }
+    .chart-container{position:relative;width:100%;max-width:1000px;margin:0 auto;height:40vh;max-height:400px;}
+    @media(min-width:768px){.chart-container{height:350px;}}
+    body{background-color:#fafaf9;color:#292524;}
+    .tbl::-webkit-scrollbar{height:8px;width:8px;}
+    .tbl::-webkit-scrollbar-track{background:#f5f5f4;}
+    .tbl::-webkit-scrollbar-thumb{background:#d6d3d1;border-radius:4px;}
   </style>
 </head>
-<body class="font-sans antialiased overflow-x-hidden h-screen flex flex-col md:flex-row w-full">
+<body class="font-sans antialiased overflow-hidden h-screen flex flex-col md:flex-row w-full">
 
-  <!-- Sidebar -->
-  <aside class="w-full md:w-64 lg:w-72 bg-white border-r border-stone-200 flex flex-col shadow-sm z-10 md:h-screen flex-shrink-0">
-    <div class="p-6 border-b border-stone-100">
-      <h1 class="text-xl font-bold text-stone-800 tracking-tight leading-tight flex items-center flex-wrap gap-1">
-        &#x1F3D9;&#xFE0F; Smart City Frontera
-        <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold border border-emerald-200 shadow-sm">v6.0</span>
-      </h1>
-      <p class="text-xs text-stone-500 mt-2 font-medium">Índice Comparativo Regional</p>
+<!-- ── SIDEBAR ─────────────────────────────────────────────────── -->
+<aside class="w-full md:w-64 lg:w-72 bg-white border-r border-stone-200 flex flex-col shadow-sm z-10 h-[50vh] md:h-screen flex-shrink-0 overflow-hidden">
+
+  <div class="p-5 border-b border-stone-100 flex-shrink-0">
+    <h1 class="text-lg font-bold text-stone-800 tracking-tight leading-tight flex items-center flex-wrap gap-1">
+      &#x1F3D9;&#xFE0F; Smart City Frontera
+      <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold border border-emerald-200">v7.0</span>
+    </h1>
+    <p class="text-xs text-stone-500 mt-1 font-medium">Índice Comparativo Regional</p>
+  </div>
+
+  <div class="px-4 pt-3 pb-3 border-b border-stone-100 flex-shrink-0">
+    <label class="text-[10px] uppercase font-bold text-stone-400 tracking-wider block mb-1.5">Ciudad Activa</label>
+    <select id="city-selector" class="w-full px-3 py-2 rounded-lg border border-stone-200 text-sm text-stone-700 bg-white focus:outline-none focus:ring-2 focus:ring-stone-400 cursor-pointer"></select>
+  </div>
+
+  <nav class="flex-grow p-3 overflow-y-auto space-y-1" id="nav-tabs">
+    <p class="text-[10px] uppercase font-bold text-stone-400 tracking-wider mb-1.5 px-2">Análisis General</p>
+    <button data-tab="Resumen"         class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F4CA; Resumen Global</button>
+    <button data-tab="Ranking"         class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F3C6; Ranking Regional</button>
+    <button data-tab="Comparar"        class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x2696;&#xFE0F; Comparar Ciudades</button>
+    <button data-tab="Formulas"        class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F4D0; Catálogo de Fórmulas</button>
+    <p class="text-[10px] uppercase font-bold text-stone-400 tracking-wider mt-3 mb-1.5 px-2">Dimensiones</p>
+    <button data-tab="Frontera"        class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-bold  flex items-center gap-2">&#x1F6A7; Frontera (20%)</button>
+    <button data-tab="Economía"        class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F4B9; Economía (17%)</button>
+    <button data-tab="Capital Humano"  class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F393; Capital Humano (16%)</button>
+    <button data-tab="Cohesión Social" class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F91D; Cohesión Social (16%)</button>
+    <button data-tab="Gobernanza"      class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F3DB; Gobernanza (16%)</button>
+    <button data-tab="Medio Ambiente"  class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F33F; Medio Ambiente (15%)</button>
+  </nav>
+
+  <div class="px-4 py-3 bg-stone-50 border-t border-stone-200 text-xs text-stone-500 text-center flex-shrink-0">
+    Datos embebidos · 5 ciudades · 36 indicadores
+  </div>
+</aside>
+
+<!-- ── MAIN ────────────────────────────────────────────────────── -->
+<main class="flex-grow flex flex-col overflow-hidden bg-stone-50/50 w-full relative min-h-0">
+
+  <header class="bg-white px-6 py-4 border-b border-stone-200 flex justify-between items-center flex-shrink-0 shadow-sm">
+    <div>
+      <h2 class="text-xl font-bold text-stone-800" id="view-title">Resumen del Índice</h2>
+      <p class="text-sm text-stone-500 mt-0.5" id="view-desc">Consolidado general de todas las dimensiones.</p>
+    </div>
+    <div id="dim-badge" class="hidden text-right">
+      <p class="text-[10px] font-bold text-stone-400 uppercase tracking-wider">Puntaje Promedio</p>
+      <p class="text-3xl font-black" id="dim-score">0.00</p>
+    </div>
+  </header>
+
+  <div class="flex-grow overflow-y-auto p-5 lg:p-7" id="main-scroll-area">
+
+    <div id="chart-section" class="bg-white p-5 rounded-2xl shadow-sm border border-stone-200 mb-6">
+      <h3 class="text-sm font-bold text-stone-700 mb-3 uppercase tracking-wider" id="chart-title">Desempeño Visual (0 a 10)</h3>
+      <div class="chart-container"><canvas id="mainChart"></canvas></div>
     </div>
 
-    <!-- City Selector -->
-    <div class="px-4 pt-4 pb-3 border-b border-stone-100">
-      <label class="text-[10px] uppercase font-bold text-stone-400 tracking-wider block mb-2">Ciudad Activa</label>
-      <select id="city-selector" class="w-full px-3 py-2 rounded-lg border border-stone-200 text-sm text-stone-700 bg-white focus:outline-none focus:ring-2 focus:ring-stone-400 cursor-pointer">
-        <option value="">Cargando ciudades…</option>
-      </select>
-    </div>
-
-    <nav class="flex-grow p-4 overflow-y-auto space-y-1.5" id="nav-tabs">
-      <h2 class="text-[10px] uppercase font-bold text-stone-400 tracking-wider mb-2 px-2">Análisis General</h2>
-      <button data-tab="Resumen"  class="tab-btn w-full text-left px-4 py-3 rounded-xl bg-stone-800 text-white font-medium transition-colors shadow-md flex items-center">&#x1F4CA;&nbsp; Resumen Global</button>
-      <button data-tab="Ranking"  class="tab-btn w-full text-left px-4 py-3 rounded-xl bg-white text-stone-600 hover:bg-stone-100 font-medium transition-colors border border-transparent flex items-center">&#x1F3C6;&nbsp; Ranking Regional</button>
-      <button data-tab="Comparar" class="tab-btn w-full text-left px-4 py-3 rounded-xl bg-white text-stone-600 hover:bg-stone-100 font-medium transition-colors border border-transparent flex items-center">&#x2696;&#xFE0F;&nbsp; Comparar Ciudades</button>
-      <button data-tab="Formulas" class="tab-btn w-full text-left px-4 py-3 rounded-xl bg-white text-stone-600 hover:bg-stone-100 font-medium transition-colors border border-transparent flex items-center">&#x1F4D0;&nbsp; Catálogo de Fórmulas</button>
-
-      <h2 class="text-[10px] uppercase font-bold text-stone-400 tracking-wider mt-4 mb-2 px-2">Dimensiones del Modelo</h2>
-      <button data-tab="Frontera"       class="tab-btn w-full text-left px-4 py-3 rounded-xl bg-white text-stone-600 font-bold   transition-colors border border-transparent flex items-center">&#x1F6A7;&nbsp; Frontera (20%)</button>
-      <button data-tab="Economía"       class="tab-btn w-full text-left px-4 py-3 rounded-xl bg-white text-stone-600 font-medium transition-colors border border-transparent flex items-center">&#x1F4B9;&nbsp; Economía (17%)</button>
-      <button data-tab="Capital Humano" class="tab-btn w-full text-left px-4 py-3 rounded-xl bg-white text-stone-600 font-medium transition-colors border border-transparent flex items-center">&#x1F393;&nbsp; Capital Humano (16%)</button>
-      <button data-tab="Cohesión Social"class="tab-btn w-full text-left px-4 py-3 rounded-xl bg-white text-stone-600 font-medium transition-colors border border-transparent flex items-center">&#x1F91D;&nbsp; Cohesión Social (16%)</button>
-      <button data-tab="Gobernanza"     class="tab-btn w-full text-left px-4 py-3 rounded-xl bg-white text-stone-600 font-medium transition-colors border border-transparent flex items-center">&#x1F3DB;&nbsp; Gobernanza (16%)</button>
-      <button data-tab="Medio Ambiente" class="tab-btn w-full text-left px-4 py-3 rounded-xl bg-white text-stone-600 font-medium transition-colors border border-transparent flex items-center">&#x1F33F;&nbsp; Medio Ambiente (15%)</button>
-    </nav>
-
-    <div class="p-4 bg-stone-50 border-t border-stone-200 text-xs text-stone-500 text-center">
-      Conectado a MongoDB Atlas
-    </div>
-  </aside>
-
-  <!-- Main -->
-  <main class="flex-grow flex flex-col h-screen overflow-hidden bg-stone-50/50 w-full relative">
-
-    <!-- Loading overlay -->
-    <div id="loading-overlay" class="absolute inset-0 bg-white/80 flex items-center justify-center z-50 hidden">
-      <div class="text-center">
-        <div class="w-10 h-10 border-4 border-stone-200 border-t-stone-700 rounded-full animate-spin mx-auto"></div>
-        <p class="text-stone-500 mt-4 text-sm font-medium">Cargando datos…</p>
+    <div id="table-card" class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
+      <div id="table-header" class="px-5 py-3 border-b border-stone-100 bg-stone-50 flex justify-between items-center">
+        <h3 class="text-sm font-bold text-stone-700" id="table-title">Datos</h3>
+      </div>
+      <div class="overflow-x-auto tbl" id="data-container">
+        <div class="p-10 text-center text-stone-400">Cargando…</div>
       </div>
     </div>
 
-    <!-- Toast -->
-    <div id="save-toast" class="fixed bottom-6 right-6 bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-lg z-50 text-sm font-medium pointer-events-none opacity-0">
-      ✓ Guardado en MongoDB
-    </div>
-
-    <!-- Header -->
-    <header class="bg-white px-8 py-5 border-b border-stone-200 flex justify-between items-center flex-shrink-0 shadow-sm">
-      <div>
-        <h2 class="text-2xl font-bold text-stone-800" id="view-title">Resumen del Índice</h2>
-        <p class="text-sm text-stone-500" id="view-desc">Consolidado general de todas las dimensiones.</p>
-      </div>
-      <div id="dim-badge" class="hidden text-right">
-        <p class="text-xs font-bold text-stone-400 uppercase tracking-wider">Puntaje Promedio</p>
-        <p class="text-3xl font-black text-stone-800" id="dim-score">0.00</p>
-      </div>
-    </header>
-
-    <!-- Scroll area -->
-    <div class="flex-grow overflow-y-auto p-6 lg:p-8" id="main-scroll-area">
-
-      <!-- Bar chart -->
-      <div id="chart-section" class="bg-white p-6 rounded-2xl shadow-sm border border-stone-200 mb-8 w-full">
-        <h3 class="text-sm font-bold text-stone-700 mb-4 uppercase tracking-wider" id="chart-title">Desempeño Visual (0 a 10)</h3>
-        <div class="chart-container"><canvas id="mainChart"></canvas></div>
-      </div>
-
-      <!-- Dynamic card -->
-      <div id="table-card" class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden w-full">
-        <div id="table-header" class="px-6 py-4 border-b border-stone-100 bg-stone-50 flex justify-between items-center">
-          <h3 class="text-md font-bold text-stone-700" id="table-title">Datos</h3>
-        </div>
-        <div class="overflow-x-auto table-container w-full" id="data-container">
-          <div class="p-12 text-center text-stone-400">Iniciando…</div>
-        </div>
-      </div>
-
-      <div class="h-12"></div>
-    </div>
-  </main>
+    <div class="h-10"></div>
+  </div>
+</main>
 
 <script>
-const DIMS = ['Frontera','Economía','Capital Humano','Cohesión Social','Gobernanza','Medio Ambiente'];
-const W    = { 'Frontera':0.20,'Economía':0.17,'Capital Humano':0.16,'Cohesión Social':0.16,'Gobernanza':0.16,'Medio Ambiente':0.15 };
-const C    = {
-  'Resumen':        { hex:'#292524' },
-  'Formulas':       { hex:'#57534e' },
-  'Ranking':        { hex:'#0ea5e9' },
-  'Comparar':       { hex:'#8b5cf6' },
-  'Frontera':       { bg:'bg-rose-50',    text:'text-rose-700',    border:'border-rose-200',    hex:'#e11d48' },
-  'Economía':       { bg:'bg-blue-50',    text:'text-blue-700',    border:'border-blue-200',    hex:'#2563eb' },
-  'Capital Humano': { bg:'bg-indigo-50',  text:'text-indigo-700',  border:'border-indigo-200',  hex:'#4f46e5' },
-  'Cohesión Social':{ bg:'bg-fuchsia-50', text:'text-fuchsia-700', border:'border-fuchsia-200', hex:'#c026d3' },
-  'Gobernanza':     { bg:'bg-amber-50',   text:'text-amber-700',   border:'border-amber-200',   hex:'#d97706' },
-  'Medio Ambiente': { bg:'bg-emerald-50', text:'text-emerald-700', border:'border-emerald-200', hex:'#10b981' }
-};
-const DESC = {
-  'Resumen':        'Consolidado general del Índice con cálculos en tiempo real.',
-  'Ranking':        'Top 3 ciudades de la región fronteriza según el Índice Compuesto.',
-  'Comparar':       'Compara el desempeño por dimensiones de dos ciudades en un radar.',
-  'Formulas':       'Catálogo exhaustivo con fórmulas, variables y fuentes de cada indicador.',
-  'Frontera':       'Métricas de comercio binacional, flujo migratorio e integración (Peso: 20%).',
-  'Economía':       'Competitividad, startups y digitalización del ecosistema local (Peso: 17%).',
-  'Capital Humano': 'Educación, brecha digital e inversión en talento (Peso: 16%).',
-  'Cohesión Social':'Seguridad, inclusión, salud y acceso a redes TIC (Peso: 16%).',
-  'Gobernanza':     'Eficiencia gubernamental, transparencia e instituciones (Peso: 16%).',
-  'Medio Ambiente': 'Métricas de sensores IoT, agua y sostenibilidad urbana (Peso: 15%).'
+// ═══════════════════════════════════════════════════════════════════
+// DATA — embebido desde lib/cities-data.js
+// ═══════════════════════════════════════════════════════════════════
+const BASE_IND = [
+  // FRONTERA 20%
+  {id:1, dim:'Frontera',       ind:'Volumen Comercio Transfronterizo',  tipo:'pos',ref:500,     form:'V_com = Σ (Exp + Imp)',               vars:'<b>V_com:</b> Volumen de comercio transfronterizo.<br><b>Exp:</b> Exportaciones (USD).<br><b>Imp:</b> Importaciones (USD).',                                                desc:'Millones de USD por año. Valor total del comercio formal en el paso fronterizo.'},
+  {id:2, dim:'Frontera',       ind:'Flujo Migratorio Formal',           tipo:'pos',ref:3000000, form:'F_mig = Σ Cruces_reg',                vars:'<b>F_mig:</b> Flujo migratorio formal.<br><b>Cruces_reg:</b> Tránsitos validados por puestos de control migratorio.',                                                            desc:'Número de cruces de frontera registrados formalmente por año.'},
+  {id:3, dim:'Frontera',       ind:'Tasa Informalidad Migrante',        tipo:'neg',ref:60,      form:'Inf = (P_inf / P_mig_act) * 100',     vars:'<b>Inf:</b> Tasa de informalidad.<br><b>P_inf:</b> Migrantes sin contrato.<br><b>P_mig_act:</b> Población migrante económicamente activa.',                                    desc:'Porcentaje de migrantes en situación de empleo informal.'},
+  {id:4, dim:'Frontera',       ind:'Trazabilidad Biométrica',           tipo:'pos',ref:10,      form:'T_bio = (P_bio / P_ctrl) * 10',       vars:'<b>T_bio:</b> Índice de trazabilidad.<br><b>P_bio:</b> Puestos con biometría activa.<br><b>P_ctrl:</b> Puestos fronterizos totales.',                                           desc:'Puntos de control equipados con sistemas biométricos para registro.'},
+  {id:5, dim:'Frontera',       ind:'Plataformas Comercio Digital',      tipo:'pos',ref:5,       form:'P_dig = Σ Apps_Aduanas',              vars:'<b>P_dig:</b> Plataformas digitales activas.<br><b>Apps_Aduanas:</b> Sistemas VUCE o aduanas web operativas.',                                                                  desc:'Plataformas digitales activas para facilitar intercambio comercial.'},
+  {id:6, dim:'Frontera',       ind:'Migrantes con PPT Digital',         tipo:'pos',ref:100,     form:'PPT = (M_ppt / M_tot) * 100',         vars:'<b>PPT:</b> Permiso de Protección Temporal.<br><b>M_ppt:</b> Migrantes regularizados.<br><b>M_tot:</b> Total migrantes censados.',                                              desc:'Porcentaje de migrantes con permiso de protección temporal activo.'},
+  // ECONOMÍA 17%
+  {id:7, dim:'Economía',       ind:'Empresas Unicornio',                tipo:'pos',ref:2,       form:'U_val = Startups ≥ $10^9 USD',        vars:'<b>U_val:</b> Empresas Unicornio locales.',                                                                                                                                     desc:'Startups con valor de mercado ≥ USD 1.000 millones.'},
+  {id:8, dim:'Economía',       ind:'Facilidad abrir empresa (Ranking)', tipo:'neg',ref:50,      form:'R_biz = Posición_Global',             vars:'<b>R_biz:</b> Ranking Doing Business o equivalente.',                                                                                                                           desc:'Posición global en facilidad para hacer negocios (menor es mejor).'},
+  {id:9, dim:'Economía',       ind:'Índice Global Ecosistemas Startup', tipo:'neg',ref:200,     form:'Rank_eco = Puesto_Mundial',           vars:'<b>Rank_eco:</b> Startup Ecosystem Benchmark.',                                                                                                                                  desc:'Posición de la ciudad en el ranking global de ecosistemas startup.'},
+  {id:10,dim:'Economía',       ind:'Startups Tecnológicas Activas',     tipo:'pos',ref:20,      form:'S_act = Σ Emp_TIC_validas',           vars:'<b>S_act:</b> Startups activas con producto validado.',                                                                                                                          desc:'Startups con producto validado y operando en el mercado.'},
+  {id:11,dim:'Economía',       ind:'Comercio Electrónico (%)',          tipo:'pos',ref:40,      form:'E_com = (V_web / V_tot) * 100',       vars:'<b>E_com:</b> Adopción de E-commerce.<br><b>V_web:</b> Empresas con canales digitales.<br><b>V_tot:</b> Empresas registradas.',                                                 desc:'Empresas que realizan ventas por canales digitales.'},
+  {id:12,dim:'Economía',       ind:'Inversión en I+D+TIC (% PIB)',      tipo:'pos',ref:2,       form:'I_D = (Inv_tech / PIB) * 100',        vars:'<b>I_D:</b> Inversión en I+D+i.<br><b>Inv_tech:</b> Capital en innovación.<br><b>PIB:</b> Producto Interno Bruto municipal.',                                                  desc:'Porcentaje del PIB local destinado a innovación y tecnología.'},
+  // CAPITAL HUMANO 16%
+  {id:13,dim:'Capital Humano', ind:'Población con Educ. Superior (%)', tipo:'pos',ref:80,      form:'E_sup = (P_grad / P_tot) * 100',      vars:'<b>E_sup:</b> Educación superior/técnica.<br><b>P_grad:</b> Personas con título post-secundaria.',                                                                               desc:'Proporción de la población con educación secundaria y superior.'},
+  {id:14,dim:'Capital Humano', ind:'Total Escuelas',                    tipo:'pos',ref:500,     form:'Esc = Σ (Públicas + Privadas)',       vars:'<b>Esc:</b> Inventario escolar georeferenciado.',                                                                                                                                desc:'Cantidad de escuelas públicas y privadas mapeadas en la ciudad.'},
+  {id:15,dim:'Capital Humano', ind:'Gasto Privado en Educación (USD)', tipo:'pos',ref:800,     form:'G_edu = Σ G_hogares / Pob',           vars:'<b>G_edu:</b> Gasto per cápita en educación.<br><b>G_hogares:</b> Inversión familiar anual.',                                                                                    desc:'Gasto privado anual en educación per cápita estimado en USD.'},
+  {id:16,dim:'Capital Humano', ind:'Laboratorios TIC en Escuelas',     tipo:'pos',ref:60,      form:'Lab_tic = (Esc_lab / Esc_tot) * 100', vars:'<b>Lab_tic:</b> Laboratorios de tecnología.<br><b>Esc_lab:</b> Colegios con cómputo o robótica.',                                                                               desc:'Colegios con salas dotadas de computadores o robótica (%).'},
+  {id:17,dim:'Capital Humano', ind:'Conectividad Escolar (%)',          tipo:'pos',ref:100,     form:'C_esc = (Esc_net / Esc_tot) * 100',  vars:'<b>C_esc:</b> Conectividad escolar.<br><b>Esc_net:</b> Instituciones con internet de banda ancha.',                                                                               desc:'Instituciones educativas con conexión a internet activa.'},
+  {id:18,dim:'Capital Humano', ind:'Brecha Digital Estudiantil (%)',   tipo:'neg',ref:5,       form:'B_dig = (Est_0_pc / Est_tot) * 100',  vars:'<b>B_dig:</b> Brecha digital.<br><b>Est_0_pc:</b> Estudiantes sin computador ni tablet en casa.',                                                                                desc:'Estudiantes sin computador ni tablet en casa (%).'},
+  // COHESIÓN SOCIAL 16%
+  {id:19,dim:'Cohesión Social', ind:'Ciudad Amigable con Mujeres',     tipo:'pos',ref:4.5,     form:'C_amig = x̄(Índices_seguridad)',       vars:'<b>C_amig:</b> Score de ciudad amigable/segura (media de encuestas internacionales).',                                                                                           desc:'Score de 1 a 5 de entorno amigable y seguro para mujeres.'},
+  {id:20,dim:'Cohesión Social', ind:'Total Hospitales y Clínicas',     tipo:'pos',ref:50,      form:'Hosp = Σ Centros_salud',              vars:'<b>Hosp:</b> Clínicas y hospitales en servicio continuo.',                                                                                                                       desc:'Infraestructura de salud incluyendo centros de salud locales.'},
+  {id:21,dim:'Cohesión Social', ind:'Tasa de Criminalidad',            tipo:'neg',ref:30,      form:'Crimen = (Delitos / 100k_hab)',       vars:'<b>Crimen:</b> Tasa delictiva percibida.<br><b>Delitos:</b> Denuncias ponderadas.<br><b>100k_hab:</b> Ratio poblacional estándar.',                                              desc:'Nivel general de crimen percibido (escala 0 a 100).'},
+  {id:22,dim:'Cohesión Social', ind:'Hospitales con Telemedicina',     tipo:'pos',ref:10,      form:'H_tele = (H_dig / Hosp) * 100',      vars:'<b>H_tele:</b> Telemedicina habilitada.<br><b>H_dig:</b> Centros equipados para consultas remotas.',                                                                             desc:'Establecimientos que ofrecen consulta médica remota.'},
+  {id:23,dim:'Cohesión Social', ind:'Cobertura 4G/5G (%)',             tipo:'pos',ref:100,     form:'Cob_4G = (A_4G / A_urb) * 100',      vars:'<b>Cob_4G:</b> Cobertura móvil.<br><b>A_4G:</b> km² con señal estable.<br><b>A_urb:</b> Perímetro urbano.',                                                                      desc:'Zona urbana con señal de telefonía móvil de alta velocidad (%).'},
+  {id:24,dim:'Cohesión Social', ind:'Apps Ciudadanas Activas',         tipo:'pos',ref:5,       form:'Apps_gov = Σ Apps_Oficiales',         vars:'<b>Apps_gov:</b> Aplicaciones de la Alcaldía en tiendas de apps.',                                                                                                               desc:'Aplicaciones móviles oficiales con servicios activos para ciudadanos.'},
+  // GOBERNANZA 16%
+  {id:25,dim:'Gobernanza',     ind:'Bitcoin Legal (0 o 1)',            tipo:'pos',ref:1,       form:'Crypto = {0, 0.5, 1}',               vars:'<b>Crypto:</b> Variable categórica de marco legal de criptomonedas.<br><b>0:</b> Ilegal. <b>0.5:</b> Tolerado. <b>1:</b> Marco claro.',                                          desc:'Situación legal de criptoactivos (0.5 = Zona Gris / Tolerado).'},
+  {id:26,dim:'Gobernanza',     ind:'Certificación ISO 37120',          tipo:'pos',ref:4,       form:'ISO_37120 = Nivel (0..6)',            vars:'<b>ISO_37120:</b> Estándar global de Smart Cities.<br><b>Nivel:</b> Grado de certificación institucional.',                                                                        desc:'Nivel de certificación global para servicios urbanos y calidad de vida.'},
+  {id:27,dim:'Gobernanza',     ind:'Trámites Digitales (%)',           tipo:'pos',ref:70,      form:'T_dig = (T_web / T_tot) * 100',       vars:'<b>T_dig:</b> Digitalización de burocracia.<br><b>T_web:</b> Trámites completables online.',                                                                                      desc:'Servicios del gobierno local que se pueden completar 100% online.'},
+  {id:28,dim:'Gobernanza',     ind:'Datos Abiertos Alcaldía',          tipo:'pos',ref:30,      form:'D_open = Σ Datasets_pub',            vars:'<b>D_open:</b> Datasets en formatos abiertos (CSV, JSON) en portal oficial.',                                                                                                      desc:'Conjuntos de datos publicados oficialmente.'},
+  {id:29,dim:'Gobernanza',     ind:'Cámaras Videovigilancia',          tipo:'pos',ref:300,     form:'Cam_seg = Σ Cámaras_C4',             vars:'<b>Cam_seg:</b> Cámaras PTZ o LPR conectadas al centro de comando.',                                                                                                               desc:'Cámaras de seguridad operativas conectadas al centro de monitoreo.'},
+  {id:30,dim:'Gobernanza',     ind:'Semáforos Inteligentes',           tipo:'pos',ref:20,      form:'S_intel = (S_act / S_tot) * 100',    vars:'<b>S_intel:</b> Semaforización adaptativa.<br><b>S_act:</b> Intersecciones con sensores de flujo en tiempo real.',                                                                desc:'Semáforos con control adaptativo al flujo vehicular en tiempo real.'},
+  // MEDIO AMBIENTE 15%
+  {id:31,dim:'Medio Ambiente', ind:'Calidad Agua Potable',             tipo:'pos',ref:80,      form:'ICA = x̄(Var_químicas)',              vars:'<b>ICA:</b> Índice de Calidad del Agua.<br><b>Var_químicas:</b> Mediciones de pH, Turbidez, Cloro residual.',                                                                      desc:'Índice de 0 a 100 sobre la calidad percibida y real del agua.'},
+  {id:32,dim:'Medio Ambiente', ind:'Áreas Verdes (m²/hab)',            tipo:'pos',ref:9,       form:'A_verde = Σ (m²_parq) / Pob',        vars:'<b>A_verde:</b> Espacio verde per cápita.<br><b>m²_parq:</b> Área total de zonas arborizadas o parques urbanos.',                                                                  desc:'Metros cuadrados de área verde urbana disponible por persona.'},
+  {id:33,dim:'Medio Ambiente', ind:'Índice Calidad del Aire (AQI)',    tipo:'neg',ref:10,      form:'AQI = max(I_PM2.5, I_PM10, I_O3)',   vars:'<b>AQI:</b> Air Quality Index.<br><b>I_PM:</b> Sub-índices del mayor contaminante.',                                                                                               desc:'Promedio anual de AQI. Menor valor indica aire más limpio.'},
+  {id:34,dim:'Medio Ambiente', ind:'Sensores IoT Calidad Aire',        tipo:'pos',ref:15,      form:'S_iot = Σ Nodos_ESP32',              vars:'<b>S_iot:</b> Nodos ESP32 midiendo variables ambientales en tiempo real.',                                                                                                          desc:'Dispositivos de bajo costo instalados para medir contaminantes.'},
+  {id:35,dim:'Medio Ambiente', ind:'Sistemas Alerta Inundaciones',     tipo:'pos',ref:5,       form:'A_inun = Σ Telemetría_río',          vars:'<b>A_inun:</b> Sensores de nivel del agua en ríos principales.',                                                                                                                   desc:'Sensores en ríos con notificación automática de crecidas.'},
+  {id:36,dim:'Medio Ambiente', ind:'Energía Solar Instalada (MW)',     tipo:'pos',ref:5,       form:'E_sol = Σ (MW_inst)',                vars:'<b>E_sol:</b> MW generados por paneles solares interconectados a la red.',                                                                                                          desc:'Capacidad de generación solar en techos públicos y parques.'}
+];
+
+const CV = {
+  cucuta:     {1:{v:320,f:'DIAN'},2:{v:12775000,f:'Migración Colombia'},3:{v:78,f:'DNP'},4:{v:4,f:'Migración Colombia'},5:{v:3,f:'DIAN/MinTIC'},6:{v:80,f:'Migración Colombia'},7:{v:0,f:'CB Insights'},8:{v:67,f:'World Bank'},9:{v:640,f:'StartupBlink'},10:{v:5,f:'iNNpulsa'},11:{v:15,f:'CC Cúcuta'},12:{v:0.5,f:'DNP'},13:{v:43,f:'DANE'},14:{v:483,f:'OpenStreetMap'},15:{v:148,f:'DANE'},16:{v:15,f:'Comp. para Educar'},17:{v:90,f:'Comp. para Educar'},18:{v:35,f:'DANE'},19:{v:2.5,f:'Nomad List'},20:{v:18,f:'OpenStreetMap'},21:{v:68,f:'Numbeo'},22:{v:3,f:'MinSalud'},23:{v:95,f:'MinTIC'},24:{v:2,f:'Alcaldía Cúcuta'},25:{v:0.5,f:'Banco República'},26:{v:0,f:'WCCD'},27:{v:30,f:'Alcaldía Cúcuta'},28:{v:12,f:'Datos.gov.co'},29:{v:150,f:'Policía Cúcuta'},30:{v:5,f:'Sec. Movilidad'},31:{v:55,f:'Numbeo/SSPD'},32:{v:3.2,f:'Plan Desarrollo'},33:{v:45,f:'IQAir'},34:{v:3,f:'Jesús Álvarez'},35:{v:1,f:'IDEAM'},36:{v:1.2,f:'UPME'}},
+  sanantonio: {1:{v:60,f:'SENIAT (est.)'},2:{v:820000,f:'SAIME (est.)'},3:{v:92,f:'INE Venezuela (est.)'},4:{v:1,f:'SAIME (est.)'},5:{v:0,f:'SENIAT (est.)'},6:{v:10,f:'SAIME (est.)'},7:{v:0,f:'CB Insights'},8:{v:188,f:'World Bank'},9:{v:1850,f:'StartupBlink (est.)'},10:{v:0,f:'Inapyme (est.)'},11:{v:3,f:'CCIAST (est.)'},12:{v:0.05,f:'ONCTI (est.)'},13:{v:32,f:'INE Venezuela (est.)'},14:{v:98,f:'OpenStreetMap'},15:{v:12,f:'INE Venezuela (est.)'},16:{v:3,f:'Min. Educación VE (est.)'},17:{v:18,f:'CONATEL (est.)'},18:{v:82,f:'INE Venezuela (est.)'},19:{v:1.2,f:'Numbeo (est.)'},20:{v:3,f:'OpenStreetMap'},21:{v:88,f:'Numbeo (est.)'},22:{v:0,f:'MPPS (est.)'},23:{v:28,f:'CONATEL (est.)'},24:{v:0,f:'Alcaldía SATS (est.)'},25:{v:0.5,f:'BCV (est.)'},26:{v:0,f:'WCCD'},27:{v:5,f:'Alcaldía SATS (est.)'},28:{v:1,f:'Datos.gob.ve (est.)'},29:{v:8,f:'PNB Táchira (est.)'},30:{v:0,f:'IAHULA (est.)'},31:{v:18,f:'Numbeo (est.)'},32:{v:1.5,f:'Alcaldía SATS (est.)'},33:{v:32,f:'IQAir (est.)'},34:{v:0,f:'N/A'},35:{v:0,f:'INAMEH (est.)'},36:{v:0.05,f:'Min. Energía VE (est.)'}},
+  ipiales:    {1:{v:175,f:'DIAN Nariño (est.)'},2:{v:1480000,f:'Migración Colombia'},3:{v:65,f:'DNP (est.)'},4:{v:3,f:'Migración Colombia'},5:{v:2,f:'DIAN/MinTIC'},6:{v:55,f:'Migración Colombia (est.)'},7:{v:0,f:'CB Insights'},8:{v:73,f:'World Bank'},9:{v:920,f:'StartupBlink (est.)'},10:{v:3,f:'iNNpulsa (est.)'},11:{v:12,f:'CC Ipiales (est.)'},12:{v:0.3,f:'DNP (est.)'},13:{v:38,f:'DANE'},14:{v:182,f:'OpenStreetMap'},15:{v:118,f:'DANE (est.)'},16:{v:12,f:'Comp. para Educar'},17:{v:75,f:'Comp. para Educar'},18:{v:45,f:'DANE (est.)'},19:{v:2.2,f:'Numbeo (est.)'},20:{v:8,f:'OpenStreetMap'},21:{v:52,f:'Numbeo (est.)'},22:{v:1,f:'MinSalud (est.)'},23:{v:82,f:'MinTIC (est.)'},24:{v:1,f:'Alcaldía Ipiales (est.)'},25:{v:0.5,f:'Banco República'},26:{v:0,f:'WCCD'},27:{v:20,f:'Alcaldía Ipiales (est.)'},28:{v:8,f:'Datos.gov.co (est.)'},29:{v:85,f:'Policía Nariño (est.)'},30:{v:2,f:'Sec. Tránsito Ipiales (est.)'},31:{v:60,f:'Numbeo/SSPD (est.)'},32:{v:4.5,f:'Plan Desarrollo Ipiales'},33:{v:18,f:'IQAir (est.)'},34:{v:1,f:'Iniciativa local (est.)'},35:{v:0,f:'IDEAM (est.)'},36:{v:0.3,f:'UPME (est.)'}},
+  leticia:    {1:{v:22,f:'DIAN Amazonas (est.)'},2:{v:245000,f:'Migración Colombia (est.)'},3:{v:70,f:'DNP (est.)'},4:{v:2,f:'Migración Colombia (est.)'},5:{v:1,f:'DIAN/MinTIC (est.)'},6:{v:38,f:'Migración Colombia (est.)'},7:{v:0,f:'CB Insights'},8:{v:73,f:'World Bank'},9:{v:1100,f:'StartupBlink (est.)'},10:{v:1,f:'iNNpulsa (est.)'},11:{v:8,f:'CC Amazonas (est.)'},12:{v:0.2,f:'DNP (est.)'},13:{v:28,f:'DANE'},14:{v:46,f:'OpenStreetMap'},15:{v:78,f:'DANE (est.)'},16:{v:8,f:'Comp. para Educar (est.)'},17:{v:65,f:'Comp. para Educar (est.)'},18:{v:55,f:'DANE (est.)'},19:{v:2.8,f:'Numbeo (est.)'},20:{v:4,f:'OpenStreetMap'},21:{v:32,f:'Numbeo (est.)'},22:{v:1,f:'MinSalud (est.)'},23:{v:62,f:'MinTIC (est.)'},24:{v:1,f:'Alcaldía Leticia (est.)'},25:{v:0.5,f:'Banco República'},26:{v:0,f:'WCCD'},27:{v:15,f:'Alcaldía Leticia (est.)'},28:{v:5,f:'Datos.gov.co (est.)'},29:{v:28,f:'Policía Amazonas (est.)'},30:{v:0,f:'N/A'},31:{v:65,f:'SSPD (est.)'},32:{v:8.0,f:'SINCHI (est.)'},33:{v:12,f:'IQAir (est.)'},34:{v:2,f:'SINCHI/IDEAM (est.)'},35:{v:2,f:'IDEAM (est.)'},36:{v:0.5,f:'UPME (est.)'}},
+  pacaraima:  {1:{v:14,f:'Receita Federal (est.)'},2:{v:385000,f:'Polícia Federal (est.)'},3:{v:80,f:'IBGE (est.)'},4:{v:3,f:'Polícia Federal (est.)'},5:{v:1,f:'Receita Federal (est.)'},6:{v:48,f:'ACNUR Brasil (est.)'},7:{v:0,f:'CB Insights'},8:{v:124,f:'World Bank'},9:{v:1200,f:'StartupBlink (est.)'},10:{v:0,f:'SEBRAE (est.)'},11:{v:10,f:'SEBRAE (est.)'},12:{v:0.1,f:'MCTI Brasil (est.)'},13:{v:25,f:'IBGE (est.)'},14:{v:16,f:'OpenStreetMap'},15:{v:195,f:'IBGE (est.)'},16:{v:15,f:'MEC Brasil (est.)'},17:{v:70,f:'MEC Brasil (est.)'},18:{v:50,f:'IBGE (est.)'},19:{v:2.3,f:'Numbeo (est.)'},20:{v:2,f:'OpenStreetMap'},21:{v:48,f:'Numbeo (est.)'},22:{v:1,f:'Min. Saúde Brasil (est.)'},23:{v:55,f:'ANATEL (est.)'},24:{v:1,f:'Pref. Pacaraima (est.)'},25:{v:1,f:'Banco Central do Brasil'},26:{v:0,f:'WCCD'},27:{v:35,f:'gov.br (est.)'},28:{v:10,f:'dados.gov.br (est.)'},29:{v:14,f:'PC Roraima (est.)'},30:{v:0,f:'N/A'},31:{v:48,f:'FUNASA (est.)'},32:{v:6.0,f:'IBGE (est.)'},33:{v:22,f:'IQAir (est.)'},34:{v:1,f:'INPA (est.)'},35:{v:1,f:'ANA Brasil (est.)'},36:{v:0.8,f:'ANEEL (est.)'}}
 };
 
-const ALL_TAB_CLS = [
+const CITIES_META = [
+  {key:'cucuta',     name:'Cúcuta',                   country:'Colombia',  flag:'🇨🇴', population:750000,  region:'Norte de Santander'},
+  {key:'sanantonio', name:'San Antonio del Táchira',   country:'Venezuela', flag:'🇻🇪', population:150000,  region:'Estado Táchira'},
+  {key:'ipiales',    name:'Ipiales',                   country:'Colombia',  flag:'🇨🇴', population:122000,  region:'Nariño'},
+  {key:'leticia',    name:'Leticia',                   country:'Colombia',  flag:'🇨🇴', population:45000,   region:'Amazonas'},
+  {key:'pacaraima',  name:'Pacaraima',                 country:'Brasil',    flag:'🇧🇷', population:18000,   region:'Roraima'}
+];
+
+const CITIES = CITIES_META.map(m => ({
+  ...m,
+  indicators: BASE_IND.map(b => ({ ...b, val: CV[m.key][b.id].v, fuente: CV[m.key][b.id].f }))
+}));
+
+// ═══════════════════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════════════════
+const DIMS = ['Frontera','Economía','Capital Humano','Cohesión Social','Gobernanza','Medio Ambiente'];
+const W    = {Frontera:0.20,Economía:0.17,'Capital Humano':0.16,'Cohesión Social':0.16,Gobernanza:0.16,'Medio Ambiente':0.15};
+const C    = {
+  Frontera:         {bg:'bg-rose-50',    text:'text-rose-700',    border:'border-rose-200',    hex:'#e11d48'},
+  Economía:         {bg:'bg-blue-50',    text:'text-blue-700',    border:'border-blue-200',    hex:'#2563eb'},
+  'Capital Humano': {bg:'bg-indigo-50',  text:'text-indigo-700',  border:'border-indigo-200',  hex:'#4f46e5'},
+  'Cohesión Social':{bg:'bg-fuchsia-50', text:'text-fuchsia-700', border:'border-fuchsia-200', hex:'#c026d3'},
+  Gobernanza:       {bg:'bg-amber-50',   text:'text-amber-700',   border:'border-amber-200',   hex:'#d97706'},
+  'Medio Ambiente': {bg:'bg-emerald-50', text:'text-emerald-700', border:'border-emerald-200', hex:'#10b981'}
+};
+const DESC = {
+  Resumen:'Consolidado general del Índice con cálculos en tiempo real.',
+  Ranking:'Top 3 ciudades según el Índice Compuesto ponderado.',
+  Comparar:'Compara el desempeño por dimensiones de dos ciudades en un radar.',
+  Formulas:'Catálogo exhaustivo con fórmulas, variables y fuentes.',
+  Frontera:'Métricas de comercio binacional, flujo migratorio e integración (Peso: 20%).',
+  Economía:'Competitividad, startups y digitalización del ecosistema local (Peso: 17%).',
+  'Capital Humano':'Educación, brecha digital e inversión en talento (Peso: 16%).',
+  'Cohesión Social':'Seguridad, inclusión, salud y acceso a redes TIC (Peso: 16%).',
+  Gobernanza:'Eficiencia gubernamental, transparencia e instituciones (Peso: 16%).',
+  'Medio Ambiente':'Métricas de sensores IoT, agua y sostenibilidad urbana (Peso: 15%).'
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// SCORING
+// ═══════════════════════════════════════════════════════════════════
+function calcScore(tipo, val, ref) {
+  if (tipo === 'neg' && val === 0) return 0;
+  if (tipo === 'pos' && ref === 0) return 0;
+  return Math.min(Math.max(tipo === 'pos' ? (val/ref)*10 : (ref/val)*10, 0), 10);
+}
+function sColor(s) { return s >= 8 ? 'text-emerald-600' : s >= 5 ? 'text-amber-500' : 'text-red-500'; }
+function dimAvgs(inds) {
+  const acc = {};
+  DIMS.forEach(d => acc[d] = {sum:0, n:0});
+  inds.forEach(i => { acc[i.dim].sum += calcScore(i.tipo, i.val, i.ref); acc[i.dim].n++; });
+  const r = {};
+  DIMS.forEach(d => r[d] = acc[d].n ? acc[d].sum / acc[d].n : 0);
+  return r;
+}
+function composite(inds) {
+  const a = dimAvgs(inds);
+  return DIMS.reduce((s, d) => s + a[d] * W[d], 0);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════
+const st = { tab:'Resumen', cityIdx:0, cmpA:0, cmpB:1, barChart:null, radarChart:null };
+
+// ═══════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════
+(function init() {
+  const sel = document.getElementById('city-selector');
+  CITIES.forEach((c, i) => {
+    const o = document.createElement('option');
+    o.value = i;
+    o.textContent = `${c.flag} ${c.name} (${c.country})`;
+    sel.appendChild(o);
+  });
+  sel.addEventListener('change', e => { st.cityIdx = +e.target.value; render(); });
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      st.tab = btn.dataset.tab;
+      setActive();
+      document.getElementById('main-scroll-area').scrollTop = 0;
+      render();
+    });
+  });
+
+  setActive();
+  render();
+})();
+
+// ═══════════════════════════════════════════════════════════════════
+// NAV ACTIVE
+// ═══════════════════════════════════════════════════════════════════
+const ALL_CLS = [
   'bg-stone-800','text-white','shadow-md',
-  'bg-stone-200','text-stone-800','shadow-inner',
   'bg-sky-100','text-sky-700','border-sky-200',
   'bg-violet-100','text-violet-700','border-violet-200',
+  'bg-stone-200','text-stone-800','shadow-inner',
   'bg-rose-50','text-rose-700','border-rose-200',
   'bg-blue-50','text-blue-700','border-blue-200',
   'bg-indigo-50','text-indigo-700','border-indigo-200',
@@ -150,215 +253,118 @@ const ALL_TAB_CLS = [
   'shadow-sm','bg-white','text-stone-600','border-transparent'
 ];
 
-const state = {
-  tab: 'Resumen',
-  cities: [], cityId: null, city: null,
-  rankings: null,
-  compareIds: ['',''],
-  compareCache: {},
-  barChart: null, radarChart: null,
-  saveTimer: null, pendingSaves: {}
-};
-
-// ── Scoring ──────────────────────────────────────────────────────
-function calcScore(tipo, val, ref) {
-  if (val === 0 && tipo === 'neg') return 0;
-  if (ref === 0 && tipo === 'pos') return 0;
-  return Math.min(Math.max(tipo === 'pos' ? (val/ref)*10 : (ref/val)*10, 0), 10);
-}
-function sColor(s) { return s >= 8 ? 'text-emerald-600' : s >= 5 ? 'text-amber-500' : 'text-red-500'; }
-function dimAvgs(inds) {
-  const a = {};
-  DIMS.forEach(d => {
-    const items = inds.filter(i => i.dim === d);
-    a[d] = items.length ? items.reduce((s,i) => s + calcScore(i.tipo,i.val,i.ref), 0) / items.length : 0;
-  });
-  return a;
-}
-function composite(avgs) { return DIMS.reduce((s,d) => s + (avgs[d]||0)*W[d], 0); }
-
-// ── UI helpers ───────────────────────────────────────────────────
-function showLoad() { document.getElementById('loading-overlay').classList.remove('hidden'); }
-function hideLoad() { document.getElementById('loading-overlay').classList.add('hidden'); }
-function toast(msg, err=false) {
-  const t = document.getElementById('save-toast');
-  t.textContent = msg;
-  t.style.background = err ? '#dc2626' : '#059669';
-  t.style.opacity = '1';
-  setTimeout(() => { t.style.opacity = '0'; }, 2800);
-}
-
-// ── Boot ─────────────────────────────────────────────────────────
-async function boot() {
-  showLoad();
-  try {
-    const res  = await fetch('/api/cities');
-    const json = await res.json();
-    if (!json.success) throw new Error(json.error);
-    state.cities = json.data;
-
-    const sel = document.getElementById('city-selector');
-    sel.innerHTML = state.cities.map(c =>
-      `<option value="${c._id}">${c.flag ? c.flag+' ' : ''}${c.name}</option>`
-    ).join('');
-
-    const cucuta = state.cities.find(c => /c[uú]cuta/i.test(c.name));
-    const first  = (cucuta || state.cities[0])?._id;
-    if (first) { sel.value = first; await loadCity(first); }
-  } catch(e) {
-    toast('Error cargando ciudades: ' + e.message, true);
-  } finally {
-    hideLoad();
-    setNavActive();
-    render();
-  }
-}
-
-async function loadCity(id) {
-  showLoad();
-  try {
-    const res  = await fetch(`/api/cities/${id}`);
-    const json = await res.json();
-    if (!json.success) throw new Error(json.error);
-    state.cityId = id;
-    state.city   = json.data;
-  } catch(e) {
-    toast('Error cargando ciudad: ' + e.message, true);
-  } finally {
-    hideLoad();
-  }
-}
-
-document.getElementById('city-selector').addEventListener('change', async e => {
-  await loadCity(e.target.value);
-  render();
-});
-
-// ── Nav ──────────────────────────────────────────────────────────
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', async e => {
-    state.tab = e.currentTarget.getAttribute('data-tab');
-    setNavActive();
-    document.getElementById('main-scroll-area').scrollTop = 0;
-    await render();
-  });
-});
-
-function setNavActive() {
+function setActive() {
   document.querySelectorAll('.tab-btn').forEach(btn => {
-    const t = btn.getAttribute('data-tab');
-    btn.classList.remove(...ALL_TAB_CLS);
-    if (t === state.tab) {
+    btn.classList.remove(...ALL_CLS);
+    const t = btn.dataset.tab;
+    if (t === st.tab) {
       if      (t === 'Resumen')  btn.classList.add('bg-stone-800','text-white','shadow-md');
-      else if (t === 'Formulas') btn.classList.add('bg-stone-200','text-stone-800','shadow-inner');
       else if (t === 'Ranking')  btn.classList.add('bg-sky-100','text-sky-700','border-sky-200','shadow-sm');
       else if (t === 'Comparar') btn.classList.add('bg-violet-100','text-violet-700','border-violet-200','shadow-sm');
+      else if (t === 'Formulas') btn.classList.add('bg-stone-200','text-stone-800','shadow-inner');
       else { const col = C[t]; btn.classList.add(col.bg, col.text, col.border, 'shadow-sm'); }
     } else {
       btn.classList.add('bg-white','text-stone-600','border-transparent');
     }
   });
-  const titles = { Resumen:'Resumen del Índice', Ranking:'Ranking Regional', Comparar:'Comparar Ciudades', Formulas:'Catálogo Analítico de Fórmulas' };
-  DIMS.forEach(d => { titles[d] = `Indicadores: ${d}`; });
-  document.getElementById('view-title').textContent = titles[state.tab] || state.tab;
-  document.getElementById('view-desc').textContent  = DESC[state.tab] || '';
+
+  const titles = {Resumen:'Resumen del Índice',Ranking:'Ranking Regional',Comparar:'Comparar Ciudades',Formulas:'Catálogo Analítico de Fórmulas'};
+  DIMS.forEach(d => titles[d] = `Indicadores: ${d}`);
+  document.getElementById('view-title').textContent = titles[st.tab] || st.tab;
+  document.getElementById('view-desc').textContent  = DESC[st.tab] || '';
+
+  const badge = document.getElementById('dim-badge');
+  if (DIMS.includes(st.tab)) {
+    const avg = dimAvgs(CITIES[st.cityIdx].indicators)[st.tab];
+    badge.classList.remove('hidden');
+    const el = document.getElementById('dim-score');
+    el.textContent = avg.toFixed(2);
+    el.className = `text-3xl font-black ${sColor(avg)}`;
+  } else {
+    badge.classList.add('hidden');
+  }
 }
 
-// ── Render ───────────────────────────────────────────────────────
-async function render() {
-  updateDimBadge();
+// ═══════════════════════════════════════════════════════════════════
+// RENDER DISPATCHER
+// ═══════════════════════════════════════════════════════════════════
+function render() {
   const cs = document.getElementById('chart-section');
-  if (['Ranking','Comparar','Formulas'].includes(state.tab)) {
+  if (['Ranking','Comparar','Formulas'].includes(st.tab)) {
     cs.style.display = 'none';
   } else {
     cs.style.display = 'block';
-    renderBarChart();
-    renderDataTable();
-    return;
+    renderBar();
   }
-  if (state.tab === 'Ranking')  { await renderRanking(); }
-  if (state.tab === 'Comparar') { renderComparar(); }
-  if (state.tab === 'Formulas') { renderFormulas(); }
+  switch (st.tab) {
+    case 'Ranking':  renderRanking();  break;
+    case 'Comparar': renderComparar(); break;
+    case 'Formulas': renderFormulas(); break;
+    default:         renderTable();
+  }
 }
 
-function updateDimBadge() {
-  const badge = document.getElementById('dim-badge');
-  const el    = document.getElementById('dim-score');
-  if (['Resumen','Formulas','Ranking','Comparar'].includes(state.tab) || !state.city) {
-    badge.classList.add('hidden'); return;
-  }
-  badge.classList.remove('hidden');
-  const avgs = dimAvgs(state.city.indicators || []);
-  const avg  = avgs[state.tab] || 0;
-  el.textContent = avg.toFixed(2);
-  el.className   = `text-3xl font-black ${sColor(avg)}`;
-}
-
-// ── Bar chart ────────────────────────────────────────────────────
-function renderBarChart() {
-  if (!state.city) return;
-  if (state.barChart) { state.barChart.destroy(); state.barChart = null; }
-  const ctx  = document.getElementById('mainChart').getContext('2d');
-  const inds = state.city.indicators || [];
+// ═══════════════════════════════════════════════════════════════════
+// BAR CHART
+// ═══════════════════════════════════════════════════════════════════
+function renderBar() {
+  const inds = CITIES[st.cityIdx].indicators;
+  if (st.barChart) { st.barChart.destroy(); st.barChart = null; }
+  const ctx = document.getElementById('mainChart').getContext('2d');
   let labels, data, bg;
-
-  if (state.tab === 'Resumen') {
+  if (st.tab === 'Resumen') {
     const avgs = dimAvgs(inds);
     labels = DIMS; data = DIMS.map(d => +avgs[d].toFixed(4)); bg = DIMS.map(d => C[d].hex);
     document.getElementById('chart-title').textContent = 'Desempeño por Dimensión (0 a 10)';
   } else {
-    const items = inds.filter(i => i.dim === state.tab);
-    labels = items.map(i => i.ind.length > 20 ? i.ind.slice(0,20)+'…' : i.ind);
-    data   = items.map(i => +calcScore(i.tipo,i.val,i.ref).toFixed(4));
-    bg     = C[state.tab].hex;
-    document.getElementById('chart-title').textContent = `${state.tab} — Indicadores (0 a 10)`;
+    const items = inds.filter(i => i.dim === st.tab);
+    labels = items.map(i => i.ind.length > 22 ? i.ind.slice(0,22)+'…' : i.ind);
+    data   = items.map(i => +calcScore(i.tipo, i.val, i.ref).toFixed(4));
+    bg     = C[st.tab].hex;
+    document.getElementById('chart-title').textContent = `${st.tab} — Indicadores (0 a 10)`;
   }
-
-  state.barChart = new Chart(ctx, {
+  st.barChart = new Chart(ctx, {
     type: 'bar',
-    data: { labels, datasets: [{ label:'Puntaje', data, backgroundColor:bg, borderRadius:4, maxBarThickness:60 }] },
+    data: { labels, datasets:[{ label:'Puntaje', data, backgroundColor:bg, borderRadius:4, maxBarThickness:60 }] },
     options: {
       responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{ display:false } },
-      scales:{
-        y:{ beginAtZero:true, max:10, grid:{ color:'#f5f5f4' } },
-        x:{ grid:{ display:false }, ticks:{ maxRotation:45 } }
-      }
+      scales:{ y:{ beginAtZero:true, max:10, grid:{ color:'#f5f5f4' } }, x:{ grid:{ display:false }, ticks:{ maxRotation:45 } } }
     }
   });
 }
 
-// ── Data table ───────────────────────────────────────────────────
-function renderDataTable() {
+// ═══════════════════════════════════════════════════════════════════
+// TABLE — Resumen + dimensiones
+// ═══════════════════════════════════════════════════════════════════
+function renderTable() {
+  const city = CITIES[st.cityIdx];
+  const inds = city.indicators;
   document.getElementById('table-header').style.display = 'flex';
   const container = document.getElementById('data-container');
   const titleEl   = document.getElementById('table-title');
-  if (!state.city) { container.innerHTML = '<div class="p-8 text-center text-stone-400">Sin datos</div>'; return; }
-  const inds = state.city.indicators || [];
 
-  if (state.tab === 'Resumen') {
+  if (st.tab === 'Resumen') {
     const avgs  = dimAvgs(inds);
-    const total = composite(avgs);
-    titleEl.innerHTML = `&#x1F4CA; Consolidado &mdash; ${state.city.flag||''} ${state.city.name}`;
-
+    const total = composite(inds);
+    titleEl.innerHTML = `&#x1F4CA; Consolidado &mdash; ${city.flag} ${city.name}`;
     let html = `<table class="w-full text-left border-collapse min-w-[600px]">
       <thead><tr class="bg-stone-100 text-stone-500 text-[11px] uppercase tracking-wider font-semibold border-b border-stone-200">
         <th class="px-6 py-4">Dimensión</th>
-        <th class="px-6 py-4 text-center">N° Ind.</th>
-        <th class="px-6 py-4 text-right">Promedio (0-10)</th>
-        <th class="px-6 py-4 text-center">Peso (%)</th>
-        <th class="px-6 py-4 text-right">Puntaje Ponderado</th>
+        <th class="px-5 py-4 text-center">Inds.</th>
+        <th class="px-5 py-4 text-right">Promedio (0-10)</th>
+        <th class="px-5 py-4 text-center">Peso</th>
+        <th class="px-5 py-4 text-right">Puntaje Ponderado</th>
       </tr></thead><tbody class="text-sm">`;
-
     DIMS.forEach(dim => {
-      const n = inds.filter(d => d.dim === dim).length;
+      const n = inds.filter(i => i.dim === dim).length;
       const avg = avgs[dim]; const w = W[dim];
       html += `<tr class="border-b border-stone-100 hover:bg-stone-50">
         <td class="px-6 py-4 font-bold text-stone-700">${dim}</td>
-        <td class="px-6 py-4 text-center text-stone-500">${n}</td>
-        <td class="px-6 py-4 text-right font-mono ${sColor(avg)} font-bold text-lg">${avg.toFixed(4)}</td>
-        <td class="px-6 py-4 text-center text-stone-500 font-bold">${(w*100)}%</td>
-        <td class="px-6 py-4 text-right font-mono font-bold text-stone-700 text-lg">${(avg*w).toFixed(4)}</td>
+        <td class="px-5 py-4 text-center text-stone-500">${n}</td>
+        <td class="px-5 py-4 text-right font-mono ${sColor(avg)} font-bold text-lg">${avg.toFixed(4)}</td>
+        <td class="px-5 py-4 text-center text-stone-500 font-bold">${(w*100)}%</td>
+        <td class="px-5 py-4 text-right font-mono font-bold text-stone-700 text-lg">${(avg*w).toFixed(4)}</td>
       </tr>`;
     });
     html += `<tr class="bg-stone-800 text-white font-bold border-t-4 border-emerald-500">
@@ -366,38 +372,31 @@ function renderDataTable() {
       <td class="px-6 py-5 text-right font-mono text-emerald-400 text-3xl">${total.toFixed(4)}</td>
     </tr></tbody></table>`;
     container.innerHTML = html;
-
   } else {
-    titleEl.innerHTML = `Ingreso de Datos: ${state.tab}`;
-    const items = inds.filter(d => d.dim === state.tab);
-    let html = `<table class="w-full text-left border-collapse min-w-[900px]">
+    titleEl.innerHTML = `Indicadores: ${st.tab}`;
+    const items = inds.filter(i => i.dim === st.tab);
+    let html = `<table class="w-full text-left border-collapse min-w-[820px]">
       <thead><tr class="bg-stone-100 text-stone-500 text-[10px] uppercase tracking-wider font-semibold border-b border-stone-200">
         <th class="px-6 py-4">Indicador</th>
         <th class="px-4 py-4 text-center">Tipo</th>
         <th class="px-4 py-4 text-right">Ref. Óptima</th>
-        <th class="px-6 py-4">Valor (Editar)</th>
+        <th class="px-5 py-4 text-right">Valor Actual</th>
         <th class="px-6 py-4 text-right">Puntaje</th>
       </tr></thead><tbody class="text-sm">`;
-
     items.forEach(item => {
       const score = calcScore(item.tipo, item.val, item.ref);
       const arrow = item.tipo === 'pos'
-        ? '<span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-xs font-bold">Positivo ↑</span>'
-        : '<span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-bold">Negativo ↓</span>';
+        ? '<span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded text-xs font-bold">Positivo ↑</span>'
+        : '<span class="px-2 py-0.5 bg-red-100 text-red-700 rounded text-xs font-bold">Negativo ↓</span>';
       html += `<tr class="border-b border-stone-100 hover:bg-stone-50">
         <td class="px-6 py-4">
           <div class="font-bold text-stone-800">${item.ind}</div>
-          <div class="text-[10px] text-stone-400 mt-1 uppercase">Fuente: ${item.fuente}</div>
+          <div class="text-[10px] text-stone-400 mt-0.5 uppercase">Fuente: ${item.fuente}</div>
         </td>
         <td class="px-4 py-4 text-center">${arrow}</td>
         <td class="px-4 py-4 text-right font-mono text-stone-500">${item.ref}</td>
-        <td class="px-6 py-4">
-          <input type="number" step="any" value="${item.val}" oninput="onValueChange(${item.id}, this.value)"
-            class="w-full max-w-[120px] px-3 py-2 border border-stone-300 rounded-lg text-right font-mono focus:ring-2 focus:ring-stone-500 outline-none bg-white text-stone-800 shadow-inner">
-        </td>
-        <td class="px-6 py-4 text-right font-mono text-xl">
-          <span id="score-${item.id}" class="font-bold ${sColor(score)}">${score.toFixed(2)}</span>
-        </td>
+        <td class="px-5 py-4 text-right font-mono text-stone-700 font-bold">${item.val}</td>
+        <td class="px-6 py-4 text-right font-mono text-xl font-bold ${sColor(score)}">${score.toFixed(2)}</td>
       </tr>`;
     });
     html += `</tbody></table>`;
@@ -405,75 +404,42 @@ function renderDataTable() {
   }
 }
 
-window.onValueChange = function(id, raw) {
-  const val = parseFloat(raw) || 0;
-  const ind = state.city?.indicators?.find(i => i.id === id);
-  if (!ind) return;
-  ind.val = val;
-  const s = calcScore(ind.tipo, val, ind.ref);
-  const el = document.getElementById(`score-${id}`);
-  if (el) { el.textContent = s.toFixed(2); el.className = `font-bold ${sColor(s)}`; }
-  renderBarChart();
-  updateDimBadge();
-  state.pendingSaves[id] = val;
-  clearTimeout(state.saveTimer);
-  state.saveTimer = setTimeout(flushSaves, 800);
-};
-
-async function flushSaves() {
-  if (!state.cityId || !Object.keys(state.pendingSaves).length) return;
-  const updates = Object.entries(state.pendingSaves).map(([id, val]) => ({ id:+id, val }));
-  state.pendingSaves = {};
-  try {
-    const res  = await fetch(`/api/indicators/${state.cityId}`, {
-      method:'PUT', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ updates })
-    });
-    const json = await res.json();
-    if (!json.success) throw new Error(json.error);
-    toast('✓ Guardado en MongoDB');
-  } catch(e) {
-    toast('Error guardando: ' + e.message, true);
-  }
-}
-
-// ── Ranking ──────────────────────────────────────────────────────
-async function renderRanking() {
+// ═══════════════════════════════════════════════════════════════════
+// RANKING — top 3 por puntaje compuesto
+// ═══════════════════════════════════════════════════════════════════
+function renderRanking() {
   document.getElementById('table-header').style.display = 'none';
   const container = document.getElementById('data-container');
-  container.innerHTML = '<div class="p-12 text-center text-stone-400">Cargando ranking…</div>';
 
-  if (!state.rankings) {
-    try {
-      const res  = await fetch('/api/rankings');
-      const json = await res.json();
-      if (!json.success) throw new Error(json.error);
-      state.rankings = json.data;
-    } catch(e) {
-      container.innerHTML = `<div class="p-12 text-center text-red-500">Error: ${e.message}</div>`;
-      return;
-    }
-  }
+  const ranked = CITIES
+    .map(c => ({ ...c, score: composite(c.indicators), avgs: dimAvgs(c.indicators) }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3);
 
-  const medals   = ['🥇','🥈','🥉'];
-  const cardBg   = ['from-yellow-50 to-amber-50 border-amber-200','from-slate-50 to-stone-100 border-stone-200','from-orange-50 to-amber-50 border-amber-100'];
-  const numColor = ['text-amber-600','text-slate-500','text-amber-700'];
+  const medals = ['🥇','🥈','🥉'];
+  const cardBg = [
+    'from-yellow-50 to-amber-50 border-amber-200',
+    'from-slate-50 to-stone-100 border-stone-200',
+    'from-orange-50 to-amber-50 border-amber-100'
+  ];
+  const numCol = ['text-amber-600','text-slate-500','text-amber-700'];
 
-  let html = `<div class="p-8">
-    <div class="text-center mb-8">
+  let html = `<div class="p-7">
+    <div class="text-center mb-7">
       <h2 class="text-3xl font-black text-stone-800">&#x1F3C6; Ranking de Ciudades Inteligentes</h2>
-      <p class="text-stone-500 mt-2 text-sm">Top 3 ciudades — región fronteriza Colombia · Venezuela · Brasil</p>
-    </div><div class="space-y-5">`;
+      <p class="text-stone-500 mt-2 text-sm">Top 3 · región fronteriza Colombia · Venezuela · Brasil</p>
+    </div>
+    <div class="space-y-5">`;
 
-  state.rankings.forEach((city, i) => {
-    const dimBars = DIMS.map(dim => {
-      const s = city.dimScores?.[dim] ?? 0;
+  ranked.forEach((city, i) => {
+    const bars = DIMS.map(dim => {
+      const s = city.avgs[dim];
       return `<div class="flex items-center gap-2 text-xs">
         <span class="w-28 text-stone-500 truncate">${dim}</span>
         <div class="flex-1 bg-stone-100 rounded-full h-1.5">
           <div class="h-1.5 rounded-full" style="width:${((s/10)*100).toFixed(1)}%;background:${C[dim].hex}"></div>
         </div>
-        <span class="w-8 text-right font-mono font-bold ${sColor(s)}">${s.toFixed(1)}</span>
+        <span class="w-9 text-right font-mono font-bold ${sColor(s)}">${s.toFixed(1)}</span>
       </div>`;
     }).join('');
 
@@ -482,18 +448,18 @@ async function renderRanking() {
         <div class="flex items-center gap-4">
           <span class="text-5xl leading-none">${medals[i]}</span>
           <div>
-            <div class="text-4xl leading-none mb-1">${city.flag||''}</div>
+            <div class="text-4xl leading-none mb-1">${city.flag}</div>
             <div class="text-xl font-black text-stone-800">${city.name}</div>
-            <div class="text-sm text-stone-500">${city.country||''}</div>
+            <div class="text-sm text-stone-500">${city.country} · ${city.region}</div>
           </div>
         </div>
         <div class="text-right">
           <div class="text-[10px] uppercase tracking-widest text-stone-400 font-bold">Índice Compuesto</div>
-          <div class="text-5xl font-black ${numColor[i]} leading-none mt-1">${city.compositeScore.toFixed(2)}</div>
+          <div class="text-5xl font-black ${numCol[i]} leading-none mt-1">${city.score.toFixed(2)}</div>
           <div class="text-xs text-stone-400 mt-1">/ 10.00</div>
         </div>
       </div>
-      <div class="mt-5 pt-4 border-t border-stone-200/70 space-y-2">${dimBars}</div>
+      <div class="mt-5 pt-4 border-t border-stone-200/70 space-y-2">${bars}</div>
     </div>`;
   });
 
@@ -501,157 +467,124 @@ async function renderRanking() {
   container.innerHTML = html;
 }
 
-// ── Comparar ─────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+// COMPARAR — radar + tabla de dimensiones
+// ═══════════════════════════════════════════════════════════════════
 function renderComparar() {
   document.getElementById('table-header').style.display = 'none';
   const container = document.getElementById('data-container');
-  const opts = state.cities.map(c =>
-    `<option value="${c._id}">${c.flag||''} ${c.name}</option>`
-  ).join('');
+  const opts = CITIES.map((c,i) => `<option value="${i}">${c.flag} ${c.name}</option>`).join('');
 
-  container.innerHTML = `<div class="p-8">
-    <div class="flex flex-col md:flex-row gap-4 mb-8 items-end">
+  container.innerHTML = `<div class="p-6">
+    <div class="flex flex-col md:flex-row gap-4 mb-7 items-end">
       <div class="flex-1">
         <label class="block text-[10px] uppercase tracking-widest text-stone-400 font-bold mb-2">Ciudad A</label>
-        <select id="cmp-1" onchange="onCmp(0,this.value)"
-          class="w-full px-4 py-3 rounded-xl border border-blue-300 text-stone-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 font-medium">
-          <option value="">— Seleccionar —</option>${opts}
-        </select>
+        <select id="cmp-a" class="w-full px-4 py-3 rounded-xl border border-blue-300 text-stone-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 font-medium">${opts}</select>
       </div>
       <div class="pb-3 text-stone-300 text-2xl font-light hidden md:block">vs</div>
       <div class="flex-1">
         <label class="block text-[10px] uppercase tracking-widest text-stone-400 font-bold mb-2">Ciudad B</label>
-        <select id="cmp-2" onchange="onCmp(1,this.value)"
-          class="w-full px-4 py-3 rounded-xl border border-rose-300 text-stone-700 bg-white focus:outline-none focus:ring-2 focus:ring-rose-400 font-medium">
-          <option value="">— Seleccionar —</option>${opts}
-        </select>
+        <select id="cmp-b" class="w-full px-4 py-3 rounded-xl border border-rose-300 text-stone-700 bg-white focus:outline-none focus:ring-2 focus:ring-rose-400 font-medium">${opts}</select>
       </div>
     </div>
-    <div id="cmp-content">
-      <div class="text-center py-16 text-stone-400 text-sm">Selecciona dos ciudades para comparar</div>
-    </div>
+    <div id="cmp-content"></div>
   </div>`;
 
-  const [id1, id2] = state.compareIds;
-  if (id1) document.getElementById('cmp-1').value = id1;
-  if (id2) document.getElementById('cmp-2').value = id2;
-  if (id1 && id2) triggerComparison();
+  document.getElementById('cmp-a').value = st.cmpA;
+  document.getElementById('cmp-b').value = st.cmpB;
+  document.getElementById('cmp-a').addEventListener('change', e => { st.cmpA = +e.target.value; updateComparar(); });
+  document.getElementById('cmp-b').addEventListener('change', e => { st.cmpB = +e.target.value; updateComparar(); });
+  updateComparar();
 }
 
-window.onCmp = async function(idx, val) {
-  state.compareIds[idx] = val;
-  if (state.compareIds[0] && state.compareIds[1]) await triggerComparison();
-};
-
-async function triggerComparison() {
-  const [id1, id2] = state.compareIds;
-  if (!id1 || !id2) return;
-  const content = document.getElementById('cmp-content');
-  if (content) content.innerHTML = '<div class="text-center py-8 text-stone-400">Cargando datos…</div>';
-
-  for (const id of [id1, id2]) {
-    if (!state.compareCache[id]) {
-      try {
-        const res  = await fetch(`/api/cities/${id}`);
-        const json = await res.json();
-        if (!json.success) throw new Error(json.error);
-        state.compareCache[id] = json.data;
-      } catch(e) {
-        if (content) content.innerHTML = `<div class="text-center py-8 text-red-500">Error: ${e.message}</div>`;
-        return;
-      }
-    }
-  }
-
-  const c1 = state.compareCache[id1];
-  const c2 = state.compareCache[id2];
-  const s1 = dimAvgs(c1.indicators || []);
-  const s2 = dimAvgs(c2.indicators || []);
-  const t1 = composite(s1), t2 = composite(s2);
-  const winner = t1 >= t2 ? 1 : 2;
+function updateComparar() {
+  const ca  = CITIES[st.cmpA];
+  const cb  = CITIES[st.cmpB];
+  const s1  = dimAvgs(ca.indicators);
+  const s2  = dimAvgs(cb.indicators);
+  const t1  = composite(ca.indicators);
+  const t2  = composite(cb.indicators);
+  const win = t1 >= t2 ? 1 : 2;
+  const cnt = document.getElementById('cmp-content');
+  if (!cnt) return;
 
   const rows = DIMS.map(dim => {
-    const v1 = s1[dim]||0, v2 = s2[dim]||0;
-    const win = v1 > v2 ? 1 : v2 > v1 ? 2 : 0;
+    const v1 = s1[dim], v2 = s2[dim];
+    const w  = v1 > v2 ? 1 : v2 > v1 ? 2 : 0;
     return `<tr class="border-b border-stone-100 hover:bg-stone-50">
       <td class="px-5 py-3 text-sm font-medium text-stone-600">${dim}</td>
-      <td class="px-5 py-3 text-right font-mono font-bold text-lg ${win===1?'text-blue-600':'text-stone-400'}">${v1.toFixed(2)}</td>
-      <td class="px-3 py-3 text-center text-stone-300 text-xs">${win===1?'◀':win===2?'▶':'—'}</td>
-      <td class="px-5 py-3 text-left font-mono font-bold text-lg ${win===2?'text-rose-600':'text-stone-400'}">${v2.toFixed(2)}</td>
+      <td class="px-5 py-3 text-right font-mono font-bold text-lg ${w===1?'text-blue-600':'text-stone-400'}">${v1.toFixed(2)}</td>
+      <td class="px-3 py-3 text-center text-stone-300 text-xs">${w===1?'◀':w===2?'▶':'—'}</td>
+      <td class="px-5 py-3 text-left  font-mono font-bold text-lg ${w===2?'text-rose-600':'text-stone-400'}">${v2.toFixed(2)}</td>
     </tr>`;
   }).join('');
 
-  if (content) {
-    content.innerHTML = `<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div class="bg-stone-50 rounded-2xl border border-stone-200 p-5">
-        <h4 class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-4">Radar de Dimensiones</h4>
-        <div style="position:relative;height:300px;"><canvas id="radar-cv"></canvas></div>
+  cnt.innerHTML = `<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="bg-stone-50 rounded-2xl border border-stone-200 p-5">
+      <h4 class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-4">Radar de Dimensiones</h4>
+      <div style="position:relative;height:300px;"><canvas id="radar-cv"></canvas></div>
+    </div>
+    <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden">
+      <div class="px-5 py-3 bg-stone-50 border-b border-stone-200 flex justify-between text-sm font-bold">
+        <span class="text-blue-600">${ca.flag} ${ca.name}</span>
+        <span class="text-rose-600">${cb.flag} ${cb.name}</span>
       </div>
-      <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden">
-        <div class="px-5 py-3 bg-stone-50 border-b border-stone-200 flex justify-between text-sm font-bold">
-          <span class="text-blue-600">${c1.flag||''} ${c1.name}</span>
-          <span class="text-rose-600">${c2.flag||''} ${c2.name}</span>
-        </div>
-        <table class="w-full"><tbody>${rows}</tbody>
-          <tfoot><tr class="bg-stone-800 text-white">
-            <td class="px-5 py-4 text-[10px] uppercase tracking-widest font-bold">Índice Compuesto</td>
-            <td class="px-5 py-4 text-right font-mono text-xl ${winner===1?'text-emerald-400 font-black':'text-stone-400'}">${t1.toFixed(2)}</td>
-            <td class="px-3 py-4 text-center">${winner===1?'🏆':''}</td>
-            <td class="px-5 py-4 text-left font-mono text-xl ${winner===2?'text-emerald-400 font-black':'text-stone-400'}">${t2.toFixed(2)}</td>
-          </tr></tfoot>
-        </table>
-      </div>
-    </div>`;
+      <table class="w-full"><tbody>${rows}</tbody>
+        <tfoot><tr class="bg-stone-800 text-white">
+          <td class="px-5 py-4 text-[10px] uppercase tracking-widest font-bold">Índice Compuesto</td>
+          <td class="px-5 py-4 text-right font-mono text-xl ${win===1?'text-emerald-400 font-black':'text-stone-400'}">${t1.toFixed(2)}</td>
+          <td class="px-3 py-4 text-center">${win===1?'🏆':''}</td>
+          <td class="px-5 py-4 text-left  font-mono text-xl ${win===2?'text-emerald-400 font-black':'text-stone-400'}">${t2.toFixed(2)}</td>
+        </tr></tfoot>
+      </table>
+    </div>
+  </div>`;
 
-    if (state.radarChart) { state.radarChart.destroy(); state.radarChart = null; }
-    state.radarChart = new Chart(document.getElementById('radar-cv').getContext('2d'), {
-      type: 'radar',
-      data: {
-        labels: DIMS,
-        datasets: [
-          { label:`${c1.flag||''} ${c1.name}`, data:DIMS.map(d => +(s1[d]||0).toFixed(2)),
-            backgroundColor:'rgba(37,99,235,0.12)', borderColor:'#2563eb', pointBackgroundColor:'#2563eb', borderWidth:2, pointRadius:3 },
-          { label:`${c2.flag||''} ${c2.name}`, data:DIMS.map(d => +(s2[d]||0).toFixed(2)),
-            backgroundColor:'rgba(225,29,72,0.12)', borderColor:'#e11d48', pointBackgroundColor:'#e11d48', borderWidth:2, pointRadius:3 }
-        ]
-      },
-      options: {
-        responsive:true, maintainAspectRatio:false,
-        scales:{ r:{ min:0, max:10, ticks:{ stepSize:2, font:{size:9} }, pointLabels:{ font:{size:10} } } },
-        plugins:{ legend:{ position:'bottom', labels:{ font:{size:11}, padding:12 } } }
-      }
-    });
-  }
+  if (st.radarChart) { st.radarChart.destroy(); st.radarChart = null; }
+  st.radarChart = new Chart(document.getElementById('radar-cv').getContext('2d'), {
+    type: 'radar',
+    data: {
+      labels: DIMS,
+      datasets: [
+        { label:`${ca.flag} ${ca.name}`, data:DIMS.map(d => +(s1[d]).toFixed(2)),
+          backgroundColor:'rgba(37,99,235,0.12)', borderColor:'#2563eb', pointBackgroundColor:'#2563eb', borderWidth:2, pointRadius:3 },
+        { label:`${cb.flag} ${cb.name}`, data:DIMS.map(d => +(s2[d]).toFixed(2)),
+          backgroundColor:'rgba(225,29,72,0.12)',  borderColor:'#e11d48', pointBackgroundColor:'#e11d48', borderWidth:2, pointRadius:3 }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      scales:{ r:{ min:0, max:10, ticks:{ stepSize:2, font:{size:9} }, pointLabels:{ font:{size:10} } } },
+      plugins:{ legend:{ position:'bottom', labels:{ font:{size:11}, padding:12 } } }
+    }
+  });
 }
 
-// ── Formulas ─────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+// FORMULAS
+// ═══════════════════════════════════════════════════════════════════
 function renderFormulas() {
   document.getElementById('table-header').style.display = 'none';
   const container = document.getElementById('data-container');
-  if (!state.city) { container.innerHTML = '<div class="p-8 text-center text-stone-400">Sin datos de ciudad</div>'; return; }
-  const inds = state.city.indicators || [];
   let body = '';
-
   DIMS.forEach(dim => {
-    const items = inds.filter(d => d.dim === dim);
-    if (!items.length) return;
-    const col = C[dim];
+    const items = BASE_IND.filter(b => b.dim === dim);
+    const col   = C[dim];
     let cards = '';
     items.forEach(item => {
       const badge = item.tipo === 'pos'
         ? '<span class="text-[10px] px-2 py-0.5 rounded font-bold border bg-emerald-100 text-emerald-800 border-emerald-200 whitespace-nowrap">Positivo ↑</span>'
         : '<span class="text-[10px] px-2 py-0.5 rounded font-bold border bg-red-100 text-red-800 border-red-200 whitespace-nowrap">Negativo ↓</span>';
-      cards += `<div class="bg-stone-50 p-5 rounded-xl border border-stone-200 flex flex-col">
-        <div class="flex justify-between items-start mb-3">
-          <strong class="text-stone-800 text-base pr-2 leading-tight">${item.ind}</strong>${badge}
+      cards += `<div class="bg-stone-50 p-4 rounded-xl border border-stone-200">
+        <div class="flex justify-between items-start mb-2 gap-2">
+          <strong class="text-stone-800 text-sm leading-tight">${item.ind}</strong>${badge}
         </div>
-        <code class="block bg-stone-800 text-emerald-400 p-3 rounded-lg font-mono text-sm mb-3 tracking-wide">${item.form}</code>
-        ${item.vars ? `<div class="${col.bg} p-3 rounded-lg border ${col.border} mb-3">
+        <code class="block bg-stone-800 text-emerald-400 px-3 py-2 rounded-lg font-mono text-sm mb-2">${item.form}</code>
+        ${item.vars ? `<div class="${col.bg} p-2.5 rounded-lg border ${col.border} mb-2">
           <p class="font-bold ${col.text} text-[10px] uppercase tracking-widest mb-1">&#x1F50D; Variables</p>
           <p class="text-xs text-stone-700 leading-relaxed">${item.vars}</p>
         </div>` : ''}
-        <p class="text-stone-600 text-sm leading-relaxed mb-3 flex-1">${item.desc}</p>
-        <p class="text-stone-400 text-xs border-t border-stone-200 pt-2"><strong>Fuente:</strong> ${item.fuente}</p>
+        <p class="text-stone-600 text-sm leading-relaxed">${item.desc}</p>
       </div>`;
     });
     body += `<div class="bg-white p-5 rounded-xl border ${col.border} shadow-sm mb-5">
@@ -659,18 +592,13 @@ function renderFormulas() {
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">${cards}</div>
     </div>`;
   });
-
-  container.innerHTML = `<div class="p-8 bg-white">
-    <div class="mb-8 text-center max-w-3xl mx-auto">
-      <h2 class="text-3xl font-black text-stone-800 mb-3">&#x1F4D0; Catálogo Analítico de Fórmulas</h2>
-      <p class="text-stone-500">Formulación matemática, definición de variables y fuente de los ${inds.length} indicadores.</p>
+  container.innerHTML = `<div class="p-7 bg-white">
+    <div class="mb-7 text-center max-w-3xl mx-auto">
+      <h2 class="text-3xl font-black text-stone-800 mb-2">&#x1F4D0; Catálogo Analítico de Fórmulas</h2>
+      <p class="text-stone-500 text-sm">Formulación matemática, definición de variables y fuente de los ${BASE_IND.length} indicadores.</p>
     </div>${body}
   </div>`;
 }
-
-// ── Init ─────────────────────────────────────────────────────────
-setNavActive();
-boot();
 </script>
 </body>
 </html>
