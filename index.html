@@ -49,7 +49,7 @@
   </nav>
 
   <div class="px-4 py-3 bg-stone-50 border-t border-stone-200 text-xs text-stone-500 text-center flex-shrink-0">
-    Datos embebidos · 5 ciudades · 36 indicadores
+    Datos embebidos · 5 ciudades · 60 indicadores
   </div>
 </aside>
 
@@ -96,59 +96,83 @@
 
 <script>
 // ═══════════════════════════════════════════════════════════════════
-// DATA — embebido desde lib/cities-data.js
+// DATA — 60 indicadores · 6 dimensiones · 5 ciudades
 // ═══════════════════════════════════════════════════════════════════
 const BASE_IND = [
-  // FRONTERA 20%
-  {id:1, dim:'Frontera',       ind:'Volumen Comercio Transfronterizo',  tipo:'pos',ref:500,     form:'V_com = Σ (Exp + Imp)',               vars:'<b>V_com:</b> Volumen de comercio transfronterizo.<br><b>Exp:</b> Exportaciones (USD).<br><b>Imp:</b> Importaciones (USD).',                                                desc:'Millones de USD por año. Valor total del comercio formal en el paso fronterizo.'},
-  {id:2, dim:'Frontera',       ind:'Flujo Migratorio Formal',           tipo:'pos',ref:3000000, form:'F_mig = Σ Cruces_reg',                vars:'<b>F_mig:</b> Flujo migratorio formal.<br><b>Cruces_reg:</b> Tránsitos validados por puestos de control migratorio.',                                                            desc:'Número de cruces de frontera registrados formalmente por año.'},
-  {id:3, dim:'Frontera',       ind:'Tasa Informalidad Migrante',        tipo:'neg',ref:60,      form:'Inf = (P_inf / P_mig_act) * 100',     vars:'<b>Inf:</b> Tasa de informalidad.<br><b>P_inf:</b> Migrantes sin contrato.<br><b>P_mig_act:</b> Población migrante económicamente activa.',                                    desc:'Porcentaje de migrantes en situación de empleo informal.'},
-  {id:4, dim:'Frontera',       ind:'Trazabilidad Biométrica',           tipo:'pos',ref:10,      form:'T_bio = (P_bio / P_ctrl) * 10',       vars:'<b>T_bio:</b> Índice de trazabilidad.<br><b>P_bio:</b> Puestos con biometría activa.<br><b>P_ctrl:</b> Puestos fronterizos totales.',                                           desc:'Puntos de control equipados con sistemas biométricos para registro.'},
-  {id:5, dim:'Frontera',       ind:'Plataformas Comercio Digital',      tipo:'pos',ref:5,       form:'P_dig = Σ Apps_Aduanas',              vars:'<b>P_dig:</b> Plataformas digitales activas.<br><b>Apps_Aduanas:</b> Sistemas VUCE o aduanas web operativas.',                                                                  desc:'Plataformas digitales activas para facilitar intercambio comercial.'},
-  {id:6, dim:'Frontera',       ind:'Migrantes con PPT Digital',         tipo:'pos',ref:100,     form:'PPT = (M_ppt / M_tot) * 100',         vars:'<b>PPT:</b> Permiso de Protección Temporal.<br><b>M_ppt:</b> Migrantes regularizados.<br><b>M_tot:</b> Total migrantes censados.',                                              desc:'Porcentaje de migrantes con permiso de protección temporal activo.'},
-  // ECONOMÍA 17%
-  {id:7, dim:'Economía',       ind:'Empresas Unicornio',                tipo:'pos',ref:2,       form:'U_val = Startups ≥ $10^9 USD',        vars:'<b>U_val:</b> Empresas Unicornio locales.',                                                                                                                                     desc:'Startups con valor de mercado ≥ USD 1.000 millones.'},
-  {id:8, dim:'Economía',       ind:'Facilidad abrir empresa (Ranking)', tipo:'neg',ref:50,      form:'R_biz = Posición_Global',             vars:'<b>R_biz:</b> Ranking Doing Business o equivalente.',                                                                                                                           desc:'Posición global en facilidad para hacer negocios (menor es mejor).'},
-  {id:9, dim:'Economía',       ind:'Índice Global Ecosistemas Startup', tipo:'neg',ref:200,     form:'Rank_eco = Puesto_Mundial',           vars:'<b>Rank_eco:</b> Startup Ecosystem Benchmark.',                                                                                                                                  desc:'Posición de la ciudad en el ranking global de ecosistemas startup.'},
-  {id:10,dim:'Economía',       ind:'Startups Tecnológicas Activas',     tipo:'pos',ref:20,      form:'S_act = Σ Emp_TIC_validas',           vars:'<b>S_act:</b> Startups activas con producto validado.',                                                                                                                          desc:'Startups con producto validado y operando en el mercado.'},
-  {id:11,dim:'Economía',       ind:'Comercio Electrónico (%)',          tipo:'pos',ref:40,      form:'E_com = (V_web / V_tot) * 100',       vars:'<b>E_com:</b> Adopción de E-commerce.<br><b>V_web:</b> Empresas con canales digitales.<br><b>V_tot:</b> Empresas registradas.',                                                 desc:'Empresas que realizan ventas por canales digitales.'},
-  {id:12,dim:'Economía',       ind:'Inversión en I+D+TIC (% PIB)',      tipo:'pos',ref:2,       form:'I_D = (Inv_tech / PIB) * 100',        vars:'<b>I_D:</b> Inversión en I+D+i.<br><b>Inv_tech:</b> Capital en innovación.<br><b>PIB:</b> Producto Interno Bruto municipal.',                                                  desc:'Porcentaje del PIB local destinado a innovación y tecnología.'},
-  // CAPITAL HUMANO 16%
-  {id:13,dim:'Capital Humano', ind:'Población con Educ. Superior (%)', tipo:'pos',ref:80,      form:'E_sup = (P_grad / P_tot) * 100',      vars:'<b>E_sup:</b> Educación superior/técnica.<br><b>P_grad:</b> Personas con título post-secundaria.',                                                                               desc:'Proporción de la población con educación secundaria y superior.'},
-  {id:14,dim:'Capital Humano', ind:'Total Escuelas',                    tipo:'pos',ref:500,     form:'Esc = Σ (Públicas + Privadas)',       vars:'<b>Esc:</b> Inventario escolar georeferenciado.',                                                                                                                                desc:'Cantidad de escuelas públicas y privadas mapeadas en la ciudad.'},
-  {id:15,dim:'Capital Humano', ind:'Gasto Privado en Educación (USD)', tipo:'pos',ref:800,     form:'G_edu = Σ G_hogares / Pob',           vars:'<b>G_edu:</b> Gasto per cápita en educación.<br><b>G_hogares:</b> Inversión familiar anual.',                                                                                    desc:'Gasto privado anual en educación per cápita estimado en USD.'},
-  {id:16,dim:'Capital Humano', ind:'Laboratorios TIC en Escuelas',     tipo:'pos',ref:60,      form:'Lab_tic = (Esc_lab / Esc_tot) * 100', vars:'<b>Lab_tic:</b> Laboratorios de tecnología.<br><b>Esc_lab:</b> Colegios con cómputo o robótica.',                                                                               desc:'Colegios con salas dotadas de computadores o robótica (%).'},
-  {id:17,dim:'Capital Humano', ind:'Conectividad Escolar (%)',          tipo:'pos',ref:100,     form:'C_esc = (Esc_net / Esc_tot) * 100',  vars:'<b>C_esc:</b> Conectividad escolar.<br><b>Esc_net:</b> Instituciones con internet de banda ancha.',                                                                               desc:'Instituciones educativas con conexión a internet activa.'},
-  {id:18,dim:'Capital Humano', ind:'Brecha Digital Estudiantil (%)',   tipo:'neg',ref:5,       form:'B_dig = (Est_0_pc / Est_tot) * 100',  vars:'<b>B_dig:</b> Brecha digital.<br><b>Est_0_pc:</b> Estudiantes sin computador ni tablet en casa.',                                                                                desc:'Estudiantes sin computador ni tablet en casa (%).'},
-  // COHESIÓN SOCIAL 16%
-  {id:19,dim:'Cohesión Social', ind:'Ciudad Amigable con Mujeres',     tipo:'pos',ref:4.5,     form:'C_amig = x̄(Índices_seguridad)',       vars:'<b>C_amig:</b> Score de ciudad amigable/segura (media de encuestas internacionales).',                                                                                           desc:'Score de 1 a 5 de entorno amigable y seguro para mujeres.'},
-  {id:20,dim:'Cohesión Social', ind:'Total Hospitales y Clínicas',     tipo:'pos',ref:50,      form:'Hosp = Σ Centros_salud',              vars:'<b>Hosp:</b> Clínicas y hospitales en servicio continuo.',                                                                                                                       desc:'Infraestructura de salud incluyendo centros de salud locales.'},
-  {id:21,dim:'Cohesión Social', ind:'Tasa de Criminalidad',            tipo:'neg',ref:30,      form:'Crimen = (Delitos / 100k_hab)',       vars:'<b>Crimen:</b> Tasa delictiva percibida.<br><b>Delitos:</b> Denuncias ponderadas.<br><b>100k_hab:</b> Ratio poblacional estándar.',                                              desc:'Nivel general de crimen percibido (escala 0 a 100).'},
-  {id:22,dim:'Cohesión Social', ind:'Hospitales con Telemedicina',     tipo:'pos',ref:10,      form:'H_tele = (H_dig / Hosp) * 100',      vars:'<b>H_tele:</b> Telemedicina habilitada.<br><b>H_dig:</b> Centros equipados para consultas remotas.',                                                                             desc:'Establecimientos que ofrecen consulta médica remota.'},
-  {id:23,dim:'Cohesión Social', ind:'Cobertura 4G/5G (%)',             tipo:'pos',ref:100,     form:'Cob_4G = (A_4G / A_urb) * 100',      vars:'<b>Cob_4G:</b> Cobertura móvil.<br><b>A_4G:</b> km² con señal estable.<br><b>A_urb:</b> Perímetro urbano.',                                                                      desc:'Zona urbana con señal de telefonía móvil de alta velocidad (%).'},
-  {id:24,dim:'Cohesión Social', ind:'Apps Ciudadanas Activas',         tipo:'pos',ref:5,       form:'Apps_gov = Σ Apps_Oficiales',         vars:'<b>Apps_gov:</b> Aplicaciones de la Alcaldía en tiendas de apps.',                                                                                                               desc:'Aplicaciones móviles oficiales con servicios activos para ciudadanos.'},
-  // GOBERNANZA 16%
-  {id:25,dim:'Gobernanza',     ind:'Bitcoin Legal (0 o 1)',            tipo:'pos',ref:1,       form:'Crypto = {0, 0.5, 1}',               vars:'<b>Crypto:</b> Variable categórica de marco legal de criptomonedas.<br><b>0:</b> Ilegal. <b>0.5:</b> Tolerado. <b>1:</b> Marco claro.',                                          desc:'Situación legal de criptoactivos (0.5 = Zona Gris / Tolerado).'},
-  {id:26,dim:'Gobernanza',     ind:'Certificación ISO 37120',          tipo:'pos',ref:4,       form:'ISO_37120 = Nivel (0..6)',            vars:'<b>ISO_37120:</b> Estándar global de Smart Cities.<br><b>Nivel:</b> Grado de certificación institucional.',                                                                        desc:'Nivel de certificación global para servicios urbanos y calidad de vida.'},
-  {id:27,dim:'Gobernanza',     ind:'Trámites Digitales (%)',           tipo:'pos',ref:70,      form:'T_dig = (T_web / T_tot) * 100',       vars:'<b>T_dig:</b> Digitalización de burocracia.<br><b>T_web:</b> Trámites completables online.',                                                                                      desc:'Servicios del gobierno local que se pueden completar 100% online.'},
-  {id:28,dim:'Gobernanza',     ind:'Datos Abiertos Alcaldía',          tipo:'pos',ref:30,      form:'D_open = Σ Datasets_pub',            vars:'<b>D_open:</b> Datasets en formatos abiertos (CSV, JSON) en portal oficial.',                                                                                                      desc:'Conjuntos de datos publicados oficialmente.'},
-  {id:29,dim:'Gobernanza',     ind:'Cámaras Videovigilancia',          tipo:'pos',ref:300,     form:'Cam_seg = Σ Cámaras_C4',             vars:'<b>Cam_seg:</b> Cámaras PTZ o LPR conectadas al centro de comando.',                                                                                                               desc:'Cámaras de seguridad operativas conectadas al centro de monitoreo.'},
-  {id:30,dim:'Gobernanza',     ind:'Semáforos Inteligentes',           tipo:'pos',ref:20,      form:'S_intel = (S_act / S_tot) * 100',    vars:'<b>S_intel:</b> Semaforización adaptativa.<br><b>S_act:</b> Intersecciones con sensores de flujo en tiempo real.',                                                                desc:'Semáforos con control adaptativo al flujo vehicular en tiempo real.'},
-  // MEDIO AMBIENTE 15%
-  {id:31,dim:'Medio Ambiente', ind:'Calidad Agua Potable',             tipo:'pos',ref:80,      form:'ICA = x̄(Var_químicas)',              vars:'<b>ICA:</b> Índice de Calidad del Agua.<br><b>Var_químicas:</b> Mediciones de pH, Turbidez, Cloro residual.',                                                                      desc:'Índice de 0 a 100 sobre la calidad percibida y real del agua.'},
-  {id:32,dim:'Medio Ambiente', ind:'Áreas Verdes (m²/hab)',            tipo:'pos',ref:9,       form:'A_verde = Σ (m²_parq) / Pob',        vars:'<b>A_verde:</b> Espacio verde per cápita.<br><b>m²_parq:</b> Área total de zonas arborizadas o parques urbanos.',                                                                  desc:'Metros cuadrados de área verde urbana disponible por persona.'},
-  {id:33,dim:'Medio Ambiente', ind:'Índice Calidad del Aire (AQI)',    tipo:'neg',ref:10,      form:'AQI = max(I_PM2.5, I_PM10, I_O3)',   vars:'<b>AQI:</b> Air Quality Index.<br><b>I_PM:</b> Sub-índices del mayor contaminante.',                                                                                               desc:'Promedio anual de AQI. Menor valor indica aire más limpio.'},
-  {id:34,dim:'Medio Ambiente', ind:'Sensores IoT Calidad Aire',        tipo:'pos',ref:15,      form:'S_iot = Σ Nodos_ESP32',              vars:'<b>S_iot:</b> Nodos ESP32 midiendo variables ambientales en tiempo real.',                                                                                                          desc:'Dispositivos de bajo costo instalados para medir contaminantes.'},
-  {id:35,dim:'Medio Ambiente', ind:'Sistemas Alerta Inundaciones',     tipo:'pos',ref:5,       form:'A_inun = Σ Telemetría_río',          vars:'<b>A_inun:</b> Sensores de nivel del agua en ríos principales.',                                                                                                                   desc:'Sensores en ríos con notificación automática de crecidas.'},
-  {id:36,dim:'Medio Ambiente', ind:'Energía Solar Instalada (MW)',     tipo:'pos',ref:5,       form:'E_sol = Σ (MW_inst)',                vars:'<b>E_sol:</b> MW generados por paneles solares interconectados a la red.',                                                                                                          desc:'Capacidad de generación solar en techos públicos y parques.'}
+  // CAPITAL HUMANO
+  {id:"ch1",  dim:"Capital Humano",  name:"Educación secundaria y superior",     unit:"%",                tipo:"pos", ref:65,      desc:"Proporción de la población con educación secundaria y superior."},
+  {id:"ch2",  dim:"Capital Humano",  name:"Participación en actividad física",    unit:"%",                tipo:"pos", ref:40,      desc:"Porcentaje de población que practica actividad física regularmente."},
+  {id:"ch3",  dim:"Capital Humano",  name:"Colegios con salas STEM",              unit:"%",                tipo:"pos", ref:50,      desc:"Colegios equipados con laboratorios de ciencia y tecnología."},
+  {id:"ch4",  dim:"Capital Humano",  name:"Penetración internet fijo en hogares", unit:"%",                tipo:"pos", ref:65,      desc:"Hogares con conexión a internet de banda ancha."},
+  {id:"ch5",  dim:"Capital Humano",  name:"Conectividad escolar",                 unit:"%",                tipo:"pos", ref:95,      desc:"Instituciones educativas con conexión a internet activa."},
+  {id:"ch6",  dim:"Capital Humano",  name:"Brecha digital estudiantil",           unit:"%",                tipo:"neg", ref:15,      desc:"Estudiantes sin computador ni tablet en casa."},
+  {id:"ch7",  dim:"Capital Humano",  name:"Gasto privado en educación",           unit:"USD/persona/año",  tipo:"pos", ref:350,     desc:"Gasto privado anual en educación per cápita."},
+  {id:"ch8",  dim:"Capital Humano",  name:"Instalaciones deportivas oficiales",   unit:"número",           tipo:"pos", ref:50,      desc:"Instalaciones deportivas registradas oficialmente."},
+  {id:"ch9",  dim:"Capital Humano",  name:"Parques con equipamiento deportivo",   unit:"número",           tipo:"pos", ref:60,      desc:"Parques urbanos con equipamiento deportivo activo."},
+  {id:"ch10", dim:"Capital Humano",  name:"Programas universitarios en TIC",      unit:"número",           tipo:"pos", ref:20,      desc:"Programas de pregrado o posgrado en tecnología e informática."},
+  // COHESIÓN SOCIAL
+  {id:"cs1",  dim:"Cohesión Social", name:"Tasa de desempleo",                    unit:"%",                tipo:"neg", ref:8,       desc:"Porcentaje de la población económicamente activa sin empleo."},
+  {id:"cs2",  dim:"Cohesión Social", name:"Tasa de homicidios",                   unit:"por 100k hab",     tipo:"neg", ref:12,      desc:"Homicidios por cada 100.000 habitantes al año."},
+  {id:"cs3",  dim:"Cohesión Social", name:"Índice de criminalidad percibida",     unit:"Numbeo 0-100",     tipo:"neg", ref:45,      desc:"Percepción de criminalidad según Numbeo (menor = mejor)."},
+  {id:"cs4",  dim:"Cohesión Social", name:"Coeficiente de Gini",                  unit:"0-1",              tipo:"neg", ref:0.38,    desc:"Medida de desigualdad en distribución del ingreso."},
+  {id:"cs5",  dim:"Cohesión Social", name:"Índice de Felicidad",                  unit:"escala 0-10",      tipo:"pos", ref:6.5,     desc:"Nivel de bienestar subjetivo declarado por ciudadanos."},
+  {id:"cs6",  dim:"Cohesión Social", name:"Índice de salud",                      unit:"Numbeo 0-100",     tipo:"pos", ref:68,      desc:"Calidad percibida del sistema de salud según Numbeo."},
+  {id:"cs7",  dim:"Cohesión Social", name:"Tasa de empleo femenino",              unit:"%",                tipo:"pos", ref:50,      desc:"Porcentaje de mujeres en edad laboral con empleo."},
+  {id:"cs8",  dim:"Cohesión Social", name:"Tasa de mortalidad general",           unit:"por 100k hab",     tipo:"neg", ref:350,     desc:"Muertes por cada 100.000 habitantes al año."},
+  {id:"cs9",  dim:"Cohesión Social", name:"Cobertura 4G/5G urbana",               unit:"%",                tipo:"pos", ref:98,      desc:"Zona urbana con cobertura de red móvil 4G o 5G."},
+  {id:"cs10", dim:"Cohesión Social", name:"Establecimientos con telemedicina",    unit:"número",           tipo:"pos", ref:12,      desc:"Centros de salud habilitados para consulta médica remota."},
+  // ECONOMÍA
+  {id:"ec1",  dim:"Economía",        name:"PIB per cápita",                       unit:"USD",              tipo:"pos", ref:6000,    desc:"Producto Interno Bruto dividido entre la población total."},
+  {id:"ec2",  dim:"Economía",        name:"Salario por hora",                     unit:"USD",              tipo:"pos", ref:3,       desc:"Remuneración horaria promedio del trabajador formal."},
+  {id:"ec3",  dim:"Economía",        name:"Facilidad para abrir empresa",         unit:"ranking 1-190",    tipo:"neg", ref:40,      desc:"Posición en el ranking Doing Business (menor = mejor)."},
+  {id:"ec4",  dim:"Economía",        name:"Días para crear empresa",              unit:"días",             tipo:"neg", ref:7,       desc:"Días hábiles requeridos para constituir una empresa."},
+  {id:"ec5",  dim:"Economía",        name:"Motivación emprendedora",              unit:"ratio oport/nec",  tipo:"pos", ref:1.2,     desc:"Ratio entre emprendimiento por oportunidad vs. por necesidad."},
+  {id:"ec6",  dim:"Economía",        name:"Poder adquisitivo relativo",           unit:"índice NYC=100",   tipo:"pos", ref:35,      desc:"Poder de compra relativo frente a Nueva York (100)."},
+  {id:"ec7",  dim:"Economía",        name:"Startups tecnológicas activas",        unit:"número",           tipo:"pos", ref:20,      desc:"Startups con producto validado operando en el mercado."},
+  {id:"ec8",  dim:"Economía",        name:"Comercio electrónico",                 unit:"%",                tipo:"pos", ref:40,      desc:"Empresas que realizan ventas por canales digitales."},
+  {id:"ec9",  dim:"Economía",        name:"Productividad laboral",                unit:"miles USD/ocupado",tipo:"pos", ref:14,      desc:"Valor agregado por ocupado en miles de dólares al año."},
+  {id:"ec10", dim:"Economía",        name:"Inversión en I+D+TIC",                 unit:"% PIB local",      tipo:"pos", ref:1.5,     desc:"Porcentaje del PIB local destinado a I+D y tecnología."},
+  // GOBERNANZA
+  {id:"go1",  dim:"Gobernanza",      name:"Índice de E-Participación ONU",        unit:"escala 0-1",       tipo:"pos", ref:0.85,    desc:"Participación electrónica ciudadana según índice ONU."},
+  {id:"go2",  dim:"Gobernanza",      name:"Índice de Derechos Legales",           unit:"escala 0-12",      tipo:"pos", ref:9,       desc:"Solidez del marco legal para acceso a crédito y derechos."},
+  {id:"go3",  dim:"Gobernanza",      name:"Trámites municipales en línea",        unit:"%",                tipo:"pos", ref:70,      desc:"Servicios del gobierno local completables 100% en línea."},
+  {id:"go4",  dim:"Gobernanza",      name:"Datasets de datos abiertos",           unit:"número",           tipo:"pos", ref:50,      desc:"Conjuntos de datos publicados en formatos abiertos."},
+  {id:"go5",  dim:"Gobernanza",      name:"Cámaras de videovigilancia",           unit:"número",           tipo:"pos", ref:400,     desc:"Cámaras operativas conectadas al centro de monitoreo."},
+  {id:"go6",  dim:"Gobernanza",      name:"Satisfacción servicios digitales",     unit:"escala 1-10",      tipo:"pos", ref:7.5,     desc:"Valoración ciudadana de los servicios digitales municipales."},
+  {id:"go7",  dim:"Gobernanza",      name:"Certificación ISO 37120",              unit:"nivel 0-6",        tipo:"pos", ref:3,       desc:"Nivel de certificación internacional para servicios urbanos."},
+  {id:"go8",  dim:"Gobernanza",      name:"Índice Capital Humano EGDI",           unit:"escala 0-1",       tipo:"pos", ref:0.85,    desc:"Componente de capital humano del Índice de Gobierno Digital ONU."},
+  {id:"go9",  dim:"Gobernanza",      name:"Índice Infraestructura Telecom",       unit:"escala 0-1",       tipo:"pos", ref:0.8,     desc:"Componente de telecomunicaciones del EGDI de la ONU."},
+  {id:"go10", dim:"Gobernanza",      name:"Semáforos inteligentes",               unit:"número",           tipo:"pos", ref:30,      desc:"Semáforos con control adaptativo al flujo vehicular."},
+  // MEDIO AMBIENTE
+  {id:"ma1",  dim:"Medio Ambiente",  name:"Áreas verdes per cápita",              unit:"m²/hab",           tipo:"pos", ref:9,       desc:"Metros cuadrados de área verde urbana por habitante."},
+  {id:"ma2",  dim:"Medio Ambiente",  name:"Índice de Calidad del Aire (AQI)",     unit:"AQI",              tipo:"neg", ref:35,      desc:"Promedio anual del AQI (menor = mejor)."},
+  {id:"ma3",  dim:"Medio Ambiente",  name:"PM2.5 anual",                          unit:"µg/m³",            tipo:"neg", ref:5,       desc:"Concentración anual de partículas finas PM2.5 (menor = mejor)."},
+  {id:"ma4",  dim:"Medio Ambiente",  name:"Energía renovable",                    unit:"%",                tipo:"pos", ref:85,      desc:"Porcentaje de la matriz energética de fuentes renovables."},
+  {id:"ma5",  dim:"Medio Ambiente",  name:"Tratamiento aguas residuales",         unit:"%",                tipo:"pos", ref:80,      desc:"Aguas residuales tratadas antes de su vertimiento."},
+  {id:"ma6",  dim:"Medio Ambiente",  name:"Emisiones CO2 por habitante",          unit:"ton/año",          tipo:"neg", ref:1.5,     desc:"Toneladas de CO2 equivalente emitidas por habitante al año."},
+  {id:"ma7",  dim:"Medio Ambiente",  name:"Vulnerabilidad climática",             unit:"escala 1-10",      tipo:"neg", ref:4,       desc:"Nivel de exposición a riesgos climáticos (menor = mejor)."},
+  {id:"ma8",  dim:"Medio Ambiente",  name:"Índice Desempeño Ambiental (EPI)",     unit:"0-100",            tipo:"pos", ref:55,      desc:"Puntuación en el Environmental Performance Index de Yale."},
+  {id:"ma9",  dim:"Medio Ambiente",  name:"Calidad del agua potable",             unit:"Numbeo 0-100",     tipo:"pos", ref:80,      desc:"Calidad percibida del agua potable según Numbeo."},
+  {id:"ma10", dim:"Medio Ambiente",  name:"Residuos sólidos per cápita",          unit:"kg/hab/año",       tipo:"neg", ref:280,     desc:"Kilogramos de residuos sólidos por habitante al año."},
+  // FRONTERA
+  {id:"fr1",  dim:"Frontera",        name:"Volumen comercio transfronterizo",     unit:"M USD/año",        tipo:"pos", ref:800,     desc:"Valor total del comercio formal en el paso fronterizo."},
+  {id:"fr2",  dim:"Frontera",        name:"Flujo migratorio formal",              unit:"cruces/año",       tipo:"pos", ref:5000000, desc:"Cruces de frontera registrados formalmente por año."},
+  {id:"fr3",  dim:"Frontera",        name:"Informalidad laboral migrante",        unit:"%",                tipo:"neg", ref:40,      desc:"Migrantes en situación de empleo informal."},
+  {id:"fr4",  dim:"Frontera",        name:"Infraestructura fronteriza",           unit:"escala 1-10",      tipo:"pos", ref:8,       desc:"Calidad y capacidad de la infraestructura de paso fronterizo."},
+  {id:"fr5",  dim:"Frontera",        name:"Acceso a servicios para migrantes",    unit:"%",                tipo:"pos", ref:70,      desc:"Migrantes con acceso efectivo a servicios básicos."},
+  {id:"fr6",  dim:"Frontera",        name:"Tensión social fronteriza",            unit:"escala 1-10",      tipo:"neg", ref:3,       desc:"Nivel de conflictividad social en la frontera."},
+  {id:"fr7",  dim:"Frontera",        name:"Diferencial cambiario",                unit:"%",                tipo:"neg", ref:20,      desc:"Diferencia entre tipo de cambio oficial y paralelo."},
+  {id:"fr8",  dim:"Frontera",        name:"Sistemas biométricos migración",       unit:"número",           tipo:"pos", ref:4,       desc:"Puestos de control con sistemas biométricos activos."},
+  {id:"fr9",  dim:"Frontera",        name:"Migrantes con PPT digital activo",     unit:"%",                tipo:"pos", ref:80,      desc:"Migrantes con Permiso de Protección Temporal vigente."},
+  {id:"fr10", dim:"Frontera",        name:"Integración económica binacional",     unit:"escala 1-10",      tipo:"pos", ref:7,       desc:"Integración económica formal entre ciudades fronterizas."}
 ];
 
 const CV = {
-  cucuta:     {1:{v:320,f:'DIAN'},2:{v:12775000,f:'Migración Colombia'},3:{v:78,f:'DNP'},4:{v:4,f:'Migración Colombia'},5:{v:3,f:'DIAN/MinTIC'},6:{v:80,f:'Migración Colombia'},7:{v:0,f:'CB Insights'},8:{v:67,f:'World Bank'},9:{v:640,f:'StartupBlink'},10:{v:5,f:'iNNpulsa'},11:{v:15,f:'CC Cúcuta'},12:{v:0.5,f:'DNP'},13:{v:43,f:'DANE'},14:{v:483,f:'OpenStreetMap'},15:{v:148,f:'DANE'},16:{v:15,f:'Comp. para Educar'},17:{v:90,f:'Comp. para Educar'},18:{v:35,f:'DANE'},19:{v:2.5,f:'Nomad List'},20:{v:18,f:'OpenStreetMap'},21:{v:68,f:'Numbeo'},22:{v:3,f:'MinSalud'},23:{v:95,f:'MinTIC'},24:{v:2,f:'Alcaldía Cúcuta'},25:{v:0.5,f:'Banco República'},26:{v:0,f:'WCCD'},27:{v:30,f:'Alcaldía Cúcuta'},28:{v:12,f:'Datos.gov.co'},29:{v:150,f:'Policía Cúcuta'},30:{v:5,f:'Sec. Movilidad'},31:{v:55,f:'Numbeo/SSPD'},32:{v:3.2,f:'Plan Desarrollo'},33:{v:45,f:'IQAir'},34:{v:3,f:'Jesús Álvarez'},35:{v:1,f:'IDEAM'},36:{v:1.2,f:'UPME'}},
-  sanantonio: {1:{v:60,f:'SENIAT (est.)'},2:{v:820000,f:'SAIME (est.)'},3:{v:92,f:'INE Venezuela (est.)'},4:{v:1,f:'SAIME (est.)'},5:{v:0,f:'SENIAT (est.)'},6:{v:10,f:'SAIME (est.)'},7:{v:0,f:'CB Insights'},8:{v:188,f:'World Bank'},9:{v:1850,f:'StartupBlink (est.)'},10:{v:0,f:'Inapyme (est.)'},11:{v:3,f:'CCIAST (est.)'},12:{v:0.05,f:'ONCTI (est.)'},13:{v:32,f:'INE Venezuela (est.)'},14:{v:98,f:'OpenStreetMap'},15:{v:12,f:'INE Venezuela (est.)'},16:{v:3,f:'Min. Educación VE (est.)'},17:{v:18,f:'CONATEL (est.)'},18:{v:82,f:'INE Venezuela (est.)'},19:{v:1.2,f:'Numbeo (est.)'},20:{v:3,f:'OpenStreetMap'},21:{v:88,f:'Numbeo (est.)'},22:{v:0,f:'MPPS (est.)'},23:{v:28,f:'CONATEL (est.)'},24:{v:0,f:'Alcaldía SATS (est.)'},25:{v:0.5,f:'BCV (est.)'},26:{v:0,f:'WCCD'},27:{v:5,f:'Alcaldía SATS (est.)'},28:{v:1,f:'Datos.gob.ve (est.)'},29:{v:8,f:'PNB Táchira (est.)'},30:{v:0,f:'IAHULA (est.)'},31:{v:18,f:'Numbeo (est.)'},32:{v:1.5,f:'Alcaldía SATS (est.)'},33:{v:32,f:'IQAir (est.)'},34:{v:0,f:'N/A'},35:{v:0,f:'INAMEH (est.)'},36:{v:0.05,f:'Min. Energía VE (est.)'}},
-  ipiales:    {1:{v:175,f:'DIAN Nariño (est.)'},2:{v:1480000,f:'Migración Colombia'},3:{v:65,f:'DNP (est.)'},4:{v:3,f:'Migración Colombia'},5:{v:2,f:'DIAN/MinTIC'},6:{v:55,f:'Migración Colombia (est.)'},7:{v:0,f:'CB Insights'},8:{v:73,f:'World Bank'},9:{v:920,f:'StartupBlink (est.)'},10:{v:3,f:'iNNpulsa (est.)'},11:{v:12,f:'CC Ipiales (est.)'},12:{v:0.3,f:'DNP (est.)'},13:{v:38,f:'DANE'},14:{v:182,f:'OpenStreetMap'},15:{v:118,f:'DANE (est.)'},16:{v:12,f:'Comp. para Educar'},17:{v:75,f:'Comp. para Educar'},18:{v:45,f:'DANE (est.)'},19:{v:2.2,f:'Numbeo (est.)'},20:{v:8,f:'OpenStreetMap'},21:{v:52,f:'Numbeo (est.)'},22:{v:1,f:'MinSalud (est.)'},23:{v:82,f:'MinTIC (est.)'},24:{v:1,f:'Alcaldía Ipiales (est.)'},25:{v:0.5,f:'Banco República'},26:{v:0,f:'WCCD'},27:{v:20,f:'Alcaldía Ipiales (est.)'},28:{v:8,f:'Datos.gov.co (est.)'},29:{v:85,f:'Policía Nariño (est.)'},30:{v:2,f:'Sec. Tránsito Ipiales (est.)'},31:{v:60,f:'Numbeo/SSPD (est.)'},32:{v:4.5,f:'Plan Desarrollo Ipiales'},33:{v:18,f:'IQAir (est.)'},34:{v:1,f:'Iniciativa local (est.)'},35:{v:0,f:'IDEAM (est.)'},36:{v:0.3,f:'UPME (est.)'}},
-  leticia:    {1:{v:22,f:'DIAN Amazonas (est.)'},2:{v:245000,f:'Migración Colombia (est.)'},3:{v:70,f:'DNP (est.)'},4:{v:2,f:'Migración Colombia (est.)'},5:{v:1,f:'DIAN/MinTIC (est.)'},6:{v:38,f:'Migración Colombia (est.)'},7:{v:0,f:'CB Insights'},8:{v:73,f:'World Bank'},9:{v:1100,f:'StartupBlink (est.)'},10:{v:1,f:'iNNpulsa (est.)'},11:{v:8,f:'CC Amazonas (est.)'},12:{v:0.2,f:'DNP (est.)'},13:{v:28,f:'DANE'},14:{v:46,f:'OpenStreetMap'},15:{v:78,f:'DANE (est.)'},16:{v:8,f:'Comp. para Educar (est.)'},17:{v:65,f:'Comp. para Educar (est.)'},18:{v:55,f:'DANE (est.)'},19:{v:2.8,f:'Numbeo (est.)'},20:{v:4,f:'OpenStreetMap'},21:{v:32,f:'Numbeo (est.)'},22:{v:1,f:'MinSalud (est.)'},23:{v:62,f:'MinTIC (est.)'},24:{v:1,f:'Alcaldía Leticia (est.)'},25:{v:0.5,f:'Banco República'},26:{v:0,f:'WCCD'},27:{v:15,f:'Alcaldía Leticia (est.)'},28:{v:5,f:'Datos.gov.co (est.)'},29:{v:28,f:'Policía Amazonas (est.)'},30:{v:0,f:'N/A'},31:{v:65,f:'SSPD (est.)'},32:{v:8.0,f:'SINCHI (est.)'},33:{v:12,f:'IQAir (est.)'},34:{v:2,f:'SINCHI/IDEAM (est.)'},35:{v:2,f:'IDEAM (est.)'},36:{v:0.5,f:'UPME (est.)'}},
-  pacaraima:  {1:{v:14,f:'Receita Federal (est.)'},2:{v:385000,f:'Polícia Federal (est.)'},3:{v:80,f:'IBGE (est.)'},4:{v:3,f:'Polícia Federal (est.)'},5:{v:1,f:'Receita Federal (est.)'},6:{v:48,f:'ACNUR Brasil (est.)'},7:{v:0,f:'CB Insights'},8:{v:124,f:'World Bank'},9:{v:1200,f:'StartupBlink (est.)'},10:{v:0,f:'SEBRAE (est.)'},11:{v:10,f:'SEBRAE (est.)'},12:{v:0.1,f:'MCTI Brasil (est.)'},13:{v:25,f:'IBGE (est.)'},14:{v:16,f:'OpenStreetMap'},15:{v:195,f:'IBGE (est.)'},16:{v:15,f:'MEC Brasil (est.)'},17:{v:70,f:'MEC Brasil (est.)'},18:{v:50,f:'IBGE (est.)'},19:{v:2.3,f:'Numbeo (est.)'},20:{v:2,f:'OpenStreetMap'},21:{v:48,f:'Numbeo (est.)'},22:{v:1,f:'Min. Saúde Brasil (est.)'},23:{v:55,f:'ANATEL (est.)'},24:{v:1,f:'Pref. Pacaraima (est.)'},25:{v:1,f:'Banco Central do Brasil'},26:{v:0,f:'WCCD'},27:{v:35,f:'gov.br (est.)'},28:{v:10,f:'dados.gov.br (est.)'},29:{v:14,f:'PC Roraima (est.)'},30:{v:0,f:'N/A'},31:{v:48,f:'FUNASA (est.)'},32:{v:6.0,f:'IBGE (est.)'},33:{v:22,f:'IQAir (est.)'},34:{v:1,f:'INPA (est.)'},35:{v:1,f:'ANA Brasil (est.)'},36:{v:0.8,f:'ANEEL (est.)'}}
+  cucuta:    {ch1:43,ch2:28,ch3:15,ch4:42,ch5:90,ch6:35,ch7:148,ch8:41,ch9:34,ch10:8,cs1:15.1,cs2:36,cs3:68,cs4:0.458,cs5:5.9,cs6:52,cs7:38,cs8:475,cs9:95,cs10:3,ec1:3227,ec2:1.8,ec3:67,ec4:11,ec5:0.62,ec6:22,ec7:5,ec8:15,ec9:8.4,ec10:0.5,go1:0.74,go2:5,go3:30,go4:12,go5:150,go6:5,go7:0,go8:0.73,go9:0.59,go10:5,ma1:3.2,ma2:52,ma3:10,ma4:68,ma5:38,ma6:2.3,ma7:7,ma8:42.9,ma9:55,ma10:430,fr1:320,fr2:12775000,fr3:78,fr4:5,fr5:42,fr6:7,fr7:80,fr8:2,fr9:42,fr10:3},
+  sanantonio:{ch1:38,ch2:20,ch3:4,ch4:12,ch5:65,ch6:72,ch7:45,ch8:18,ch9:15,ch10:2,cs1:28,cs2:48,cs3:72,cs4:0.52,cs5:4.2,cs6:28,cs7:22,cs8:820,cs9:35,cs10:1,ec1:980,ec2:0.3,ec3:185,ec4:32,ec5:0.18,ec6:8,ec7:1,ec8:8,ec9:2.8,ec10:0.2,go1:0.25,go2:1,go3:8,go4:2,go5:40,go6:2.1,go7:0,go8:0.38,go9:0.32,go10:2,ma1:5.8,ma2:45,ma3:8,ma4:62,ma5:18,ma6:2.1,ma7:5,ma8:41,ma9:38,ma10:410,fr1:320,fr2:12775000,fr3:85,fr4:4,fr5:22,fr6:8,fr7:82,fr8:2,fr9:null,fr10:2},
+  ipiales:   {ch1:41,ch2:30,ch3:12,ch4:35,ch5:82,ch6:42,ch7:120,ch8:22,ch9:28,ch10:4,cs1:12.5,cs2:18,cs3:52,cs4:0.44,cs5:5.9,cs6:48,cs7:40,cs8:420,cs9:88,cs10:2,ec1:2800,ec2:1.5,ec3:67,ec4:13,ec5:0.62,ec6:20,ec7:3,ec8:12,ec9:6.8,ec10:0.4,go1:0.74,go2:5,go3:22,go4:8,go5:80,go6:4.8,go7:0,go8:0.73,go9:0.59,go10:5,ma1:6.5,ma2:28,ma3:4,ma4:68,ma5:32,ma6:1.8,ma7:4.5,ma8:42.9,ma9:72,ma10:310,fr1:180,fr2:4200000,fr3:55,fr4:7,fr5:38,fr6:4,fr7:8,fr8:2,fr9:45,fr10:4},
+  leticia:   {ch1:36,ch2:32,ch3:8,ch4:28,ch5:75,ch6:55,ch7:95,ch8:12,ch9:18,ch10:3,cs1:13.2,cs2:12,cs3:48,cs4:0.46,cs5:5.9,cs6:42,cs7:35,cs8:480,cs9:72,cs10:1,ec1:2100,ec2:1.4,ec3:67,ec4:15,ec5:0.62,ec6:16,ec7:1,ec8:10,ec9:5.2,ec10:0.3,go1:0.74,go2:5,go3:18,go4:5,go5:45,go6:4.2,go7:0,go8:0.73,go9:0.59,go10:2,ma1:18.5,ma2:22,ma3:3,ma4:68,ma5:25,ma6:0.8,ma7:3,ma8:42.9,ma9:62,ma10:280,fr1:85,fr2:850000,fr3:48,fr4:3,fr5:35,fr6:3,fr7:8,fr8:1,fr9:28,fr10:3},
+  pacaraima: {ch1:48,ch2:35,ch3:18,ch4:40,ch5:88,ch6:30,ch7:180,ch8:18,ch9:22,ch10:3,cs1:14.5,cs2:28,cs3:58,cs4:0.49,cs5:6.1,cs6:55,cs7:40,cs8:480,cs9:80,cs10:2,ec1:4200,ec2:2.2,ec3:55,ec4:17,ec5:0.82,ec6:28,ec7:2,ec8:22,ec9:8.8,ec10:0.7,go1:0.78,go2:6,go3:45,go4:18,go5:65,go6:5.8,go7:0,go8:0.80,go9:0.76,go10:5,ma1:12,ma2:30,ma3:5,ma4:82,ma5:42,ma6:1.4,ma7:4,ma8:52.8,ma9:68,ma10:285,fr1:420,fr2:1800000,fr3:68,fr4:6,fr5:45,fr6:6,fr7:null,fr8:3,fr9:55,fr10:4}
 };
 
 const CITIES_META = [
@@ -161,7 +185,7 @@ const CITIES_META = [
 
 const CITIES = CITIES_META.map(m => ({
   ...m,
-  indicators: BASE_IND.map(b => ({ ...b, val: CV[m.key][b.id].v, fuente: CV[m.key][b.id].f }))
+  indicators: BASE_IND.map(b => ({ ...b, val: CV[m.key][b.id] ?? null }))
 }));
 
 // ═══════════════════════════════════════════════════════════════════
@@ -203,15 +227,19 @@ function interpretBand(s) { return s < 4 ? 0 : s < 6 ? 1 : s < 7.5 ? 2 : s < 9 ?
 // SCORING
 // ═══════════════════════════════════════════════════════════════════
 function calcScore(tipo, val, ref) {
+  if (val === null || val === undefined) return null;
   if (tipo === 'neg' && val === 0) return 0;
   if (tipo === 'pos' && ref === 0) return 0;
-  return Math.min(Math.max(tipo === 'pos' ? (val/ref)*10 : (ref/val)*10, 0), 10);
+  return Math.min(10, Math.max(0, tipo === 'pos' ? (val / ref) * 10 : (ref / val) * 10));
 }
 function sColor(s) { return s >= 8 ? 'text-emerald-600' : s >= 5 ? 'text-amber-500' : 'text-red-500'; }
 function dimAvgs(inds) {
   const acc = {};
   DIMS.forEach(d => acc[d] = {sum:0, n:0});
-  inds.forEach(i => { acc[i.dim].sum += calcScore(i.tipo, i.val, i.ref); acc[i.dim].n++; });
+  inds.forEach(i => {
+    const s = calcScore(i.tipo, i.val, i.ref);
+    if (s !== null) { acc[i.dim].sum += s; acc[i.dim].n++; }
+  });
   const r = {};
   DIMS.forEach(d => r[d] = acc[d].n ? acc[d].sum / acc[d].n : 0);
   return r;
@@ -335,7 +363,7 @@ function renderBar() {
   } else {
     const items = inds.filter(i => i.dim === st.tab);
     labels = items.map(i => i.ind.length > 22 ? i.ind.slice(0,22)+'…' : i.ind);
-    data   = items.map(i => +calcScore(i.tipo, i.val, i.ref).toFixed(4));
+    data   = items.map(i => { const s = calcScore(i.tipo, i.val, i.ref); return s === null ? 0 : +s.toFixed(4); });
     bg     = C[st.tab].hex;
     document.getElementById('chart-title').textContent = `${st.tab} — Indicadores (0 a 10)`;
   }
@@ -425,7 +453,7 @@ function renderTable() {
     document.getElementById('interp-card').classList.add('hidden');
     titleEl.innerHTML = `Indicadores: ${st.tab}`;
     const items = inds.filter(i => i.dim === st.tab);
-    let html = `<table class="w-full text-left border-collapse min-w-[820px]">
+    let html = `<table class="w-full text-left border-collapse min-w-[700px]">
       <thead><tr class="bg-stone-100 text-stone-500 text-[10px] uppercase tracking-wider font-semibold border-b border-stone-200">
         <th class="px-6 py-4">Indicador</th>
         <th class="px-4 py-4 text-center">Tipo</th>
@@ -438,15 +466,21 @@ function renderTable() {
       const arrow = item.tipo === 'pos'
         ? '<span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded text-xs font-bold">Positivo ↑</span>'
         : '<span class="px-2 py-0.5 bg-red-100 text-red-700 rounded text-xs font-bold">Negativo ↓</span>';
+      const scoreCell = score === null
+        ? '<span class="text-stone-300 text-sm font-normal">N/D</span>'
+        : `<span class="font-mono text-xl font-bold ${sColor(score)}">${score.toFixed(2)}</span>`;
+      const valDisplay = item.val === null
+        ? '<span class="text-stone-300">N/D</span>'
+        : item.val;
       html += `<tr class="border-b border-stone-100 hover:bg-stone-50">
         <td class="px-6 py-4">
-          <div class="font-bold text-stone-800">${item.ind}</div>
-          <div class="text-[10px] text-stone-400 mt-0.5 uppercase">Fuente: ${item.fuente}</div>
+          <div class="font-bold text-stone-800">${item.name}</div>
+          <div class="text-[10px] text-stone-400 mt-0.5">${item.unit}</div>
         </td>
         <td class="px-4 py-4 text-center">${arrow}</td>
         <td class="px-4 py-4 text-right font-mono text-stone-500">${item.ref}</td>
-        <td class="px-5 py-4 text-right font-mono text-stone-700 font-bold">${item.val}</td>
-        <td class="px-6 py-4 text-right font-mono text-xl font-bold ${sColor(score)}">${score.toFixed(2)}</td>
+        <td class="px-5 py-4 text-right font-mono text-stone-700 font-bold">${valDisplay}</td>
+        <td class="px-6 py-4 text-right">${scoreCell}</td>
       </tr>`;
     });
     html += `</tbody></table>`;
@@ -622,21 +656,21 @@ function renderFormulas() {
   let body = '';
   DIMS.forEach(dim => {
     const items = BASE_IND.filter(b => b.dim === dim);
-    const col   = C[dim];
+    const col = C[dim];
     let cards = '';
     items.forEach(item => {
       const badge = item.tipo === 'pos'
         ? '<span class="text-[10px] px-2 py-0.5 rounded font-bold border bg-emerald-100 text-emerald-800 border-emerald-200 whitespace-nowrap">Positivo ↑</span>'
         : '<span class="text-[10px] px-2 py-0.5 rounded font-bold border bg-red-100 text-red-800 border-red-200 whitespace-nowrap">Negativo ↓</span>';
+      const formula = item.tipo === 'pos'
+        ? `score = min(10, (val / ${item.ref}) × 10)`
+        : `score = min(10, (${item.ref} / val) × 10)`;
       cards += `<div class="bg-stone-50 p-4 rounded-xl border border-stone-200">
         <div class="flex justify-between items-start mb-2 gap-2">
-          <strong class="text-stone-800 text-sm leading-tight">${item.ind}</strong>${badge}
+          <strong class="text-stone-800 text-sm leading-tight">${item.name}</strong>${badge}
         </div>
-        <code class="block bg-stone-800 text-emerald-400 px-3 py-2 rounded-lg font-mono text-sm mb-2">${item.form}</code>
-        ${item.vars ? `<div class="${col.bg} p-2.5 rounded-lg border ${col.border} mb-2">
-          <p class="font-bold ${col.text} text-[10px] uppercase tracking-widest mb-1">&#x1F50D; Variables</p>
-          <p class="text-xs text-stone-700 leading-relaxed">${item.vars}</p>
-        </div>` : ''}
+        <div class="text-[10px] text-stone-400 mb-2 uppercase tracking-wider">${item.unit}</div>
+        <code class="block bg-stone-800 text-emerald-400 px-3 py-2 rounded-lg font-mono text-sm mb-2">${formula}</code>
         <p class="text-stone-600 text-sm leading-relaxed">${item.desc}</p>
       </div>`;
     });
@@ -647,8 +681,8 @@ function renderFormulas() {
   });
   container.innerHTML = `<div class="p-7 bg-white">
     <div class="mb-7 text-center max-w-3xl mx-auto">
-      <h2 class="text-3xl font-black text-stone-800 mb-2">&#x1F4D0; Catálogo Analítico de Fórmulas</h2>
-      <p class="text-stone-500 text-sm">Formulación matemática, definición de variables y fuente de los ${BASE_IND.length} indicadores.</p>
+      <h2 class="text-3xl font-black text-stone-800 mb-2">&#x1F4D0; Catálogo Analítico</h2>
+      <p class="text-stone-500 text-sm">Fórmula, unidad y descripción de los ${BASE_IND.length} indicadores en 6 dimensiones.</p>
     </div>${body}
   </div>`;
 }
