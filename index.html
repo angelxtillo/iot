@@ -50,7 +50,7 @@
   </nav>
 
   <div class="px-4 py-3 bg-stone-50 border-t border-stone-200 text-xs text-stone-500 text-center flex-shrink-0">
-    Datos embebidos · 5 ciudades · 60 indicadores
+    Datos embebidos · 10 ciudades · 60 indicadores
   </div>
 </aside>
 
@@ -97,7 +97,7 @@
 
 <script>
 // ═══════════════════════════════════════════════════════════════════
-// DATA — 60 indicadores · 6 dimensiones · 5 ciudades
+// DATA — 60 indicadores · 6 dimensiones · 10 ciudades
 // ═══════════════════════════════════════════════════════════════════
 const BASE_IND = [
   // CAPITAL HUMANO
@@ -173,7 +173,12 @@ const CV = {
   sanantonio:{ch1:38,ch2:20,ch3:4,ch4:12,ch5:65,ch6:72,ch7:45,ch8:18,ch9:15,ch10:2,cs1:28,cs2:48,cs3:72,cs4:0.52,cs5:4.2,cs6:28,cs7:22,cs8:820,cs9:35,cs10:1,ec1:980,ec2:0.3,ec3:185,ec4:32,ec5:0.18,ec6:8,ec7:1,ec8:8,ec9:2.8,ec10:0.2,go1:0.25,go2:1,go3:8,go4:2,go5:40,go6:2.1,go7:0,go8:0.38,go9:0.32,go10:2,ma1:5.8,ma2:45,ma3:8,ma4:62,ma5:18,ma6:2.1,ma7:5,ma8:41,ma9:38,ma10:410,fr1:320,fr2:12775000,fr3:85,fr4:4,fr5:22,fr6:8,fr7:82,fr8:2,fr9:null,fr10:2},
   ipiales:   {ch1:41,ch2:30,ch3:12,ch4:35,ch5:82,ch6:42,ch7:120,ch8:22,ch9:28,ch10:4,cs1:12.5,cs2:18,cs3:52,cs4:0.44,cs5:5.9,cs6:48,cs7:40,cs8:420,cs9:88,cs10:2,ec1:2800,ec2:1.5,ec3:67,ec4:13,ec5:0.62,ec6:20,ec7:3,ec8:12,ec9:6.8,ec10:0.4,go1:0.74,go2:5,go3:22,go4:8,go5:80,go6:4.8,go7:0,go8:0.73,go9:0.59,go10:5,ma1:6.5,ma2:28,ma3:4,ma4:68,ma5:32,ma6:1.8,ma7:4.5,ma8:42.9,ma9:72,ma10:310,fr1:180,fr2:4200000,fr3:55,fr4:7,fr5:38,fr6:4,fr7:8,fr8:2,fr9:45,fr10:4},
   leticia:   {ch1:36,ch2:32,ch3:8,ch4:28,ch5:75,ch6:55,ch7:95,ch8:12,ch9:18,ch10:3,cs1:13.2,cs2:12,cs3:48,cs4:0.46,cs5:5.9,cs6:42,cs7:35,cs8:480,cs9:72,cs10:1,ec1:2100,ec2:1.4,ec3:67,ec4:15,ec5:0.62,ec6:16,ec7:1,ec8:10,ec9:5.2,ec10:0.3,go1:0.74,go2:5,go3:18,go4:5,go5:45,go6:4.2,go7:0,go8:0.73,go9:0.59,go10:2,ma1:18.5,ma2:22,ma3:3,ma4:68,ma5:25,ma6:0.8,ma7:3,ma8:42.9,ma9:62,ma10:280,fr1:85,fr2:850000,fr3:48,fr4:3,fr5:35,fr6:3,fr7:8,fr8:1,fr9:28,fr10:3},
-  pacaraima: {ch1:48,ch2:35,ch3:18,ch4:40,ch5:88,ch6:30,ch7:180,ch8:18,ch9:22,ch10:3,cs1:14.5,cs2:28,cs3:58,cs4:0.49,cs5:6.1,cs6:55,cs7:40,cs8:480,cs9:80,cs10:2,ec1:4200,ec2:2.2,ec3:55,ec4:17,ec5:0.82,ec6:28,ec7:2,ec8:22,ec9:8.8,ec10:0.7,go1:0.78,go2:6,go3:45,go4:18,go5:65,go6:5.8,go7:0,go8:0.80,go9:0.76,go10:5,ma1:12,ma2:30,ma3:5,ma4:82,ma5:42,ma6:1.4,ma7:4,ma8:52.8,ma9:68,ma10:285,fr1:420,fr2:1800000,fr3:68,fr4:6,fr5:45,fr6:6,fr7:null,fr8:3,fr9:55,fr10:4}
+  pacaraima:   {ch1:48,ch2:35,ch3:18,ch4:40,ch5:88,ch6:30,ch7:180,ch8:18,ch9:22,ch10:3,cs1:14.5,cs2:28,cs3:58,cs4:0.49,cs5:6.1,cs6:55,cs7:40,cs8:480,cs9:80,cs10:2,ec1:4200,ec2:2.2,ec3:55,ec4:17,ec5:0.82,ec6:28,ec7:2,ec8:22,ec9:8.8,ec10:0.7,go1:0.78,go2:6,go3:45,go4:18,go5:65,go6:5.8,go7:0,go8:0.80,go9:0.76,go10:5,ma1:12,ma2:30,ma3:5,ma4:82,ma5:42,ma6:1.4,ma7:4,ma8:52.8,ma9:68,ma10:285,fr1:420,fr2:1800000,fr3:68,fr4:6,fr5:45,fr6:6,fr7:null,fr8:3,fr9:55,fr10:4},
+  juarez:      {ch1:52,ch2:25,ch3:28,ch4:58,ch5:72,ch6:28,ch7:320,ch8:48,ch9:55,ch10:12,cs1:3.2,cs2:2.8,cs3:74,cs4:3.2,cs5:6.0,cs6:58,cs7:42,cs8:520,cs9:92,cs10:4,ec1:8500,ec2:2.8,ec3:58,ec4:8,ec5:0.95,ec6:42,ec7:0,ec8:42000,ec9:320,ec10:null,go1:0.76,go2:7,go3:38,go4:22,go5:280,go6:6.2,go7:0,go8:0.80,go9:0.72,go10:45,ma1:4.2,ma2:48,ma3:9,ma4:22,ma5:62,ma6:3.8,ma7:5,ma8:47.2,ma9:48,ma10:380,fr1:42000,fr2:25000000,fr3:35,fr4:7,fr5:55,fr6:3,fr7:5,fr8:8,fr9:null,fr10:9},
+  tijuana:     {ch1:58,ch2:30,ch3:35,ch4:62,ch5:75,ch6:22,ch7:380,ch8:65,ch9:62,ch10:18,cs1:2.8,cs2:3.2,cs3:70,cs4:3.2,cs5:6.0,cs6:62,cs7:46,cs8:480,cs9:94,cs10:6,ec1:9200,ec2:3.1,ec3:58,ec4:7,ec5:1.05,ec6:48,ec7:1,ec8:52000,ec9:350,ec10:null,go1:0.76,go2:8,go3:42,go4:28,go5:320,go6:6.5,go7:0,go8:0.80,go9:0.72,go10:52,ma1:5.8,ma2:42,ma3:8,ma4:22,ma5:68,ma6:3.5,ma7:4,ma8:47.2,ma9:55,ma10:340,fr1:52000,fr2:50000000,fr3:28,fr4:8,fr5:68,fr6:2,fr7:5,fr8:10,fr9:null,fr10:10},
+  foz:         {ch1:55,ch2:32,ch3:22,ch4:45,ch5:88,ch6:25,ch7:220,ch8:42,ch9:48,ch10:8,cs1:5.8,cs2:2.2,cs3:58,cs4:2.7,cs5:6.1,cs6:62,cs7:48,cs8:420,cs9:88,cs10:5,ec1:6800,ec2:2.4,ec3:55,ec4:14,ec5:0.88,ec6:35,ec7:0,ec8:8500,ec9:280,ec10:null,go1:0.78,go2:7,go3:48,go4:22,go5:180,go6:6.0,go7:0,go8:0.80,go9:0.76,go10:18,ma1:8.5,ma2:32,ma3:5,ma4:85,ma5:78,ma6:1.8,ma7:3,ma8:52.8,ma9:72,ma10:295,fr1:null,fr2:null,fr3:null,fr4:null,fr5:null,fr6:null,fr7:null,fr8:null,fr9:null,fr10:null},
+  tacna:       {ch1:52,ch2:28,ch3:35,ch4:32,ch5:85,ch6:18,ch7:180,ch8:35,ch9:42,ch10:6,cs1:2.8,cs2:1.8,cs3:48,cs4:3.5,cs5:6.2,cs6:58,cs7:52,cs8:380,cs9:85,cs10:3,ec1:5200,ec2:2.1,ec3:68,ec4:12,ec5:0.75,ec6:28,ec7:0,ec8:2800,ec9:180,ec10:null,go1:0.72,go2:6,go3:35,go4:18,go5:120,go6:5.5,go7:0,go8:0.75,go9:0.68,go10:12,ma1:6.2,ma2:35,ma3:5,ma4:58,ma5:55,ma6:2.2,ma7:4,ma8:48.5,ma9:62,ma10:315,fr1:2800,fr2:4500000,fr3:38,fr4:7,fr5:65,fr6:2,fr7:8,fr8:4,fr9:null,fr10:6},
+  tulcan:      {ch1:48,ch2:28,ch3:32,ch4:25,ch5:80,ch6:35,ch7:140,ch8:28,ch9:32,ch10:5,cs1:2.5,cs2:1.5,cs3:45,cs4:3.8,cs5:6.1,cs6:52,cs7:42,cs8:410,cs9:82,cs10:2,ec1:3800,ec2:1.8,ec3:78,ec4:14,ec5:0.72,ec6:22,ec7:0,ec8:1200,ec9:120,ec10:null,go1:0.75,go2:5,go3:28,go4:12,go5:95,go6:5.2,go7:0,go8:0.78,go9:0.70,go10:8,ma1:7.2,ma2:30,ma3:4,ma4:48,ma5:42,ma6:1.9,ma7:4,ma8:46.8,ma9:68,ma10:325,fr1:1200,fr2:3800000,fr3:48,fr4:6,fr5:62,fr6:3,fr7:8,fr8:3,fr9:null,fr10:5}
 };
 
 const CITIES_META = [
@@ -181,7 +186,12 @@ const CITIES_META = [
   {key:'sanantonio', name:'San Antonio del Táchira',   country:'Venezuela', flag:'🇻🇪', population:150000,  region:'Estado Táchira'},
   {key:'ipiales',    name:'Ipiales',                   country:'Colombia',  flag:'🇨🇴', population:122000,  region:'Nariño'},
   {key:'leticia',    name:'Leticia',                   country:'Colombia',  flag:'🇨🇴', population:45000,   region:'Amazonas'},
-  {key:'pacaraima',  name:'Pacaraima',                 country:'Brasil',    flag:'🇧🇷', population:18000,   region:'Roraima'}
+  {key:'pacaraima',  name:'Pacaraima',                 country:'Brasil',    flag:'🇧🇷', population:18000,   region:'Roraima'},
+  {key:'juarez',    name:'Ciudad Juárez',             country:'México',    flag:'🇲🇽', population:1500000, region:'Chihuahua'},
+  {key:'tijuana',   name:'Tijuana',                   country:'México',    flag:'🇲🇽', population:2000000, region:'Baja California'},
+  {key:'foz',       name:'Foz do Iguaçu',             country:'Brasil',    flag:'🇧🇷', population:230000,  region:'Paraná'},
+  {key:'tacna',     name:'Tacna',                     country:'Perú',      flag:'🇵🇪', population:370000,  region:'Tacna'},
+  {key:'tulcan',    name:'Tulcán',                    country:'Ecuador',   flag:'🇪🇨', population:60000,   region:'Carchi'}
 ];
 
 const CITIES = CITIES_META.map(m => ({
