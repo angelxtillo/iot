@@ -6,6 +6,8 @@
   <title>Smart City Frontera — Índice Regional</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     .chart-container{position:relative;width:100%;max-width:1000px;margin:0 auto;height:40vh;max-height:400px;}
     @media(min-width:768px){.chart-container{height:350px;}}
@@ -14,6 +16,8 @@
     .tbl::-webkit-scrollbar-track{background:#f5f5f4;}
     .tbl::-webkit-scrollbar-thumb{background:#d6d3d1;border-radius:4px;}
     .traffic-dot{display:inline-block;width:10px;height:10px;border-radius:50%;flex-shrink:0;cursor:default;vertical-align:middle;}
+    @keyframes pulse-ring{0%{box-shadow:0 0 0 0 rgba(99,102,241,.75);}70%{box-shadow:0 0 0 14px rgba(99,102,241,0);}100%{box-shadow:0 0 0 0 rgba(99,102,241,0);}}
+    .marker-active{animation:pulse-ring 1.6s ease-out infinite;}
   </style>
 </head>
 <body class="font-sans antialiased overflow-hidden h-screen flex flex-col md:flex-row w-full">
@@ -38,6 +42,7 @@
     <p class="text-[10px] uppercase font-bold text-stone-400 tracking-wider mb-1.5 px-2">Análisis General</p>
     <button data-tab="Resumen"         class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F4CA; Resumen Global</button>
     <button data-tab="Ranking"         class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F3C6; Ranking Regional</button>
+    <button data-tab="Mapa"            class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F5FA;&#xFE0F; Mapa</button>
     <button data-tab="Comparar"        class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x2696;&#xFE0F; Comparar Ciudades</button>
     <button data-tab="Formulas"        class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F4D0; Catálogo de Fórmulas</button>
     <p class="text-[10px] uppercase font-bold text-stone-400 tracking-wider mt-3 mb-1.5 px-2">Dimensiones</p>
@@ -92,6 +97,10 @@
     </div>
 
     <div class="h-10"></div>
+  </div>
+
+  <div id="map-section" class="hidden flex-grow relative" style="min-height:0;">
+    <div id="leaflet-map" style="height:100%;width:100%;"></div>
   </div>
 </main>
 
@@ -182,16 +191,16 @@ const CV = {
 };
 
 const CITIES_META = [
-  {key:'cucuta',     name:'Cúcuta',                   country:'Colombia',  flag:'🇨🇴', population:750000,  region:'Norte de Santander'},
-  {key:'sanantonio', name:'San Antonio del Táchira',   country:'Venezuela', flag:'🇻🇪', population:150000,  region:'Estado Táchira'},
-  {key:'ipiales',    name:'Ipiales',                   country:'Colombia',  flag:'🇨🇴', population:122000,  region:'Nariño'},
-  {key:'leticia',    name:'Leticia',                   country:'Colombia',  flag:'🇨🇴', population:45000,   region:'Amazonas'},
-  {key:'pacaraima',  name:'Pacaraima',                 country:'Brasil',    flag:'🇧🇷', population:18000,   region:'Roraima'},
-  {key:'juarez',    name:'Ciudad Juárez',             country:'México',    flag:'🇲🇽', population:1500000, region:'Chihuahua'},
-  {key:'tijuana',   name:'Tijuana',                   country:'México',    flag:'🇲🇽', population:2000000, region:'Baja California'},
-  {key:'foz',       name:'Foz do Iguaçu',             country:'Brasil',    flag:'🇧🇷', population:230000,  region:'Paraná'},
-  {key:'tacna',     name:'Tacna',                     country:'Perú',      flag:'🇵🇪', population:370000,  region:'Tacna'},
-  {key:'tulcan',    name:'Tulcán',                    country:'Ecuador',   flag:'🇪🇨', population:60000,   region:'Carchi'}
+  {key:'cucuta',     name:'Cúcuta',                   country:'Colombia',  flag:'🇨🇴', population:750000,  region:'Norte de Santander', lat:7.8939,   lng:-72.5078},
+  {key:'sanantonio', name:'San Antonio del Táchira',   country:'Venezuela', flag:'🇻🇪', population:150000,  region:'Estado Táchira',      lat:7.8167,   lng:-72.4500},
+  {key:'ipiales',    name:'Ipiales',                   country:'Colombia',  flag:'🇨🇴', population:122000,  region:'Nariño',              lat:0.8294,   lng:-77.6436},
+  {key:'leticia',    name:'Leticia',                   country:'Colombia',  flag:'🇨🇴', population:45000,   region:'Amazonas',            lat:-4.2153,  lng:-69.9406},
+  {key:'pacaraima',  name:'Pacaraima',                 country:'Brasil',    flag:'🇧🇷', population:18000,   region:'Roraima',             lat:4.4772,   lng:-61.1503},
+  {key:'juarez',    name:'Ciudad Juárez',             country:'México',    flag:'🇲🇽', population:1500000, region:'Chihuahua',           lat:31.6904,  lng:-106.4245},
+  {key:'tijuana',   name:'Tijuana',                   country:'México',    flag:'🇲🇽', population:2000000, region:'Baja California',     lat:32.5149,  lng:-117.0382},
+  {key:'foz',       name:'Foz do Iguaçu',             country:'Brasil',    flag:'🇧🇷', population:230000,  region:'Paraná',              lat:-25.5469, lng:-54.5882},
+  {key:'tacna',     name:'Tacna',                     country:'Perú',      flag:'🇵🇪', population:370000,  region:'Tacna',               lat:-18.0066, lng:-70.2508},
+  {key:'tulcan',    name:'Tulcán',                    country:'Ecuador',   flag:'🇪🇨', population:60000,   region:'Carchi',              lat:0.8117,   lng:-77.7170}
 ];
 
 const CITIES = CITIES_META.map(m => ({
@@ -215,6 +224,7 @@ const C    = {
 const DESC = {
   Resumen:'Consolidado general del Índice con cálculos en tiempo real.',
   Ranking:'Top 3 ciudades según el Índice Compuesto ponderado.',
+  Mapa:'Visualización geográfica interactiva de las 10 ciudades con sus puntajes.',
   Comparar:'Compara el desempeño por dimensiones de dos ciudades en un radar.',
   Formulas:'Catálogo exhaustivo con fórmulas, variables y fuentes.',
   Frontera:'Métricas de comercio binacional, flujo migratorio e integración (Peso: 20%).',
@@ -263,7 +273,7 @@ function composite(inds) {
 // ═══════════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════════
-const st = { tab:'Resumen', cityIdx:0, cmpA:0, cmpB:1, barChart:null, radarChart:null };
+const st = { tab:'Resumen', cityIdx:0, cmpA:0, cmpB:1, barChart:null, radarChart:null, leafletMap:null, markers:[] };
 
 // ═══════════════════════════════════════════════════════════════════
 // INIT — usa DOMContentLoaded para evitar TDZ con ALL_CLS
@@ -276,7 +286,17 @@ document.addEventListener('DOMContentLoaded', function() {
     o.textContent = `${c.name} (${c.country})`;
     sel.appendChild(o);
   });
-  sel.addEventListener('change', e => { st.cityIdx = +e.target.value; render(); });
+  sel.addEventListener('change', e => {
+    st.cityIdx = +e.target.value;
+    if (st.tab === 'Mapa') {
+      updateMapMarkers();
+      const city = CITIES[st.cityIdx];
+      st.leafletMap.setView([city.lat, city.lng], 7, { animate: true });
+      setTimeout(() => { if (st.markers[st.cityIdx]) st.markers[st.cityIdx].openPopup(); }, 400);
+    } else {
+      render();
+    }
+  });
 
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -297,6 +317,7 @@ document.addEventListener('DOMContentLoaded', function() {
 const ALL_CLS = [
   'bg-stone-800','text-white','shadow-md',
   'bg-sky-100','text-sky-700','border-sky-200',
+  'bg-teal-100','text-teal-700','border-teal-200',
   'bg-violet-100','text-violet-700','border-violet-200',
   'bg-stone-200','text-stone-800','shadow-inner',
   'bg-rose-50','text-rose-700','border-rose-200',
@@ -315,6 +336,7 @@ function setActive() {
     if (t === st.tab) {
       if      (t === 'Resumen')  btn.classList.add('bg-stone-800','text-white','shadow-md');
       else if (t === 'Ranking')  btn.classList.add('bg-sky-100','text-sky-700','border-sky-200','shadow-sm');
+      else if (t === 'Mapa')     btn.classList.add('bg-teal-100','text-teal-700','border-teal-200','shadow-sm');
       else if (t === 'Comparar') btn.classList.add('bg-violet-100','text-violet-700','border-violet-200','shadow-sm');
       else if (t === 'Formulas') btn.classList.add('bg-stone-200','text-stone-800','shadow-inner');
       else { const col = C[t]; btn.classList.add(col.bg, col.text, col.border, 'shadow-sm'); }
@@ -323,7 +345,7 @@ function setActive() {
     }
   });
 
-  const titles = {Resumen:'Resumen del Índice',Ranking:'Ranking Regional',Comparar:'Comparar Ciudades',Formulas:'Catálogo Analítico de Fórmulas'};
+  const titles = {Resumen:'Resumen del Índice',Ranking:'Ranking Regional',Mapa:'Mapa Interactivo',Comparar:'Comparar Ciudades',Formulas:'Catálogo Analítico de Fórmulas'};
   DIMS.forEach(d => titles[d] = `Indicadores: ${d}`);
   document.getElementById('view-title').textContent = titles[st.tab] || st.tab;
   document.getElementById('view-desc').textContent  = DESC[st.tab] || '';
@@ -374,7 +396,21 @@ function trafficSummary(items) {
 // RENDER DISPATCHER
 // ═══════════════════════════════════════════════════════════════════
 function render() {
-  const cs = document.getElementById('chart-section');
+  const cs     = document.getElementById('chart-section');
+  const ms     = document.getElementById('main-scroll-area');
+  const mapSec = document.getElementById('map-section');
+
+  if (st.tab === 'Mapa') {
+    cs.style.display = 'none';
+    ms.classList.add('hidden');
+    mapSec.classList.remove('hidden');
+    renderMapa();
+    return;
+  }
+
+  ms.classList.remove('hidden');
+  mapSec.classList.add('hidden');
+
   if (['Ranking','Comparar','Formulas'].includes(st.tab)) {
     cs.style.display = 'none';
   } else {
@@ -732,6 +768,86 @@ function renderFormulas() {
     </div>${body}
   </div>`;
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// MAPA
+// ═══════════════════════════════════════════════════════════════════
+function renderMapa() {
+  if (!st.leafletMap) {
+    st.leafletMap = L.map('leaflet-map', { zoomControl: true }).setView([-5, -70], 3);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 18
+    }).addTo(st.leafletMap);
+  }
+  setTimeout(() => st.leafletMap.invalidateSize(), 60);
+  updateMapMarkers();
+}
+
+function updateMapMarkers() {
+  if (!st.leafletMap) return;
+  st.markers.forEach(m => st.leafletMap.removeLayer(m));
+  st.markers = [];
+
+  CITIES.forEach((city, i) => {
+    const score   = composite(city.indicators);
+    const avgs    = dimAvgs(city.indicators);
+    const color   = score >= 7.0 ? '#22c55e' : score >= 4.0 ? '#eab308' : '#ef4444';
+    const isActive = i === st.cityIdx;
+    const sz      = isActive ? 24 : 18;
+    const border  = isActive ? 3 : 2;
+
+    const icon = L.divIcon({
+      className: '',
+      html: `<div class="${isActive ? 'marker-active' : ''}" style="width:${sz}px;height:${sz}px;border-radius:50%;background:${color};border:${border}px solid white;box-shadow:0 2px 8px rgba(0,0,0,.35);"></div>`,
+      iconSize:   [sz, sz],
+      iconAnchor: [sz / 2, sz / 2],
+      popupAnchor:[0, -(sz / 2 + 4)]
+    });
+
+    const pct      = (score / 10 * 100).toFixed(1);
+    const dimRows  = DIMS.map(d =>
+      `<div style="display:flex;justify-content:space-between;margin-bottom:3px;">` +
+      `<span style="color:#78716c;font-size:11px;">${d}</span>` +
+      `<span style="font-weight:700;color:#1c1917;font-size:11px;font-family:monospace;">${avgs[d].toFixed(2)}</span>` +
+      `</div>`
+    ).join('');
+
+    const popupHtml =
+      `<div style="font-family:sans-serif;min-width:230px;max-width:260px;padding:2px 0;">` +
+        `<div style="font-size:16px;font-weight:900;margin-bottom:2px;">${city.flag} ${city.name}</div>` +
+        `<div style="color:#78716c;font-size:11px;margin-bottom:8px;">${city.country} &middot; ${city.region}</div>` +
+        `<div style="margin-bottom:6px;">` +
+          `<span style="font-size:22px;font-weight:900;color:${color};font-family:monospace;">${score.toFixed(2)}</span>` +
+          `<span style="color:#a8a29e;font-size:12px;"> / 10</span>` +
+        `</div>` +
+        `<div style="background:#e7e5e4;border-radius:99px;height:8px;margin-bottom:10px;overflow:hidden;">` +
+          `<div style="background:${color};height:8px;width:${pct}%;border-radius:99px;"></div>` +
+        `</div>` +
+        `<div style="border-top:1px solid #e7e5e4;padding-top:8px;margin-bottom:10px;">${dimRows}</div>` +
+        `<button onclick="goToCity(${i})" ` +
+          `style="width:100%;padding:8px 12px;background:#1c1917;color:white;border:none;border-radius:8px;` +
+          `font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.03em;">` +
+          `Ver detalle &rarr;` +
+        `</button>` +
+      `</div>`;
+
+    const marker = L.marker([city.lat, city.lng], { icon })
+      .bindPopup(L.popup({ maxWidth: 270, minWidth: 240 }).setContent(popupHtml))
+      .addTo(st.leafletMap);
+
+    st.markers.push(marker);
+  });
+}
+
+window.goToCity = function(cityIdx) {
+  st.cityIdx = cityIdx;
+  document.getElementById('city-selector').value = cityIdx;
+  st.tab = 'Resumen';
+  setActive();
+  document.getElementById('main-scroll-area').scrollTop = 0;
+  render();
+};
 </script>
 </body>
 </html>
