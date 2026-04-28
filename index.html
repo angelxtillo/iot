@@ -233,7 +233,7 @@ const C    = {
 };
 const DESC = {
   Resumen:'Consolidado general del Índice con cálculos en tiempo real.',
-  Ranking:'Top 3 ciudades según el Índice Compuesto ponderado.',
+  Ranking:'Clasificación completa de las 10 ciudades por Índice Compuesto ponderado.',
   Mapa:'Visualización geográfica interactiva de las 10 ciudades con sus puntajes.',
   Comparar:'Compara el desempeño por dimensiones de dos ciudades en un radar.',
   Formulas:'Catálogo exhaustivo con fórmulas, variables y fuentes.',
@@ -264,6 +264,7 @@ function calcScore(tipo, val, ref) {
   return Math.min(10, Math.max(0, tipo === 'pos' ? (val / ref) * 10 : (ref / val) * 10));
 }
 function sColor(s) { return s >= 8 ? 'text-emerald-600' : s >= 5 ? 'text-amber-500' : 'text-red-500'; }
+function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function dimAvgs(inds) {
   const acc = {};
   DIMS.forEach(d => acc[d] = {sum:0, n:0});
@@ -504,6 +505,7 @@ function trafficSummary(items) {
 // RENDER DISPATCHER
 // ═══════════════════════════════════════════════════════════════════
 function render() {
+  if (st._rkTip) st._rkTip.style.display = 'none';
   const cs     = document.getElementById('chart-section');
   const ms     = document.getElementById('main-scroll-area');
   const mapSec = document.getElementById('map-section');
@@ -679,68 +681,240 @@ function renderTable() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// RANKING — top 3 por puntaje compuesto
+// RANKING — lista completa con filtros, comparación y hover tooltip
 // ═══════════════════════════════════════════════════════════════════
 function renderRanking() {
   document.getElementById('table-header').style.display = 'none';
   document.getElementById('interp-card').classList.add('hidden');
   const container = document.getElementById('data-container');
 
-  const ranked = CITIES
-    .map(c => ({ ...c, score: composite(c.indicators), avgs: dimAvgs(c.indicators) }))
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 3);
+  // Persistent state
+  if (st.rankingSearch  === undefined) st.rankingSearch  = '';
+  if (st.rankingCountry === undefined) st.rankingCountry = '';
+  if (!st.rankingSelected) st.rankingSelected = new Set();
 
+  // Build full ranked list
+  const allRanked = CITIES
+    .map((c, idx) => ({ ...c, idx, score: composite(c.indicators), avgs: dimAvgs(c.indicators) }))
+    .sort((a, b) => b.score - a.score);
+
+  // Apply filters
+  const filtered = allRanked.filter(c =>
+    (!st.rankingSearch  || c.name.toLowerCase().includes(st.rankingSearch.toLowerCase())) &&
+    (!st.rankingCountry || c.country === st.rankingCountry)
+  );
+
+  const hasFilters = !!(st.rankingSearch || st.rankingCountry);
   const medals = ['🥇','🥈','🥉'];
-  const cardBg = [
-    'from-yellow-50 to-amber-50 border-amber-200',
-    'from-slate-50 to-stone-100 border-stone-200',
-    'from-orange-50 to-amber-50 border-amber-100'
-  ];
-  const numCol = ['text-amber-600','text-slate-500','text-amber-700'];
+  const selCount = st.rankingSelected.size;
 
-  let html = `<div class="p-7">
-    <div class="text-center mb-7">
-      <h2 class="text-3xl font-black text-stone-800">&#x1F3C6; Ranking de Ciudades Inteligentes</h2>
-      <p class="text-stone-500 mt-2 text-sm">Top 3 · región fronteriza Colombia · Venezuela · Brasil</p>
-    </div>
-    <div class="space-y-5">`;
+  const countryOpts = countryList.map(({label, value}) =>
+    `<option value="${value}"${st.rankingCountry === value ? ' selected' : ''}>${label}</option>`
+  ).join('');
 
-  ranked.forEach((city, i) => {
-    const bars = DIMS.map(dim => {
-      const s = city.avgs[dim];
-      return `<div class="flex items-center gap-2 text-xs">
-        <span class="w-28 text-stone-500 truncate">${dim}</span>
-        <div class="flex-1 bg-stone-100 rounded-full h-1.5">
-          <div class="h-1.5 rounded-full" style="width:${((s/10)*100).toFixed(1)}%;background:${C[dim].hex}"></div>
-        </div>
-        <span class="w-9 text-right font-mono font-bold ${sColor(s)}">${s.toFixed(1)}</span>
-      </div>`;
-    }).join('');
+  const rowsHtml = filtered.length === 0
+    ? `<tr><td colspan="7" class="py-16 text-center text-stone-400 text-sm">No se encontraron ciudades con estos filtros.</td></tr>`
+    : filtered.map((city, fi) => {
+        const rank = allRanked.findIndex(c => c.idx === city.idx) + 1;
+        const isActive = city.idx === st.cityIdx;
+        const isChecked = st.rankingSelected.has(city.idx);
+        const band = BANDS[interpretBand(city.score)];
+        const pct = Math.min(100, city.score / 10 * 100).toFixed(1);
+        const barColor = city.score >= 7 ? '#22c55e' : city.score >= 4 ? '#eab308' : '#ef4444';
+        const pos = rank <= 3
+          ? `<span class="text-2xl leading-none">${medals[rank-1]}</span>`
+          : `<span class="text-base font-black text-stone-500">${rank}°</span>`;
+        const rowBg = isActive
+          ? 'bg-sky-50'
+          : (fi % 2 === 0 ? 'bg-white hover:bg-stone-50' : 'bg-stone-50 hover:bg-stone-100');
+        const activeBorder = isActive ? ' style="box-shadow:inset 4px 0 0 #38bdf8;"' : '';
 
-    html += `<div class="bg-gradient-to-br ${cardBg[i]} border rounded-2xl p-6 shadow-sm">
-      <div class="flex items-start justify-between">
-        <div class="flex items-center gap-4">
-          <span class="text-5xl leading-none">${medals[i]}</span>
-          <div>
-            <div class="text-4xl leading-none mb-1">${city.flag}</div>
-            <div class="text-xl font-black text-stone-800">${city.name}</div>
-            <div class="text-sm text-stone-500">${city.country} · ${city.region}</div>
-          </div>
-        </div>
-        <div class="text-right">
-          <div class="text-[10px] uppercase tracking-widest text-stone-400 font-bold">Índice Compuesto</div>
-          <div class="text-5xl font-black ${numCol[i]} leading-none mt-1">${city.score.toFixed(2)}</div>
-          <div class="text-xs text-stone-400 mt-1">/ 10.00</div>
-        </div>
+        return `<tr class="ranking-row border-b border-stone-100 cursor-pointer transition-colors ${rowBg}" data-city-idx="${city.idx}"${activeBorder}>
+          <td class="px-3 py-3 w-10 text-center">
+            <input type="checkbox" class="ranking-cb w-4 h-4 rounded accent-sky-500 cursor-pointer" data-city-idx="${city.idx}" ${isChecked ? 'checked' : ''}>
+          </td>
+          <td class="px-2 py-3 text-center w-12">${pos}</td>
+          <td class="px-3 py-3">
+            <div class="flex items-center gap-2">
+              <span class="text-xl leading-none">${city.flag}</span>
+              <div>
+                <div class="font-bold text-stone-800 text-sm leading-tight flex items-center gap-1 flex-wrap">
+                  ${city.name}
+                  ${isActive ? '<span class="text-[9px] bg-sky-500 text-white px-1.5 py-0.5 rounded-full font-bold tracking-wide">Ciudad activa</span>' : ''}
+                </div>
+                <div class="text-[10px] text-stone-400">${city.country}</div>
+              </div>
+            </div>
+          </td>
+          <td class="px-3 py-3 min-w-[90px]">
+            <div class="bg-stone-100 rounded-full h-2 overflow-hidden">
+              <div class="h-2 rounded-full" style="width:${pct}%;background:${barColor};"></div>
+            </div>
+          </td>
+          <td class="px-3 py-3 text-right whitespace-nowrap">
+            <span class="font-mono font-black text-base" style="color:${barColor};">${city.score.toFixed(2)}</span>
+            <span class="text-stone-300 text-xs">/10</span>
+          </td>
+          <td class="px-3 py-3">
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border whitespace-nowrap ${band.text} ${band.bg} ${band.border}">${band.level}</span>
+          </td>
+          <td class="px-2 py-3 w-8 text-center text-stone-300 text-xs select-none">⋯</td>
+        </tr>`;
+      }).join('');
+
+  container.innerHTML = `
+    <div class="p-5 pb-24">
+      <div class="text-center mb-5">
+        <h2 class="text-2xl font-black text-stone-800">🏆 Ranking de Ciudades Inteligentes</h2>
+        <p class="text-stone-400 text-xs mt-1">${CITIES.length} ciudades · ordenadas por Índice Compuesto ponderado</p>
       </div>
-      <div class="mt-5 pt-4 border-t border-stone-200/70 space-y-2">${bars}</div>
-    </div>`;
+
+      <div class="bg-white rounded-2xl border border-stone-200 p-4 mb-3 flex flex-wrap gap-3 items-end shadow-sm">
+        <div class="flex-1 min-w-[150px]">
+          <label class="text-[10px] uppercase font-bold text-stone-400 tracking-wider block mb-1">Buscar ciudad</label>
+          <input id="rk-search" type="text" placeholder="Nombre de ciudad…" value="${escHtml(st.rankingSearch)}"
+            class="w-full px-3 py-2 rounded-lg border border-stone-200 text-sm text-stone-700 bg-stone-50 focus:outline-none focus:ring-2 focus:ring-sky-300">
+        </div>
+        <div class="flex-1 min-w-[150px]">
+          <label class="text-[10px] uppercase font-bold text-stone-400 tracking-wider block mb-1">País</label>
+          <select id="rk-country" class="w-full px-3 py-2 rounded-lg border border-stone-200 text-sm text-stone-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-300">${countryOpts}</select>
+        </div>
+        ${hasFilters ? `<button id="rk-clear" class="px-4 py-2 rounded-lg border border-stone-200 text-sm text-stone-600 hover:bg-stone-50 font-medium transition-colors whitespace-nowrap self-end">✕ Limpiar filtros</button>` : ''}
+      </div>
+
+      ${hasFilters ? `<div class="mb-3 text-center"><button id="rk-showall" class="px-5 py-2.5 bg-sky-50 border border-sky-200 text-sky-700 text-sm font-bold rounded-xl hover:bg-sky-100 transition-colors">↩ Ver todas las ciudades</button></div>` : ''}
+
+      <div class="flex justify-between items-center mb-2 text-xs text-stone-500 px-1">
+        <span>Mostrando <strong class="text-stone-700">${filtered.length}</strong> de <strong class="text-stone-700">${CITIES.length}</strong> ciudades</span>
+        ${selCount > 0 ? `<span class="text-sky-600 font-bold">${selCount} seleccionada${selCount !== 1 ? 's' : ''}</span>` : ''}
+      </div>
+
+      <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
+        <table class="w-full text-left border-collapse min-w-[480px]">
+          <thead>
+            <tr class="bg-stone-100 text-stone-400 text-[10px] uppercase tracking-wider font-semibold border-b border-stone-200">
+              <th class="px-3 py-3 w-10"></th>
+              <th class="px-2 py-3 text-center">#</th>
+              <th class="px-3 py-3">Ciudad</th>
+              <th class="px-3 py-3">Puntaje</th>
+              <th class="px-3 py-3 text-right">Total</th>
+              <th class="px-3 py-3">Nivel</th>
+              <th class="px-2 py-3 w-8 text-center" title="Pasa el cursor sobre una fila para ver las 6 dimensiones">⋯</th>
+            </tr>
+          </thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>
+    </div>
+
+    ${selCount === 2 ? `<div onclick="goToCompareSelected()" class="fixed bottom-6 z-50 flex items-center gap-2 bg-violet-600 text-white px-6 py-3.5 rounded-full shadow-2xl font-bold text-sm cursor-pointer hover:bg-violet-700 transition-all select-none" style="left:50%;transform:translateX(-50%);">⚖️ Comparar seleccionadas <span class="bg-violet-800 text-violet-200 text-xs px-2 py-0.5 rounded-full ml-1">2</span></div>` : ''}
+  `;
+
+  // ── Event listeners ──────────────────────────────────────────────
+  const searchEl = document.getElementById('rk-search');
+  if (searchEl) searchEl.addEventListener('input', e => { st.rankingSearch = e.target.value; renderRanking(); });
+
+  const countryEl = document.getElementById('rk-country');
+  if (countryEl) countryEl.addEventListener('change', e => { st.rankingCountry = e.target.value; renderRanking(); });
+
+  const clearEl = document.getElementById('rk-clear');
+  if (clearEl) clearEl.addEventListener('click', () => { st.rankingSearch = ''; st.rankingCountry = ''; renderRanking(); });
+
+  const showAllEl = document.getElementById('rk-showall');
+  if (showAllEl) showAllEl.addEventListener('click', () => { st.rankingSearch = ''; st.rankingCountry = ''; renderRanking(); });
+
+  // Row click → activate city
+  container.querySelectorAll('.ranking-row').forEach(row => {
+    row.addEventListener('click', function(e) {
+      const idx = +this.dataset.cityIdx;
+      st.cityIdx = idx;
+      currentCountry = '';
+      document.getElementById('country-search').value = '';
+      document.getElementById('city-search').value = '';
+      buildCountrySel('');
+      document.getElementById('country-selector').value = '';
+      buildCitySel('');
+      syncCitySel();
+      setActive();
+      renderRanking();
+    });
   });
 
-  html += `</div></div>`;
-  container.innerHTML = html;
+  // Checkbox: stop click propagation + handle selection
+  container.querySelectorAll('.ranking-cb').forEach(cb => {
+    cb.addEventListener('click', e => e.stopPropagation());
+    cb.addEventListener('change', function() {
+      const idx = +this.dataset.cityIdx;
+      if (this.checked) {
+        if (st.rankingSelected.size >= 2) {
+          st.rankingSelected.delete([...st.rankingSelected][0]);
+        }
+        st.rankingSelected.add(idx);
+      } else {
+        st.rankingSelected.delete(idx);
+      }
+      renderRanking();
+    });
+  });
+
+  // Hover tooltip — mini dimension bars
+  const tip = rkGetTip();
+  container.querySelectorAll('.ranking-row').forEach(row => {
+    const idx = +row.dataset.cityIdx;
+    const city = allRanked.find(c => c.idx === idx);
+    if (!city) return;
+    row.addEventListener('mouseenter', e => {
+      tip.innerHTML =
+        `<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#a8a29e;margin-bottom:8px;">${city.flag} ${city.name} · Dimensiones</div>` +
+        DIMS.map(dim => {
+          const s = city.avgs[dim];
+          const bc = s >= 7 ? '#22c55e' : s >= 4 ? '#eab308' : '#ef4444';
+          return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+            <span style="width:110px;font-size:10px;color:#78716c;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${dim}</span>
+            <div style="flex:1;background:#e7e5e4;border-radius:4px;height:5px;overflow:hidden;min-width:55px;">
+              <div style="background:${bc};height:5px;width:${Math.min(100,s/10*100).toFixed(1)}%;border-radius:4px;"></div>
+            </div>
+            <span style="width:28px;text-align:right;font-size:10px;font-family:monospace;font-weight:700;">${s.toFixed(1)}</span>
+          </div>`;
+        }).join('');
+      tip.style.display = 'block';
+      rkPosTip(e);
+    });
+    row.addEventListener('mousemove', rkPosTip);
+    row.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+  });
 }
+
+function rkGetTip() {
+  if (!st._rkTip) {
+    st._rkTip = document.createElement('div');
+    st._rkTip.style.cssText = 'position:fixed;z-index:9999;background:#fff;border:1px solid #e7e5e4;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.14);padding:12px 14px;min-width:230px;pointer-events:none;display:none;';
+    document.body.appendChild(st._rkTip);
+  }
+  return st._rkTip;
+}
+
+function rkPosTip(e) {
+  const t = st._rkTip;
+  if (!t || t.style.display === 'none') return;
+  const pad = 14, vw = window.innerWidth, vh = window.innerHeight;
+  const {width: tw, height: th} = t.getBoundingClientRect();
+  let x = e.clientX + pad, y = e.clientY + pad;
+  if (x + tw > vw - pad) x = e.clientX - tw - pad;
+  if (y + th > vh - pad) y = e.clientY - th - pad;
+  t.style.left = Math.max(0, x) + 'px';
+  t.style.top  = Math.max(0, y) + 'px';
+}
+
+window.goToCompareSelected = function() {
+  if (!st.rankingSelected || st.rankingSelected.size !== 2) return;
+  const [a, b] = [...st.rankingSelected];
+  st.cmpA = a; st.cmpB = b;
+  st.tab = 'Comparar';
+  setActive();
+  document.getElementById('main-scroll-area').scrollTop = 0;
+  render();
+};
 
 // ═══════════════════════════════════════════════════════════════════
 // COMPARAR — radar + tabla de dimensiones
