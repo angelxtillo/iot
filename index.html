@@ -28,35 +28,41 @@
   <div class="p-5 border-b border-stone-100 flex-shrink-0">
     <h1 class="text-lg font-bold text-stone-800 tracking-tight leading-tight flex items-center flex-wrap gap-1">
       &#x1F3D9;&#xFE0F; Smart City Frontera
-      <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold border border-emerald-200">v7.0</span>
+      <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold border border-emerald-200">v8.0</span>
     </h1>
     <p class="text-xs text-stone-500 mt-1 font-medium">Índice Comparativo Regional</p>
   </div>
 
-  <div class="px-4 pt-3 pb-3 border-b border-stone-100 flex-shrink-0">
-    <p class="text-[10px] uppercase font-bold text-stone-400 tracking-wider mb-2">Ciudad activa</p>
-    <div id="active-city-card" class="bg-stone-50 rounded-xl border border-stone-200 p-3"></div>
-    <p class="text-[10px] text-stone-400 text-center mt-2">Cambia en Ranking Regional</p>
-  </div>
-
-  <nav class="flex-grow p-3 overflow-y-auto space-y-1" id="nav-tabs">
-    <p class="text-[10px] uppercase font-bold text-stone-400 tracking-wider mb-1.5 px-2">Análisis General</p>
-    <button data-tab="Resumen"         class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F4CA; Resumen Global</button>
-    <button data-tab="Ranking"         class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F3C6; Ranking Regional</button>
-    <button data-tab="Mapa"            class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F5FA;&#xFE0F; Mapa</button>
-    <button data-tab="Comparar"        class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x2696;&#xFE0F; Comparar Ciudades</button>
-    <button data-tab="Formulas"        class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F4D0; Catálogo de Fórmulas</button>
-    <p class="text-[10px] uppercase font-bold text-stone-400 tracking-wider mt-3 mb-1.5 px-2">Dimensiones</p>
-    <button data-tab="Frontera"        class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-bold  flex items-center gap-2">&#x1F6A7; Frontera (20%)</button>
-    <button data-tab="Economía"        class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F4B9; Economía (16%)</button>
-    <button data-tab="Capital Humano"  class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F393; Capital Humano (16%)</button>
-    <button data-tab="Cohesión Social" class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F91D; Cohesión Social (16%)</button>
-    <button data-tab="Gobernanza"      class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F3DB; Gobernanza (16%)</button>
-    <button data-tab="Medio Ambiente"  class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F33F; Medio Ambiente (16%)</button>
+  <nav class="p-3 flex-shrink-0 space-y-1" id="nav-tabs">
+    <button data-tab="Ranking"  class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F3C6; Ranking Regional</button>
+    <button data-tab="Mapa"     class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F5FA;&#xFE0F; Mapa</button>
+    <button data-tab="Comparar" class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x2696;&#xFE0F; Comparar Ciudades</button>
   </nav>
 
-  <div class="px-4 py-3 bg-stone-50 border-t border-stone-200 text-xs text-stone-500 text-center flex-shrink-0">
-    Datos embebidos · 10 ciudades · 60 indicadores
+  <!-- Ciudad activa — visible sólo cuando hay ciudad seleccionada -->
+  <div id="city-active-section" class="px-4 pb-3 border-t border-stone-100 flex-shrink-0 hidden">
+    <p class="text-[10px] uppercase font-bold text-stone-400 tracking-wider mt-3 mb-2">Ciudad activa</p>
+    <div id="active-city-card" class="bg-sky-50 rounded-xl border border-sky-200 p-3"></div>
+  </div>
+
+  <div class="flex-grow"></div>
+
+  <!-- Acordeón de fórmulas -->
+  <div class="px-4 py-3 border-t border-stone-200 flex-shrink-0">
+    <button id="formula-toggle" class="w-full text-left text-[10px] font-bold text-stone-400 uppercase tracking-wider flex items-center justify-between hover:text-stone-600 transition-colors py-0.5">
+      <span>&#x1F4D0; Fórmulas de puntuación</span><span id="formula-arrow" class="text-stone-300 text-xs">▸</span>
+    </button>
+    <div id="formula-body" class="hidden mt-2.5 space-y-2">
+      <div class="bg-stone-50 rounded-lg p-2.5 border border-stone-200">
+        <div class="text-[10px] font-bold text-emerald-700 mb-1.5">Positivo ↑</div>
+        <code class="block bg-stone-800 text-emerald-400 px-2.5 py-1.5 rounded-md font-mono text-[11px]">(Valor Real / Ref. Óptima) × 10</code>
+      </div>
+      <div class="bg-stone-50 rounded-lg p-2.5 border border-stone-200">
+        <div class="text-[10px] font-bold text-red-700 mb-1.5">Negativo ↓</div>
+        <code class="block bg-stone-800 text-red-400 px-2.5 py-1.5 rounded-md font-mono text-[11px]">(Ref. Óptima / Valor Real) × 10</code>
+      </div>
+      <p class="text-[10px] text-stone-400 text-center pb-0.5">Ambas recortadas entre 0 y 10</p>
+    </div>
   </div>
 </aside>
 
@@ -275,10 +281,10 @@ function composite(inds) {
 // ═══════════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════════
-const st = { tab:'Resumen', cityIdx:0, cmpA:0, cmpB:1, barChart:null, radarChart:null, leafletMap:null, markers:[] };
+const st = { tab:'Ranking', cityIdx:null, cmpA:0, cmpB:1, barChart:null, radarChart:null, leafletMap:null, markers:[] };
 
 // ═══════════════════════════════════════════════════════════════════
-// SELECTOR DE PAÍS / CIUDAD — datos y helpers de módulo
+// LISTA DE PAÍSES — usada en filtro del ranking
 // ═══════════════════════════════════════════════════════════════════
 const countryList = (() => {
   const list = [{ label: '🌎 Todos los países', value: '' }];
@@ -291,34 +297,50 @@ const countryList = (() => {
   return list;
 })();
 
-function updateSidebarCityCard() {
+// ═══════════════════════════════════════════════════════════════════
+// SIDEBAR ADAPTATIVO
+// ═══════════════════════════════════════════════════════════════════
+function renderSidebar() {
+  const section = document.getElementById('city-active-section');
+  const card    = document.getElementById('active-city-card');
+  if (st.cityIdx === null) { section.classList.add('hidden'); return; }
   const city  = CITIES[st.cityIdx];
   const score = composite(city.indicators);
   const band  = BANDS[interpretBand(score)];
-  const scoreColor = score >= 7 ? '#22c55e' : score >= 4 ? '#eab308' : '#ef4444';
-  document.getElementById('active-city-card').innerHTML = `
-    <div class="flex items-center gap-2 mb-2.5">
+  const sc    = score >= 7 ? '#22c55e' : score >= 4 ? '#eab308' : '#ef4444';
+  section.classList.remove('hidden');
+  card.innerHTML = `
+    <div class="flex items-center gap-2 mb-2">
       <span class="text-2xl leading-none">${city.flag}</span>
       <div>
         <div class="font-bold text-stone-800 text-sm leading-tight">${city.name}</div>
         <div class="text-[10px] text-stone-500">${city.country}</div>
       </div>
     </div>
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between mb-2.5">
       <div>
         <div class="text-[10px] uppercase font-bold text-stone-400 tracking-wider mb-0.5">Puntaje total</div>
-        <div class="font-mono font-black text-2xl leading-none" style="color:${scoreColor};">${score.toFixed(2)}<span class="text-stone-300 text-xs font-normal">/10</span></div>
+        <div class="font-mono font-black text-2xl leading-none" style="color:${sc};">${score.toFixed(2)}<span class="text-stone-300 text-xs font-normal">/10</span></div>
       </div>
-      <span class="text-[10px] font-bold px-2 py-1 rounded-full border ${band.text} ${band.bg} ${band.border}">${band.level}</span>
+      <span class="text-[10px] font-bold px-2 py-1 rounded-full border whitespace-nowrap ${band.text} ${band.bg} ${band.border}">${band.level}</span>
     </div>
+    <button onclick="deselectCity()" class="w-full text-center text-[11px] font-bold text-stone-500 hover:text-red-600 bg-white hover:bg-red-50 border border-stone-200 hover:border-red-200 rounded-lg py-1.5 transition-colors">✕ Deseleccionar</button>
   `;
 }
 
+window.deselectCity = function() {
+  st.cityIdx = null;
+  st.tab = 'Ranking';
+  renderSidebar();
+  setActive();
+  render();
+};
+
 // ═══════════════════════════════════════════════════════════════════
-// INIT — usa DOMContentLoaded para evitar TDZ con ALL_CLS
+// INIT
 // ═══════════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', function() {
-  updateSidebarCityCard();
+  renderSidebar();
 
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -329,6 +351,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
+  document.getElementById('formula-toggle').addEventListener('click', function() {
+    const body = document.getElementById('formula-body');
+    const open = !body.classList.contains('hidden');
+    body.classList.toggle('hidden', open);
+    document.getElementById('formula-arrow').textContent = open ? '▸' : '▾';
+  });
+
   setActive();
   render();
 });
@@ -337,51 +366,41 @@ document.addEventListener('DOMContentLoaded', function() {
 // NAV ACTIVE
 // ═══════════════════════════════════════════════════════════════════
 const ALL_CLS = [
-  'bg-stone-800','text-white','shadow-md',
   'bg-sky-100','text-sky-700','border-sky-200',
   'bg-teal-100','text-teal-700','border-teal-200',
   'bg-violet-100','text-violet-700','border-violet-200',
-  'bg-stone-200','text-stone-800','shadow-inner',
-  'bg-rose-50','text-rose-700','border-rose-200',
-  'bg-blue-50','text-blue-700','border-blue-200',
-  'bg-indigo-50','text-indigo-700','border-indigo-200',
-  'bg-fuchsia-50','text-fuchsia-700','border-fuchsia-200',
-  'bg-amber-50','text-amber-700','border-amber-200',
-  'bg-emerald-50','text-emerald-700','border-emerald-200',
   'shadow-sm','bg-white','text-stone-600','border-transparent'
 ];
 
 function setActive() {
+  const navTab = (st.tab === 'Resumen') ? 'Ranking' : st.tab;
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.classList.remove(...ALL_CLS);
     const t = btn.dataset.tab;
-    if (t === st.tab) {
-      if      (t === 'Resumen')  btn.classList.add('bg-stone-800','text-white','shadow-md');
-      else if (t === 'Ranking')  btn.classList.add('bg-sky-100','text-sky-700','border-sky-200','shadow-sm');
+    if (t === navTab) {
+      if      (t === 'Ranking')  btn.classList.add('bg-sky-100','text-sky-700','border-sky-200','shadow-sm');
       else if (t === 'Mapa')     btn.classList.add('bg-teal-100','text-teal-700','border-teal-200','shadow-sm');
       else if (t === 'Comparar') btn.classList.add('bg-violet-100','text-violet-700','border-violet-200','shadow-sm');
-      else if (t === 'Formulas') btn.classList.add('bg-stone-200','text-stone-800','shadow-inner');
-      else { const col = C[t]; btn.classList.add(col.bg, col.text, col.border, 'shadow-sm'); }
     } else {
       btn.classList.add('bg-white','text-stone-600','border-transparent');
     }
   });
 
-  const titles = {Resumen:'Resumen del Índice',Ranking:'Ranking Regional',Mapa:'Mapa Interactivo',Comparar:'Comparar Ciudades',Formulas:'Catálogo Analítico de Fórmulas'};
-  DIMS.forEach(d => titles[d] = `Indicadores: ${d}`);
+  const titles = {
+    Ranking:  'Ranking Regional',
+    Mapa:     'Mapa Interactivo',
+    Comparar: 'Comparar Ciudades',
+    Resumen:  st.cityIdx !== null ? `${CITIES[st.cityIdx].flag} ${CITIES[st.cityIdx].name}` : 'Resumen'
+  };
+  const descs = {
+    Ranking:  'Clasificación completa de las 10 ciudades por Índice Compuesto ponderado.',
+    Mapa:     'Visualización geográfica interactiva de las 10 ciudades con sus puntajes.',
+    Comparar: 'Compara el desempeño por dimensiones de dos ciudades en un radar.',
+    Resumen:  'Consolidado general del Índice con cálculos en tiempo real.'
+  };
   document.getElementById('view-title').textContent = titles[st.tab] || st.tab;
-  document.getElementById('view-desc').textContent  = DESC[st.tab] || '';
-
-  const badge = document.getElementById('dim-badge');
-  if (DIMS.includes(st.tab)) {
-    const avg = dimAvgs(CITIES[st.cityIdx].indicators)[st.tab];
-    badge.classList.remove('hidden');
-    const el = document.getElementById('dim-score');
-    el.textContent = avg.toFixed(2);
-    el.className = `text-3xl font-black ${sColor(avg)}`;
-  } else {
-    badge.classList.add('hidden');
-  }
+  document.getElementById('view-desc').textContent  = descs[st.tab]  || '';
+  document.getElementById('dim-badge').classList.add('hidden');
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -397,79 +416,49 @@ function trafficDot(score) {
   const tl = trafficLight(score);
   return `<span class="traffic-dot" style="background:${tl.color};box-shadow:0 0 5px 2px ${tl.color}55;" title="${tl.tooltip}" aria-label="${tl.tooltip}"></span>`;
 }
-function trafficSummary(items) {
-  let green = 0, yellow = 0, red = 0, gray = 0;
-  items.forEach(item => {
-    const s = calcScore(item.tipo, item.val, item.ref);
-    if (s === null)  gray++;
-    else if (s >= 7) green++;
-    else if (s >= 4) yellow++;
-    else             red++;
-  });
-  const parts = [];
-  if (green  > 0) parts.push(`<span style="color:#22c55e;text-shadow:0 0 4px #22c55e80">●</span>&nbsp;<span class="font-semibold">${green} bien</span>`);
-  if (yellow > 0) parts.push(`<span style="color:#eab308;text-shadow:0 0 4px #eab30880">●</span>&nbsp;<span class="font-semibold">${yellow} medio</span>`);
-  if (red    > 0) parts.push(`<span style="color:#ef4444;text-shadow:0 0 4px #ef444480">●</span>&nbsp;<span class="font-semibold">${red} atención</span>`);
-  if (gray   > 0) parts.push(`<span style="color:#9ca3af">●</span>&nbsp;<span class="font-semibold text-stone-400">${gray} sin dato</span>`);
-  return `<div class="flex flex-wrap items-center gap-x-4 gap-y-1 px-6 py-2 bg-stone-50 border-b border-stone-100 text-sm text-stone-600">${parts.join('<span class="text-stone-200 mx-1">·</span>')}</div>`;
-}
 
 // ═══════════════════════════════════════════════════════════════════
 // RENDER DISPATCHER
 // ═══════════════════════════════════════════════════════════════════
 function render() {
   if (st._rkTip) st._rkTip.style.display = 'none';
-  const cs     = document.getElementById('chart-section');
+  if (st.barChart) { st.barChart.destroy(); st.barChart = null; }
+  document.getElementById('chart-section').style.display = 'none';
   const ms     = document.getElementById('main-scroll-area');
   const mapSec = document.getElementById('map-section');
 
   if (st.tab === 'Mapa') {
-    cs.style.display = 'none';
     ms.classList.add('hidden');
     mapSec.classList.remove('hidden');
     renderMapa();
     return;
   }
-
   ms.classList.remove('hidden');
   mapSec.classList.add('hidden');
 
-  if (['Ranking','Comparar','Formulas'].includes(st.tab)) {
-    cs.style.display = 'none';
-  } else {
-    cs.style.display = 'block';
-    try { renderBar(); } catch(e) { cs.style.display = 'none'; console.error('Chart error:', e); }
-  }
   switch (st.tab) {
     case 'Ranking':  renderRanking();  break;
     case 'Comparar': renderComparar(); break;
-    case 'Formulas': renderFormulas(); break;
-    default:         renderTable();
+    case 'Resumen':  renderResumen();  break;
+    default:         renderRanking();
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// BAR CHART
+// BAR CHART — llamado desde renderResumen tras crear el canvas
 // ═══════════════════════════════════════════════════════════════════
 function renderBar() {
-  const inds = CITIES[st.cityIdx].indicators;
+  if (st.cityIdx === null) return;
+  const canvasEl = document.getElementById('mainChart');
+  if (!canvasEl) return;
   if (st.barChart) { st.barChart.destroy(); st.barChart = null; }
-  const ctx = document.getElementById('mainChart').getContext('2d');
-  let labels, data, bg;
-  if (st.tab === 'Resumen') {
-    const avgs = dimAvgs(inds);
-    labels = DIMS; data = DIMS.map(d => +avgs[d].toFixed(4)); bg = DIMS.map(d => C[d].hex);
-    document.getElementById('chart-title').textContent = 'Desempeño por Dimensión (0 a 10)';
-  } else {
-    const items = inds.filter(i => i.dim === st.tab);
-    labels = items.map(i => i.ind.length > 22 ? i.ind.slice(0,22)+'…' : i.ind);
-    data   = items.map(i => { const s = calcScore(i.tipo, i.val, i.ref); return s === null ? 0 : +s.toFixed(4); });
-    bg     = C[st.tab].hex;
-    document.getElementById('chart-title').textContent = `${st.tab} — Indicadores (0 a 10)`;
-  }
-  st.barChart = new Chart(ctx, {
+  const avgs = dimAvgs(CITIES[st.cityIdx].indicators);
+  st.barChart = new Chart(canvasEl.getContext('2d'), {
     type: 'bar',
-    data: { labels, datasets:[{ label:'Puntaje', data, backgroundColor:bg, borderRadius:4, maxBarThickness:60 }] },
+    data: {
+      labels: DIMS,
+      datasets: [{ label:'Puntaje', data: DIMS.map(d => +avgs[d].toFixed(4)), backgroundColor: DIMS.map(d => C[d].hex), borderRadius:4, maxBarThickness:60 }]
+    },
     options: {
       responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{ display:false } },
@@ -479,119 +468,195 @@ function renderBar() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// TABLE — Resumen + dimensiones
+// RESUMEN COMPLETO — accedido desde el botón flotante del ranking
 // ═══════════════════════════════════════════════════════════════════
-function renderTable() {
-  const city = CITIES[st.cityIdx];
-  const inds = city.indicators;
-  document.getElementById('table-header').style.display = 'flex';
+function renderResumen() {
+  if (st.cityIdx === null) { st.tab = 'Ranking'; setActive(); renderRanking(); return; }
+  document.getElementById('table-header').style.display = 'none';
+  document.getElementById('interp-card').classList.add('hidden');
   const container = document.getElementById('data-container');
-  const titleEl   = document.getElementById('table-title');
+  const city  = CITIES[st.cityIdx];
+  const inds  = city.indicators;
+  const avgs  = dimAvgs(inds);
+  const total = composite(inds);
+  const band  = BANDS[interpretBand(total)];
+  const sc    = total >= 7 ? '#22c55e' : total >= 4 ? '#eab308' : '#ef4444';
 
-  if (st.tab === 'Resumen') {
-    const avgs  = dimAvgs(inds);
-    const total = composite(inds);
-    titleEl.innerHTML = `&#x1F4CA; Consolidado &mdash; ${city.flag} ${city.name}`;
-    let html = `<table class="w-full text-left border-collapse min-w-[600px]">
-      <thead><tr class="bg-stone-100 text-stone-500 text-[11px] uppercase tracking-wider font-semibold border-b border-stone-200">
-        <th class="px-6 py-4">Dimensión</th>
-        <th class="px-5 py-4 text-center">Inds.</th>
-        <th class="px-5 py-4 text-right">Promedio (0-10)</th>
-        <th class="px-5 py-4 text-center">Peso</th>
-        <th class="px-5 py-4 text-right">Puntaje Ponderado</th>
-      </tr></thead><tbody class="text-sm">`;
-    DIMS.forEach(dim => {
-      const n = inds.filter(i => i.dim === dim).length;
-      const avg = avgs[dim]; const w = W[dim];
-      html += `<tr class="border-b border-stone-100 hover:bg-stone-50">
-        <td class="px-6 py-4 font-bold text-stone-700">${dim}</td>
-        <td class="px-5 py-4 text-center text-stone-500">${n}</td>
-        <td class="px-5 py-4 text-right font-mono ${sColor(avg)} font-bold text-lg">${avg.toFixed(4)}</td>
-        <td class="px-5 py-4 text-center text-stone-500 font-bold">${(w*100)}%</td>
-        <td class="px-5 py-4 text-right font-mono font-bold text-stone-700 text-lg">${(avg*w).toFixed(4)}</td>
+  // Filas de la tabla consolidada
+  let dimRowsHtml = '';
+  DIMS.forEach(dim => {
+    const avg = avgs[dim]; const w = W[dim];
+    dimRowsHtml += `<tr class="border-b border-stone-100 hover:bg-stone-50">
+      <td class="px-6 py-4 font-bold text-stone-700">${dim}</td>
+      <td class="px-5 py-4 text-center text-stone-500">${inds.filter(i => i.dim === dim).length}</td>
+      <td class="px-5 py-4 text-right font-mono ${sColor(avg)} font-bold text-lg">${avg.toFixed(4)}</td>
+      <td class="px-5 py-4 text-center text-stone-500 font-bold">${(w*100)}%</td>
+      <td class="px-5 py-4 text-right font-mono font-bold text-stone-700 text-lg">${(avg*w).toFixed(4)}</td>
+    </tr>`;
+  });
+
+  // Tabla de interpretación
+  const activeBand = interpretBand(total);
+  let interpHtml = '';
+  BANDS.forEach((b, i) => {
+    if (i === activeBand) {
+      interpHtml += `<tr class="${b.bg} border-l-4 ${b.border}">
+        <td class="px-6 py-3.5 font-mono font-semibold text-stone-700 whitespace-nowrap">${b.range}</td>
+        <td class="px-5 py-3.5 whitespace-nowrap"><span class="${b.text} font-bold flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full ${b.dot} flex-shrink-0"></span>${b.level}
+          <span class="text-[10px] font-bold bg-stone-800 text-white px-2 py-0.5 rounded-full ml-1">&#x2190; Ciudad actual</span>
+        </span></td>
+        <td class="px-5 py-3.5 ${b.text} font-medium">${b.desc}</td>
       </tr>`;
-    });
-    html += `<tr class="bg-stone-800 text-white font-bold border-t-4 border-emerald-500">
-      <td colspan="4" class="px-6 py-5 text-right uppercase tracking-wider text-xs">ÍNDICE COMPUESTO FINAL:</td>
-      <td class="px-6 py-5 text-right font-mono text-emerald-400 text-3xl">${total.toFixed(4)}</td>
-    </tr></tbody></table>`;
-    container.innerHTML = html;
+    } else {
+      interpHtml += `<tr class="border-b border-stone-100 hover:bg-stone-50">
+        <td class="px-6 py-3 font-mono text-stone-500 whitespace-nowrap">${b.range}</td>
+        <td class="px-5 py-3 whitespace-nowrap"><span class="${b.text} font-medium flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full ${b.dot} flex-shrink-0"></span>${b.level}
+        </span></td>
+        <td class="px-5 py-3 text-stone-500">${b.desc}</td>
+      </tr>`;
+    }
+  });
 
-    const activeBand = interpretBand(total);
-    let interpHtml = `<table class="w-full text-left border-collapse min-w-[500px]">
-      <thead><tr class="bg-stone-100 text-stone-500 text-[11px] uppercase tracking-wider font-semibold border-b border-stone-200">
-        <th class="px-6 py-3">Rango</th><th class="px-5 py-3">Nivel</th><th class="px-5 py-3">Interpretación</th>
-      </tr></thead><tbody class="text-sm">`;
-    BANDS.forEach((b, i) => {
-      if (i === activeBand) {
-        interpHtml += `<tr class="${b.bg} border-l-4 ${b.border}">
-          <td class="px-6 py-3.5 font-mono font-semibold text-stone-700 whitespace-nowrap">${b.range}</td>
-          <td class="px-5 py-3.5 whitespace-nowrap">
-            <span class="${b.text} font-bold flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full ${b.dot} flex-shrink-0"></span>${b.level}
-              <span class="text-[10px] font-bold bg-stone-800 text-white px-2 py-0.5 rounded-full ml-1">&#x2190; Ciudad actual</span>
-            </span>
-          </td>
-          <td class="px-5 py-3.5 ${b.text} font-medium">${b.desc}</td>
-        </tr>`;
-      } else {
-        interpHtml += `<tr class="border-b border-stone-100 hover:bg-stone-50">
-          <td class="px-6 py-3 font-mono text-stone-500 whitespace-nowrap">${b.range}</td>
-          <td class="px-5 py-3 whitespace-nowrap">
-            <span class="${b.text} font-medium flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full ${b.dot} flex-shrink-0"></span>${b.level}
-            </span>
-          </td>
-          <td class="px-5 py-3 text-stone-500">${b.desc}</td>
-        </tr>`;
-      }
-    });
-    interpHtml += `</tbody></table>`;
-    document.getElementById('interp-body').innerHTML = interpHtml;
-    document.getElementById('interp-card').classList.remove('hidden');
-  } else {
-    document.getElementById('interp-card').classList.add('hidden');
-    titleEl.innerHTML = `Indicadores: ${st.tab}`;
-    const items = inds.filter(i => i.dim === st.tab);
-    let html = trafficSummary(items) + `<table class="w-full text-left border-collapse min-w-[700px]">
-      <thead><tr class="bg-stone-100 text-stone-500 text-[10px] uppercase tracking-wider font-semibold border-b border-stone-200">
-        <th class="px-6 py-4">Indicador</th>
-        <th class="px-4 py-4 text-center">Tipo</th>
-        <th class="px-4 py-4 text-right">Ref. Óptima</th>
-        <th class="px-5 py-4 text-right">Valor Actual</th>
-        <th class="px-6 py-4 text-right">Puntaje</th>
-      </tr></thead><tbody class="text-sm">`;
-    items.forEach(item => {
+  // Detalle por dimensión con indicadores
+  let dimDetailsHtml = '';
+  DIMS.forEach(dim => {
+    const col = C[dim]; const avg = avgs[dim];
+    let indRows = '';
+    inds.filter(i => i.dim === dim).forEach(item => {
       const score = calcScore(item.tipo, item.val, item.ref);
-      const arrow = item.tipo === 'pos'
-        ? '<span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded text-xs font-bold">Positivo ↑</span>'
-        : '<span class="px-2 py-0.5 bg-red-100 text-red-700 rounded text-xs font-bold">Negativo ↓</span>';
       const scoreCell = score === null
-        ? '<span class="text-stone-300 text-sm font-normal">N/D</span>'
-        : `<span class="font-mono text-xl font-bold ${sColor(score)}">${score.toFixed(2)}</span>`;
-      const valDisplay = item.val === null
-        ? '<span class="text-stone-300">N/D</span>'
-        : item.val;
-      html += `<tr class="border-b border-stone-100 hover:bg-stone-50">
-        <td class="px-6 py-4">
-          <div class="flex items-center gap-2">
+        ? '<span class="text-stone-300 text-sm">N/D</span>'
+        : `<span class="font-mono font-bold text-base ${sColor(score)}">${score.toFixed(2)}</span>`;
+      const valDisplay = item.val === null ? '<span class="text-stone-300">N/D</span>' : escHtml(String(item.val));
+      const arrow = item.tipo === 'pos'
+        ? '<span class="text-[9px] px-1 py-0.5 bg-emerald-100 text-emerald-700 rounded font-bold flex-shrink-0">↑</span>'
+        : '<span class="text-[9px] px-1 py-0.5 bg-red-100 text-red-700 rounded font-bold flex-shrink-0">↓</span>';
+      indRows += `<tr class="border-b border-stone-100 hover:bg-stone-50/80">
+        <td class="px-4 py-3">
+          <div class="flex items-start gap-2">
             ${trafficDot(score)}
             <div>
-              <div class="font-bold text-stone-800">${item.name}</div>
-              <div class="text-[10px] text-stone-400 mt-0.5">${item.unit}</div>
+              <div class="font-semibold text-stone-800 text-sm flex items-center gap-1.5 flex-wrap">${item.name} ${arrow}</div>
+              <div class="text-[10px] text-stone-400 mt-0.5 leading-tight">${escHtml(item.desc)}</div>
             </div>
           </div>
         </td>
-        <td class="px-4 py-4 text-center">${arrow}</td>
-        <td class="px-4 py-4 text-right font-mono text-stone-500">${item.ref}</td>
-        <td class="px-5 py-4 text-right font-mono text-stone-700 font-bold">${valDisplay}</td>
-        <td class="px-6 py-4 text-right">${scoreCell}</td>
+        <td class="px-3 py-3 text-right align-top">
+          <div class="font-mono text-sm text-stone-700 font-semibold">${valDisplay}</div>
+          <div class="text-[10px] text-stone-400">${escHtml(item.unit)}</div>
+        </td>
+        <td class="px-3 py-3 text-right align-top font-mono text-sm text-stone-400">${item.ref}</td>
+        <td class="px-3 py-3 text-right align-top">${scoreCell}</td>
       </tr>`;
     });
-    html += `</tbody></table>`;
-    container.innerHTML = html;
-  }
+    dimDetailsHtml += `<div class="bg-white rounded-2xl border ${col.border} shadow-sm mb-5 overflow-hidden">
+      <div class="${col.bg} px-5 py-3.5 border-b ${col.border} flex items-center justify-between flex-wrap gap-2">
+        <h4 class="font-black text-base ${col.text}">${dim}</h4>
+        <div class="flex items-center gap-3 text-sm">
+          <span class="text-stone-500 font-medium">Peso <strong>${(W[dim]*100)}%</strong></span>
+          <span class="font-mono font-black text-xl ${sColor(avg)}">${avg.toFixed(2)}<span class="text-stone-400 text-xs font-normal">/10</span></span>
+        </div>
+      </div>
+      <div class="overflow-x-auto tbl">
+        <table class="w-full text-left border-collapse min-w-[520px]">
+          <thead><tr class="bg-stone-50 text-stone-400 text-[10px] uppercase tracking-wider font-semibold border-b border-stone-200">
+            <th class="px-4 py-2.5">Indicador · descripción</th>
+            <th class="px-3 py-2.5 text-right">Valor real</th>
+            <th class="px-3 py-2.5 text-right">Ref. óptima</th>
+            <th class="px-3 py-2.5 text-right">Puntaje</th>
+          </tr></thead>
+          <tbody>${indRows}</tbody>
+        </table>
+      </div>
+    </div>`;
+  });
+
+  container.innerHTML = `<div class="p-5 lg:p-7 pb-10">
+
+    <div class="bg-white rounded-2xl border border-stone-200 shadow-sm p-5 mb-6">
+      <button onclick="backToRanking()" class="flex items-center gap-1.5 text-xs text-stone-400 hover:text-stone-700 font-medium mb-4 transition-colors">← Volver al Ranking</button>
+      <div class="flex items-center justify-between flex-wrap gap-4">
+        <div class="flex items-center gap-4">
+          <span class="text-5xl leading-none">${city.flag}</span>
+          <div>
+            <h2 class="text-2xl font-black text-stone-800">${escHtml(city.name)}</h2>
+            <p class="text-stone-500 text-sm">${escHtml(city.country)} · ${escHtml(city.region)}</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="text-right">
+            <div class="text-[10px] uppercase font-bold text-stone-400 tracking-wider">Índice Compuesto</div>
+            <div class="font-mono font-black text-4xl leading-none" style="color:${sc};">${total.toFixed(2)}<span class="text-stone-300 text-lg font-normal">/10</span></div>
+          </div>
+          <span class="text-sm font-bold px-3 py-1.5 rounded-full border ${band.text} ${band.bg} ${band.border}">${band.level}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-stone-200 mb-6">
+      <h3 class="text-sm font-bold text-stone-700 mb-3 uppercase tracking-wider">Desempeño por Dimensión (0 a 10)</h3>
+      <div class="chart-container"><canvas id="mainChart"></canvas></div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden mb-6">
+      <div class="px-5 py-3 border-b border-stone-100 bg-stone-50">
+        <h3 class="text-sm font-bold text-stone-700">&#x1F4CA; Consolidado &mdash; ${escHtml(city.name)}</h3>
+      </div>
+      <div class="overflow-x-auto tbl">
+        <table class="w-full text-left border-collapse min-w-[600px]">
+          <thead><tr class="bg-stone-100 text-stone-500 text-[11px] uppercase tracking-wider font-semibold border-b border-stone-200">
+            <th class="px-6 py-4">Dimensión</th><th class="px-5 py-4 text-center">Inds.</th>
+            <th class="px-5 py-4 text-right">Promedio (0-10)</th><th class="px-5 py-4 text-center">Peso</th>
+            <th class="px-5 py-4 text-right">Puntaje Ponderado</th>
+          </tr></thead>
+          <tbody class="text-sm">
+            ${dimRowsHtml}
+            <tr class="bg-stone-800 text-white font-bold border-t-4 border-emerald-500">
+              <td colspan="4" class="px-6 py-5 text-right uppercase tracking-wider text-xs">ÍNDICE COMPUESTO FINAL:</td>
+              <td class="px-6 py-5 text-right font-mono text-emerald-400 text-3xl">${total.toFixed(4)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden mb-6">
+      <div class="px-5 py-3 border-b border-stone-100 bg-stone-50">
+        <h3 class="text-sm font-bold text-stone-700">&#x1F4CB; Tabla de Interpretación del Índice Compuesto</h3>
+      </div>
+      <div class="overflow-x-auto tbl">
+        <table class="w-full text-left border-collapse min-w-[500px]">
+          <thead><tr class="bg-stone-100 text-stone-500 text-[11px] uppercase tracking-wider font-semibold border-b border-stone-200">
+            <th class="px-6 py-3">Rango</th><th class="px-5 py-3">Nivel</th><th class="px-5 py-3">Interpretación</th>
+          </tr></thead>
+          <tbody class="text-sm">${interpHtml}</tbody>
+        </table>
+      </div>
+    </div>
+
+    <p class="text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-4 px-1">Detalle por Dimensión</p>
+    ${dimDetailsHtml}
+  </div>`;
+
+  renderBar();
 }
+
+window.backToRanking = function() {
+  st.tab = 'Ranking';
+  setActive();
+  document.getElementById('main-scroll-area').scrollTop = 0;
+  render();
+};
+
+window.goToResumen = function() {
+  if (st.cityIdx === null) return;
+  st.tab = 'Resumen';
+  setActive();
+  document.getElementById('main-scroll-area').scrollTop = 0;
+  render();
+};
 
 // ═══════════════════════════════════════════════════════════════════
 // RANKING — lista completa con filtros, comparación y hover tooltip
@@ -675,11 +740,17 @@ function renderRanking() {
         </tr>`;
       }).join('');
 
+  const floatingResumen = st.cityIdx !== null
+    ? `<div onclick="goToResumen()" class="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-sky-600 text-white px-5 py-3.5 rounded-full shadow-2xl font-bold text-sm cursor-pointer hover:bg-sky-700 active:scale-95 transition-all select-none" style="box-shadow:0 8px 25px rgba(14,165,233,.4);">
+        &#x1F4CA; Ver Resumen de ${escHtml(CITIES[st.cityIdx].name)} &#x2192;
+      </div>`
+    : '';
+
   container.innerHTML = `
-    <div class="p-5 pb-24">
+    <div class="p-5 pb-28">
       <div class="text-center mb-5">
-        <h2 class="text-2xl font-black text-stone-800">🏆 Ranking de Ciudades Inteligentes</h2>
-        <p class="text-stone-400 text-xs mt-1">${CITIES.length} ciudades · ordenadas por Índice Compuesto ponderado</p>
+        <h2 class="text-2xl font-black text-stone-800">&#x1F3C6; Ranking de Ciudades Inteligentes</h2>
+        <p class="text-stone-400 text-xs mt-1">${CITIES.length} ciudades · ordenadas por Índice Compuesto ponderado${st.cityIdx !== null ? ' · <span class="text-sky-600 font-semibold">ciudad seleccionada</span>' : ''}</p>
       </div>
 
       <div class="bg-white rounded-2xl border border-stone-200 p-4 mb-3 flex flex-wrap gap-3 items-end shadow-sm">
@@ -720,7 +791,8 @@ function renderRanking() {
       </div>
     </div>
 
-    ${selCount === 2 ? `<div onclick="goToCompareSelected()" class="fixed bottom-6 z-50 flex items-center gap-2 bg-violet-600 text-white px-6 py-3.5 rounded-full shadow-2xl font-bold text-sm cursor-pointer hover:bg-violet-700 transition-all select-none" style="left:50%;transform:translateX(-50%);">⚖️ Comparar seleccionadas <span class="bg-violet-800 text-violet-200 text-xs px-2 py-0.5 rounded-full ml-1">2</span></div>` : ''}
+    ${selCount === 2 ? `<div onclick="goToCompareSelected()" class="fixed bottom-6 z-50 flex items-center gap-2 bg-violet-600 text-white px-6 py-3.5 rounded-full shadow-2xl font-bold text-sm cursor-pointer hover:bg-violet-700 transition-all select-none" style="left:50%;transform:translateX(-50%);">&#x2696;&#xFE0F; Comparar seleccionadas <span class="bg-violet-800 text-violet-200 text-xs px-2 py-0.5 rounded-full ml-1">2</span></div>` : ''}
+    ${floatingResumen}
   `;
 
   // ── Event listeners ──────────────────────────────────────────────
@@ -736,12 +808,13 @@ function renderRanking() {
   const showAllEl = document.getElementById('rk-showall');
   if (showAllEl) showAllEl.addEventListener('click', () => { st.rankingSearch = ''; st.rankingCountry = ''; renderRanking(); });
 
-  // Row click → activate city
+  // Row click → set active city + show floating "Ver Resumen" button
   container.querySelectorAll('.ranking-row').forEach(row => {
     row.addEventListener('click', function(e) {
+      if (e.target.classList.contains('ranking-cb')) return;
       const idx = +this.dataset.cityIdx;
       st.cityIdx = idx;
-      updateSidebarCityCard();
+      renderSidebar();
       setActive();
       renderRanking();
     });
@@ -918,47 +991,6 @@ function updateComparar() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// FORMULAS
-// ═══════════════════════════════════════════════════════════════════
-function renderFormulas() {
-  document.getElementById('table-header').style.display = 'none';
-  document.getElementById('interp-card').classList.add('hidden');
-  const container = document.getElementById('data-container');
-  let body = '';
-  DIMS.forEach(dim => {
-    const items = BASE_IND.filter(b => b.dim === dim);
-    const col = C[dim];
-    let cards = '';
-    items.forEach(item => {
-      const badge = item.tipo === 'pos'
-        ? '<span class="text-[10px] px-2 py-0.5 rounded font-bold border bg-emerald-100 text-emerald-800 border-emerald-200 whitespace-nowrap">Positivo ↑</span>'
-        : '<span class="text-[10px] px-2 py-0.5 rounded font-bold border bg-red-100 text-red-800 border-red-200 whitespace-nowrap">Negativo ↓</span>';
-      const formula = item.tipo === 'pos'
-        ? `score = min(10, (val / ${item.ref}) × 10)`
-        : `score = min(10, (${item.ref} / val) × 10)`;
-      cards += `<div class="bg-stone-50 p-4 rounded-xl border border-stone-200">
-        <div class="flex justify-between items-start mb-2 gap-2">
-          <strong class="text-stone-800 text-sm leading-tight">${item.name}</strong>${badge}
-        </div>
-        <div class="text-[10px] text-stone-400 mb-2 uppercase tracking-wider">${item.unit}</div>
-        <code class="block bg-stone-800 text-emerald-400 px-3 py-2 rounded-lg font-mono text-sm mb-2">${formula}</code>
-        <p class="text-stone-600 text-sm leading-relaxed">${item.desc}</p>
-      </div>`;
-    });
-    body += `<div class="bg-white p-5 rounded-xl border ${col.border} shadow-sm mb-5">
-      <h4 class="font-black text-xl ${col.text} mb-4 border-b ${col.border} pb-2">${dim}</h4>
-      <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">${cards}</div>
-    </div>`;
-  });
-  container.innerHTML = `<div class="p-7 bg-white">
-    <div class="mb-7 text-center max-w-3xl mx-auto">
-      <h2 class="text-3xl font-black text-stone-800 mb-2">&#x1F4D0; Catálogo Analítico</h2>
-      <p class="text-stone-500 text-sm">Fórmula, unidad y descripción de los ${BASE_IND.length} indicadores en 6 dimensiones.</p>
-    </div>${body}
-  </div>`;
-}
-
-// ═══════════════════════════════════════════════════════════════════
 // MAPA
 // ═══════════════════════════════════════════════════════════════════
 function renderMapa() {
@@ -1031,7 +1063,7 @@ function updateMapMarkers() {
 
 window.goToCity = function(cityIdx) {
   st.cityIdx = cityIdx;
-  updateSidebarCityCard();
+  renderSidebar();
   st.tab = 'Resumen';
   setActive();
   document.getElementById('main-scroll-area').scrollTop = 0;
