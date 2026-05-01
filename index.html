@@ -281,7 +281,7 @@ function composite(inds) {
 // ═══════════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════════
-const st = { tab:'Ranking', cityIdx:null, cmpA:0, cmpB:1, barChart:null, radarChart:null, leafletMap:null, markers:[] };
+const st = { tab:'Ranking', cityIdx:null, cmpA:0, cmpB:1, barChart:null, radarChart:null, dimCharts:[], leafletMap:null, markers:[] };
 
 // ═══════════════════════════════════════════════════════════════════
 // LISTA DE PAÍSES — usada en filtro del ranking
@@ -949,28 +949,53 @@ function updateComparar() {
     </tr>`;
   }).join('');
 
-  cnt.innerHTML = `<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <div class="bg-stone-50 rounded-2xl border border-stone-200 p-5">
-      <h4 class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-4">Radar de Dimensiones</h4>
-      <div style="position:relative;height:300px;"><canvas id="radar-cv"></canvas></div>
+  const DIM_ORDER = ['Capital Humano','Cohesión Social','Economía','Gobernanza','Medio Ambiente','Frontera'];
+
+  const dimChartCards = DIM_ORDER.map((dim, i) => `
+    <div class="bg-white rounded-2xl shadow-sm border border-stone-200 p-5">
+      <div style="position:relative;height:320px;"><canvas id="dim-chart-${i}"></canvas></div>
     </div>
-    <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden">
-      <div class="px-5 py-3 bg-stone-50 border-b border-stone-200 flex justify-between text-sm font-bold">
-        <span class="text-blue-600">${ca.flag} ${ca.name}</span>
-        <span class="text-rose-600">${cb.flag} ${cb.name}</span>
+  `).join('');
+
+  cnt.innerHTML = `
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="bg-stone-50 rounded-2xl border border-stone-200 p-5">
+        <h4 class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-4">Radar de Dimensiones</h4>
+        <div style="position:relative;height:300px;"><canvas id="radar-cv"></canvas></div>
       </div>
-      <table class="w-full"><tbody>${rows}</tbody>
-        <tfoot><tr class="bg-stone-800 text-white">
-          <td class="px-5 py-4 text-[10px] uppercase tracking-widest font-bold">Índice Compuesto</td>
-          <td class="px-5 py-4 text-right font-mono text-xl ${win===1?'text-emerald-400 font-black':'text-stone-400'}">${t1.toFixed(2)}</td>
-          <td class="px-3 py-4 text-center">${win===1?'🏆':''}</td>
-          <td class="px-5 py-4 text-left  font-mono text-xl ${win===2?'text-emerald-400 font-black':'text-stone-400'}">${t2.toFixed(2)}</td>
-        </tr></tfoot>
-      </table>
+      <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden">
+        <div class="px-5 py-3 bg-stone-50 border-b border-stone-200 flex justify-between text-sm font-bold">
+          <span class="text-blue-600">${ca.flag} ${ca.name}</span>
+          <span class="text-rose-600">${cb.flag} ${cb.name}</span>
+        </div>
+        <table class="w-full"><tbody>${rows}</tbody>
+          <tfoot><tr class="bg-stone-800 text-white">
+            <td class="px-5 py-4 text-[10px] uppercase tracking-widest font-bold">Índice Compuesto</td>
+            <td class="px-5 py-4 text-right font-mono text-xl ${win===1?'text-emerald-400 font-black':'text-stone-400'}">${t1.toFixed(2)}</td>
+            <td class="px-3 py-4 text-center">${win===1?'&#x1F3C6;':''}</td>
+            <td class="px-5 py-4 text-left  font-mono text-xl ${win===2?'text-emerald-400 font-black':'text-stone-400'}">${t2.toFixed(2)}</td>
+          </tr></tfoot>
+        </table>
+      </div>
     </div>
-  </div>`;
+
+    <div class="mt-8 mb-4">
+      <div class="flex items-center gap-3">
+        <span class="text-xl">&#x1F4CA;</span>
+        <h4 class="text-base font-bold text-stone-700">Comparación por Dimensión e Indicador</h4>
+      </div>
+      <div class="border-t border-stone-200 mt-3"></div>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 pb-4">
+      ${dimChartCards}
+    </div>
+  `;
 
   if (st.radarChart) { st.radarChart.destroy(); st.radarChart = null; }
+  st.dimCharts.forEach(c => { if (c) c.destroy(); });
+  st.dimCharts = [];
+
   try { st.radarChart = new Chart(document.getElementById('radar-cv').getContext('2d'), {
     type: 'radar',
     data: {
@@ -988,6 +1013,76 @@ function updateComparar() {
       plugins:{ legend:{ position:'bottom', labels:{ font:{size:11}, padding:12 } } }
     }
   }); } catch(e) { console.error('Radar error:', e); }
+
+  const midLinePlugin = {
+    id: 'midLine',
+    afterDraw(chart) {
+      const xScale = chart.scales.x;
+      if (!xScale) return;
+      const { ctx, chartArea } = chart;
+      const x = xScale.getPixelForValue(5);
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(x, chartArea.top);
+      ctx.lineTo(x, chartArea.bottom);
+      ctx.strokeStyle = 'rgba(100,116,139,0.45)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([5, 4]);
+      ctx.stroke();
+      ctx.restore();
+    }
+  };
+
+  DIM_ORDER.forEach((dim, i) => {
+    const dimInds = BASE_IND.filter(b => b.dim === dim);
+    const labels  = dimInds.map(b => b.name.length > 35 ? b.name.substring(0,34) + '…' : b.name);
+    const scores1 = dimInds.map(b => { const ind = ca.indicators.find(x => x.id === b.id); const s = calcScore(ind.tipo, ind.val, ind.ref); return s !== null ? +s.toFixed(2) : null; });
+    const scores2 = dimInds.map(b => { const ind = cb.indicators.find(x => x.id === b.id); const s = calcScore(ind.tipo, ind.val, ind.ref); return s !== null ? +s.toFixed(2) : null; });
+    const avg1 = s1[dim].toFixed(2);
+    const avg2 = s2[dim].toFixed(2);
+    const canvas = document.getElementById(`dim-chart-${i}`);
+    if (!canvas) return;
+    try {
+      const chart = new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        plugins: [midLinePlugin],
+        data: {
+          labels,
+          datasets: [
+            { label:`${ca.flag} ${ca.name}`, data:scores1, backgroundColor:'rgba(59,130,246,0.8)', borderColor:'rgba(59,130,246,1)', borderWidth:1, borderRadius:2 },
+            { label:`${cb.flag} ${cb.name}`, data:scores2, backgroundColor:'rgba(239,68,68,0.8)',  borderColor:'rgba(239,68,68,1)',  borderWidth:1, borderRadius:2 }
+          ]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { min:0, max:10, ticks:{ stepSize:2, font:{size:9} }, grid:{ color:'rgba(0,0,0,0.06)' } },
+            y: { ticks:{ font:{size:9}, padding:3 }, grid:{ display:false } }
+          },
+          plugins: {
+            legend: { position:'top', labels:{ font:{size:10}, padding:10, boxWidth:12 } },
+            title:  { display:true, text:`${dim} — ${ca.name}: ${avg1} | ${cb.name}: ${avg2}`, font:{size:11,weight:'bold'}, color:'#44403c', padding:{bottom:6} },
+            tooltip: {
+              callbacks: {
+                title:  (items) => dimInds[items[0].dataIndex].name,
+                label:  (item)  => {
+                  const cityObj = item.datasetIndex === 0 ? ca : cb;
+                  const ind     = dimInds[item.dataIndex];
+                  const cityInd = cityObj.indicators.find(x => x.id === ind.id);
+                  const valStr  = cityInd.val !== null ? `${cityInd.val} ${ind.unit}` : 'Sin dato';
+                  const scoreStr = item.raw !== null ? `${item.raw}/10` : 'N/D';
+                  return [`Valor: ${valStr}`, `Puntaje: ${scoreStr}`, ind.tipo === 'pos' ? 'Positivo ↑' : 'Negativo ↓'];
+                }
+              }
+            }
+          }
+        }
+      });
+      st.dimCharts.push(chart);
+    } catch(e) { console.error(`Dim chart "${dim}" error:`, e); }
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════════
