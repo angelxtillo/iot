@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -422,6 +422,10 @@ function trafficDot(score) {
 // ═══════════════════════════════════════════════════════════════════
 function render() {
   if (st._rkTip) st._rkTip.style.display = 'none';
+  if (st._rkFloatBtn && st.tab !== 'Ranking') {
+    st._rkFloatBtn.style.opacity = '0';
+    st._rkFloatBtn.style.pointerEvents = 'none';
+  }
   if (st.barChart) { st.barChart.destroy(); st.barChart = null; }
   document.getElementById('chart-section').style.display = 'none';
   const ms     = document.getElementById('main-scroll-area');
@@ -696,6 +700,7 @@ function renderRanking() {
         const rank = allRanked.findIndex(c => c.idx === city.idx) + 1;
         const isActive = city.idx === st.cityIdx;
         const isChecked = st.rankingSelected.has(city.idx);
+        const isDisabled = !isChecked && selCount >= 2;
         const band = BANDS[interpretBand(city.score)];
         const pct = Math.min(100, city.score / 10 * 100).toFixed(1);
         const barColor = city.score >= 7 ? '#22c55e' : city.score >= 4 ? '#eab308' : '#ef4444';
@@ -709,7 +714,7 @@ function renderRanking() {
 
         return `<tr class="ranking-row border-b border-stone-100 cursor-pointer transition-colors ${rowBg}" data-city-idx="${city.idx}"${activeBorder}>
           <td class="px-3 py-3 w-10 text-center">
-            <input type="checkbox" class="ranking-cb w-4 h-4 rounded accent-sky-500 cursor-pointer" data-city-idx="${city.idx}" ${isChecked ? 'checked' : ''}>
+            <input type="checkbox" class="ranking-cb w-4 h-4 rounded accent-sky-500 ${isDisabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}" data-city-idx="${city.idx}" ${isChecked ? 'checked' : ''} ${isDisabled ? 'disabled title="Máximo 2 ciudades para comparar"' : ''}>
           </td>
           <td class="px-2 py-3 text-center w-12">${pos}</td>
           <td class="px-3 py-3">
@@ -740,11 +745,6 @@ function renderRanking() {
         </tr>`;
       }).join('');
 
-  const floatingResumen = st.cityIdx !== null
-    ? `<div onclick="goToResumen()" class="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-sky-600 text-white px-5 py-3.5 rounded-full shadow-2xl font-bold text-sm cursor-pointer hover:bg-sky-700 active:scale-95 transition-all select-none" style="box-shadow:0 8px 25px rgba(14,165,233,.4);">
-        &#x1F4CA; Ver Resumen de ${escHtml(CITIES[st.cityIdx].name)} &#x2192;
-      </div>`
-    : '';
 
   container.innerHTML = `
     <div class="p-5 pb-28">
@@ -791,8 +791,6 @@ function renderRanking() {
       </div>
     </div>
 
-    ${selCount === 2 ? `<div onclick="goToCompareSelected()" class="fixed bottom-6 z-50 flex items-center gap-2 bg-violet-600 text-white px-6 py-3.5 rounded-full shadow-2xl font-bold text-sm cursor-pointer hover:bg-violet-700 transition-all select-none" style="left:50%;transform:translateX(-50%);">&#x2696;&#xFE0F; Comparar seleccionadas <span class="bg-violet-800 text-violet-200 text-xs px-2 py-0.5 rounded-full ml-1">2</span></div>` : ''}
-    ${floatingResumen}
   `;
 
   // ── Event listeners ──────────────────────────────────────────────
@@ -826,9 +824,7 @@ function renderRanking() {
     cb.addEventListener('change', function() {
       const idx = +this.dataset.cityIdx;
       if (this.checked) {
-        if (st.rankingSelected.size >= 2) {
-          st.rankingSelected.delete([...st.rankingSelected][0]);
-        }
+        if (st.rankingSelected.size >= 2) { this.checked = false; return; }
         st.rankingSelected.add(idx);
       } else {
         st.rankingSelected.delete(idx);
@@ -863,6 +859,8 @@ function renderRanking() {
     row.addEventListener('mousemove', rkPosTip);
     row.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
   });
+
+  updateRankingFloatBtn();
 }
 
 function rkGetTip() {
@@ -896,38 +894,185 @@ window.goToCompareSelected = function() {
   render();
 };
 
+window.checkboxGoToResumen = function() {
+  if (!st.rankingSelected || st.rankingSelected.size !== 1) return;
+  const [idx] = [...st.rankingSelected];
+  st.cityIdx = idx;
+  renderSidebar();
+  st.tab = 'Resumen';
+  setActive();
+  document.getElementById('main-scroll-area').scrollTop = 0;
+  render();
+};
+
+function updateRankingFloatBtn() {
+  if (!st._rkFloatBtn) {
+    const el = document.createElement('div');
+    el.id = 'rk-float-btn';
+    el.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:50;transition:opacity 0.22s ease;pointer-events:none;opacity:0;';
+    document.body.appendChild(el);
+    st._rkFloatBtn = el;
+  }
+  const btn = st._rkFloatBtn;
+  const selCount = st.rankingSelected ? st.rankingSelected.size : 0;
+  if (selCount === 0) {
+    btn.style.opacity = '0';
+    btn.style.pointerEvents = 'none';
+    return;
+  }
+  btn.style.opacity = '1';
+  btn.style.pointerEvents = 'auto';
+  if (selCount === 1) {
+    const selectedIdx = [...st.rankingSelected][0];
+    const city = CITIES[selectedIdx];
+    btn.innerHTML = `<div onclick="window.checkboxGoToResumen()" class="flex items-center gap-2 bg-sky-600 text-white px-6 py-3.5 rounded-full shadow-2xl font-bold text-sm cursor-pointer hover:bg-sky-700 active:scale-95 transition-colors select-none" style="box-shadow:0 8px 25px rgba(14,165,233,.4);">&#x1F4CA; Ver Resumen de ${escHtml(city.name)} &#x2192;</div>`;
+  } else if (selCount === 2) {
+    btn.innerHTML = `<div onclick="window.goToCompareSelected()" class="flex items-center gap-2 bg-violet-600 text-white px-6 py-3.5 rounded-full shadow-2xl font-bold text-sm cursor-pointer hover:bg-violet-700 active:scale-95 transition-colors select-none" style="box-shadow:0 8px 25px rgba(109,40,217,.4);">&#x2696;&#xFE0F; Comparar seleccionadas <span class="bg-violet-800 text-violet-200 text-xs px-2 py-0.5 rounded-full ml-1">2</span></div>`;
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // COMPARAR — radar + tabla de dimensiones
 // ═══════════════════════════════════════════════════════════════════
+function normStr(s) {
+  return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+}
+
 function renderComparar() {
   document.getElementById('table-header').style.display = 'none';
   document.getElementById('interp-card').classList.add('hidden');
   const container = document.getElementById('data-container');
-  const opts = CITIES.map((c,i) => `<option value="${i}">${c.flag} ${c.name}</option>`).join('');
+
+  function searchInputHtml(side, borderCls, ringCls) {
+    const idx = side === 'a' ? st.cmpA : st.cmpB;
+    const val = (idx !== null && idx !== undefined) ? `${CITIES[idx].flag} ${CITIES[idx].name}` : '';
+    const hasSel = idx !== null && idx !== undefined;
+    return `<div class="flex-1" id="cmp-${side}-wrap">
+      <label class="block text-[10px] uppercase tracking-widest text-stone-400 font-bold mb-2">Ciudad ${side === 'a' ? 'A' : 'B'}</label>
+      <div class="relative">
+        <input id="cmp-${side}-input" type="text" placeholder="Buscar ciudad…" autocomplete="off"
+          value="${escHtml(val)}"
+          class="w-full px-4 py-3 pr-9 rounded-xl border ${borderCls} text-stone-700 bg-white focus:outline-none focus:ring-2 ${ringCls} font-medium text-sm">
+        <button id="cmp-${side}-clear"
+          class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 text-sm leading-none transition-opacity ${hasSel ? 'opacity-100' : 'opacity-0 pointer-events-none'}"
+          title="Limpiar selección" type="button">✕</button>
+        <div id="cmp-${side}-dropdown"
+          class="absolute left-0 right-0 bg-white rounded-xl border border-stone-200 shadow-xl mt-1 hidden overflow-y-auto"
+          style="max-height:220px;top:100%;z-index:200;"></div>
+      </div>
+    </div>`;
+  }
 
   container.innerHTML = `<div class="p-6">
     <div class="flex flex-col md:flex-row gap-4 mb-7 items-end">
-      <div class="flex-1">
-        <label class="block text-[10px] uppercase tracking-widest text-stone-400 font-bold mb-2">Ciudad A</label>
-        <select id="cmp-a" class="w-full px-4 py-3 rounded-xl border border-blue-300 text-stone-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 font-medium">${opts}</select>
-      </div>
+      ${searchInputHtml('a', 'border-blue-300', 'focus:ring-blue-400')}
       <div class="pb-3 text-stone-300 text-2xl font-light hidden md:block">vs</div>
-      <div class="flex-1">
-        <label class="block text-[10px] uppercase tracking-widest text-stone-400 font-bold mb-2">Ciudad B</label>
-        <select id="cmp-b" class="w-full px-4 py-3 rounded-xl border border-rose-300 text-stone-700 bg-white focus:outline-none focus:ring-2 focus:ring-rose-400 font-medium">${opts}</select>
-      </div>
+      ${searchInputHtml('b', 'border-rose-300', 'focus:ring-rose-400')}
     </div>
     <div id="cmp-content"></div>
   </div>`;
 
-  document.getElementById('cmp-a').value = st.cmpA;
-  document.getElementById('cmp-b').value = st.cmpB;
-  document.getElementById('cmp-a').addEventListener('change', e => { st.cmpA = +e.target.value; updateComparar(); });
-  document.getElementById('cmp-b').addEventListener('change', e => { st.cmpB = +e.target.value; updateComparar(); });
+  setupCmpSearch('a');
+  setupCmpSearch('b');
   updateComparar();
 }
 
+function setupCmpSearch(side) {
+  const input    = document.getElementById(`cmp-${side}-input`);
+  const dropdown = document.getElementById(`cmp-${side}-dropdown`);
+  const clearBtn = document.getElementById(`cmp-${side}-clear`);
+  if (!input || !dropdown) return;
+
+  const stKey  = side === 'a' ? 'cmpA' : 'cmpB';
+  const othKey = side === 'a' ? 'cmpB' : 'cmpA';
+  const getVal   = () => st[stKey];
+  const setVal   = v  => { st[stKey] = v; };
+  const getOther = () => st[othKey];
+
+  function syncClearBtn() {
+    if (!clearBtn) return;
+    const hasSel = getVal() !== null && getVal() !== undefined;
+    clearBtn.classList.toggle('opacity-0', !hasSel);
+    clearBtn.classList.toggle('pointer-events-none', !hasSel);
+    clearBtn.classList.toggle('opacity-100', hasSel);
+  }
+
+  function showDropdown(query) {
+    const otherIdx = getOther();
+    const results  = CITIES
+      .map((c, i) => ({ ...c, idx: i }))
+      .filter(c => c.idx !== otherIdx && normStr(c.name).includes(normStr(query)));
+    if (results.length === 0) {
+      dropdown.innerHTML = `<div class="px-4 py-3 text-sm text-stone-400 text-center">Sin resultados</div>`;
+    } else {
+      dropdown.innerHTML = results.map(c =>
+        `<div class="cmp-sug flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-stone-50 transition-colors border-b border-stone-100 last:border-0" data-idx="${c.idx}">
+          <span class="text-xl leading-none flex-shrink-0">${c.flag}</span>
+          <div>
+            <div class="font-semibold text-stone-800 text-sm">${escHtml(c.name)}</div>
+            <div class="text-[10px] text-stone-400">${escHtml(c.country)}</div>
+          </div>
+        </div>`
+      ).join('');
+      dropdown.querySelectorAll('.cmp-sug').forEach(el => {
+        el.addEventListener('mousedown', function(e) {
+          e.preventDefault();
+          const idx = +this.dataset.idx;
+          setVal(idx);
+          input.value = `${CITIES[idx].flag} ${CITIES[idx].name}`;
+          syncClearBtn();
+          dropdown.classList.add('hidden');
+          updateComparar();
+        });
+      });
+    }
+    dropdown.classList.remove('hidden');
+  }
+
+  input.addEventListener('focus', function() {
+    this.select();
+    showDropdown('');
+  });
+
+  input.addEventListener('input', function() {
+    if (getVal() !== null && getVal() !== undefined) {
+      setVal(null);
+      syncClearBtn();
+      updateComparar();
+    }
+    showDropdown(this.value);
+  });
+
+  input.addEventListener('blur', function() {
+    setTimeout(() => {
+      dropdown.classList.add('hidden');
+      const cur = getVal();
+      if (cur === null || cur === undefined) {
+        this.value = '';
+      } else {
+        this.value = `${CITIES[cur].flag} ${CITIES[cur].name}`;
+      }
+    }, 200);
+  });
+
+  if (clearBtn) {
+    clearBtn.addEventListener('click', function() {
+      setVal(null);
+      input.value = '';
+      syncClearBtn();
+      dropdown.classList.add('hidden');
+      updateComparar();
+    });
+  }
+}
+
 function updateComparar() {
+  const cnt = document.getElementById('cmp-content');
+  if (!cnt) return;
+  if (st.cmpA === null || st.cmpA === undefined || st.cmpB === null || st.cmpB === undefined) {
+    cnt.innerHTML = `<div class="py-16 text-center text-stone-400 text-sm font-medium">Selecciona dos ciudades para comparar</div>`;
+    return;
+  }
   const ca  = CITIES[st.cmpA];
   const cb  = CITIES[st.cmpB];
   const s1  = dimAvgs(ca.indicators);
@@ -935,8 +1080,6 @@ function updateComparar() {
   const t1  = composite(ca.indicators);
   const t2  = composite(cb.indicators);
   const win = t1 >= t2 ? 1 : 2;
-  const cnt = document.getElementById('cmp-content');
-  if (!cnt) return;
 
   const rows = DIMS.map(dim => {
     const v1 = s1[dim], v2 = s2[dim];
