@@ -4,101 +4,186 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Smart City Frontera — Índice Regional</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
+    :root {
+      --bg-page:    #fafafa;
+      --bg-card:    #ffffff;
+      --bg-subtle:  #f8fafc;
+      --bg-muted:   #f1f5f9;
+      --border:     #e5e7eb;
+      --border-sub: #f1f5f9;
+      --text-1:     #0f172a;
+      --text-2:     #64748b;
+      --text-3:     #94a3b8;
+      --accent:     #0f172a;
+      --accent-h:   #1e293b;
+      --green:      #16a34a;
+      --red:        #dc2626;
+      --amber:      #d97706;
+      --shadow:     0 1px 3px rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.03);
+    }
+    html,body { font-family:'Inter',ui-sans-serif,system-ui,sans-serif !important; }
+    body { background:var(--bg-page); color:var(--text-1); font-size:14px; }
+
     .chart-container{position:relative;width:100%;max-width:1000px;margin:0 auto;height:40vh;max-height:400px;}
     @media(min-width:768px){.chart-container{height:350px;}}
-    body{background-color:#fafaf9;color:#292524;}
-    .tbl::-webkit-scrollbar{height:8px;width:8px;}
-    .tbl::-webkit-scrollbar-track{background:#f5f5f4;}
-    .tbl::-webkit-scrollbar-thumb{background:#d6d3d1;border-radius:4px;}
-    .traffic-dot{display:inline-block;width:10px;height:10px;border-radius:50%;flex-shrink:0;cursor:default;vertical-align:middle;}
-    @keyframes pulse-ring{0%{box-shadow:0 0 0 0 rgba(99,102,241,.75);}70%{box-shadow:0 0 0 14px rgba(99,102,241,0);}100%{box-shadow:0 0 0 0 rgba(99,102,241,0);}}
+    .tbl::-webkit-scrollbar{height:6px;width:6px;}
+    .tbl::-webkit-scrollbar-track{background:var(--bg-subtle);}
+    .tbl::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+    .traffic-dot{display:inline-block;width:8px;height:8px;border-radius:50%;flex-shrink:0;cursor:default;vertical-align:middle;}
+    @keyframes pulse-ring{0%{box-shadow:0 0 0 0 rgba(15,23,42,.35);}70%{box-shadow:0 0 0 12px rgba(15,23,42,0);}100%{box-shadow:0 0 0 0 rgba(15,23,42,0);}}
     .marker-active{animation:pulse-ring 1.6s ease-out infinite;}
+
+    /* Nav tabs */
+    .tab-btn{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:8px 12px;border-radius:6px;font-size:13px;font-weight:500;color:var(--text-2);border:none;background:transparent;cursor:pointer;transition:all .15s;}
+    .tab-btn:hover{background:var(--bg-subtle);color:var(--text-1);}
+    .tab-btn.tab-active{background:var(--bg-muted);color:var(--text-1);font-weight:600;}
+    .tab-btn svg{flex-shrink:0;opacity:.7;}
+    .tab-btn.tab-active svg{opacity:1;}
+
+    /* Buttons */
+    .btn-primary{background:var(--accent);color:#fff;padding:7px 14px;border-radius:6px;font-size:13px;font-weight:500;border:none;cursor:pointer;transition:background .15s;display:inline-flex;align-items:center;gap:6px;}
+    .btn-primary:hover{background:var(--accent-h);}
+    .btn-secondary{background:var(--bg-card);color:var(--text-1);padding:7px 14px;border-radius:6px;font-size:13px;font-weight:500;border:1px solid var(--border);cursor:pointer;transition:background .15s;display:inline-flex;align-items:center;gap:6px;}
+    .btn-secondary:hover{background:var(--bg-subtle);}
+
+    /* Cards */
+    .pro-card{background:var(--bg-card);border-radius:8px;border:1px solid var(--border);box-shadow:var(--shadow);}
+    .pro-card-header{padding:12px 20px;border-bottom:1px solid var(--border-sub);background:var(--bg-subtle);display:flex;align-items:center;gap:8px;}
+    .pro-card-header h3{font-size:13px;font-weight:600;color:var(--text-1);margin:0;}
+
+    /* Table */
+    .pro-thead th{background:var(--bg-subtle);color:var(--text-2);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:10px 12px;border-bottom:1px solid var(--border);}
+    .pro-row{border-bottom:1px solid var(--border-sub);}
+    .pro-row:hover td{background:var(--bg-subtle);}
+
+    /* Ranking active row */
+    .row-active{background:var(--bg-muted) !important;}
+    .row-active td{background:var(--bg-muted) !important;}
+
+    /* Custom checkbox */
+    .ranking-cb{appearance:none;-webkit-appearance:none;width:15px;height:15px;border-radius:4px;border:1.5px solid var(--border);background:var(--bg-card);cursor:pointer;transition:all .15s;position:relative;flex-shrink:0;vertical-align:middle;}
+    .ranking-cb:checked{background:var(--accent);border-color:var(--accent);}
+    .ranking-cb:checked::after{content:'';position:absolute;top:1px;left:4px;width:4px;height:7px;border:2px solid #fff;border-top:none;border-left:none;transform:rotate(45deg);}
+    .ranking-cb:disabled{opacity:.35;cursor:not-allowed;}
+
+    /* Score colors */
+    .s-good{color:var(--green);}
+    .s-mid {color:var(--amber);}
+    .s-low {color:var(--red);}
+
+    /* KPI number */
+    .kpi{font-variant-numeric:tabular-nums;font-weight:700;}
+
+    /* Badge */
+    .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;border:1px solid;white-space:nowrap;}
+
+    /* Dim detail indicator rows */
+    .ind-row{border-bottom:1px solid #f1f5f9;}
+    .ind-row:hover td{background:#f8fafc;}
   </style>
 </head>
-<body class="font-sans antialiased overflow-hidden h-screen flex flex-col md:flex-row w-full">
+<body class="antialiased overflow-hidden h-screen flex flex-col md:flex-row w-full">
 
 <!-- ── SIDEBAR ─────────────────────────────────────────────────── -->
-<aside class="w-full md:w-64 lg:w-72 bg-white border-r border-stone-200 flex flex-col shadow-sm z-10 h-[50vh] md:h-screen flex-shrink-0 overflow-hidden">
+<aside class="w-full md:w-64 lg:w-72 bg-white flex flex-col z-10 h-[50vh] md:h-screen flex-shrink-0 overflow-hidden" style="border-right:1px solid var(--border);">
 
-  <div class="p-5 border-b border-stone-100 flex-shrink-0">
-    <h1 class="text-lg font-bold text-stone-800 tracking-tight leading-tight flex items-center flex-wrap gap-1">
-      &#x1F3D9;&#xFE0F; Smart City Frontera
-      <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold border border-emerald-200">v8.0</span>
+  <div class="p-5 flex-shrink-0" style="border-bottom:1px solid var(--border);">
+    <h1 class="font-semibold leading-tight flex items-center flex-wrap gap-2" style="font-size:15px;color:var(--text-1);">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.6;flex-shrink:0;"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>
+      Smart City Frontera
+      <span style="font-size:10px;font-weight:600;color:var(--text-2);background:var(--bg-muted);border:1px solid var(--border);padding:1px 7px;border-radius:4px;">v8.0</span>
     </h1>
-    <p class="text-xs text-stone-500 mt-1 font-medium">Índice Comparativo Regional</p>
+    <p style="font-size:12px;color:var(--text-3);margin-top:3px;font-weight:500;">Índice Comparativo Regional</p>
   </div>
 
-  <nav class="p-3 flex-shrink-0 space-y-1" id="nav-tabs">
-    <button data-tab="Ranking"  class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F3C6; Ranking Regional</button>
-    <button data-tab="Mapa"     class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x1F5FA;&#xFE0F; Mapa</button>
-    <button data-tab="Comparar" class="tab-btn w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">&#x2696;&#xFE0F; Comparar Ciudades</button>
+  <nav class="p-3 flex-shrink-0 space-y-0.5" id="nav-tabs">
+    <button data-tab="Ranking" class="tab-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6L21 6"/><path d="M8 12L21 12"/><path d="M8 18L21 18"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
+      Ranking Regional
+    </button>
+    <button data-tab="Mapa" class="tab-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+      Mapa
+    </button>
+    <button data-tab="Comparar" class="tab-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>
+      Comparar Ciudades
+    </button>
   </nav>
 
-  <!-- Ciudad activa — visible sólo cuando hay ciudad seleccionada -->
-  <div id="city-active-section" class="px-4 pb-3 border-t border-stone-100 flex-shrink-0 hidden">
-    <p class="text-[10px] uppercase font-bold text-stone-400 tracking-wider mt-3 mb-2">Ciudad activa</p>
-    <div id="active-city-card" class="bg-sky-50 rounded-xl border border-sky-200 p-3"></div>
+  <!-- Ciudad activa -->
+  <div id="city-active-section" class="px-4 pb-4 flex-shrink-0 hidden" style="border-top:1px solid var(--border-sub);">
+    <p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin:12px 0 8px;">Ciudad activa</p>
+    <div id="active-city-card" style="background:var(--bg-subtle);border-radius:8px;border:1px solid var(--border);padding:12px;"></div>
   </div>
 
   <div class="flex-grow"></div>
 
   <!-- Acordeón de fórmulas -->
-  <div class="px-4 py-3 border-t border-stone-200 flex-shrink-0">
-    <button id="formula-toggle" class="w-full text-left text-[10px] font-bold text-stone-400 uppercase tracking-wider flex items-center justify-between hover:text-stone-600 transition-colors py-0.5">
-      <span>&#x1F4D0; Fórmulas de puntuación</span><span id="formula-arrow" class="text-stone-300 text-xs">▸</span>
+  <div class="px-4 py-3 flex-shrink-0" style="border-top:1px solid var(--border);">
+    <button id="formula-toggle" class="w-full text-left flex items-center justify-between py-0.5 transition-colors" style="background:none;border:none;cursor:pointer;color:var(--text-3);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;">
+      <span class="flex items-center gap-1.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></svg>
+        Fórmulas de puntuación
+      </span>
+      <span id="formula-arrow" style="font-size:10px;color:var(--text-3);">▸</span>
     </button>
     <div id="formula-body" class="hidden mt-2.5 space-y-2">
-      <div class="bg-stone-50 rounded-lg p-2.5 border border-stone-200">
-        <div class="text-[10px] font-bold text-emerald-700 mb-1.5">Positivo ↑</div>
-        <code class="block bg-stone-800 text-emerald-400 px-2.5 py-1.5 rounded-md font-mono text-[11px]">(Valor Real / Ref. Óptima) × 10</code>
+      <div style="background:var(--bg-subtle);border-radius:6px;padding:10px;border:1px solid var(--border);">
+        <div style="font-size:10px;font-weight:600;color:var(--green);margin-bottom:6px;">Positivo ↑</div>
+        <code style="display:block;background:#0f172a;color:#86efac;padding:6px 10px;border-radius:4px;font-size:11px;">(Valor Real / Ref. Óptima) × 10</code>
       </div>
-      <div class="bg-stone-50 rounded-lg p-2.5 border border-stone-200">
-        <div class="text-[10px] font-bold text-red-700 mb-1.5">Negativo ↓</div>
-        <code class="block bg-stone-800 text-red-400 px-2.5 py-1.5 rounded-md font-mono text-[11px]">(Ref. Óptima / Valor Real) × 10</code>
+      <div style="background:var(--bg-subtle);border-radius:6px;padding:10px;border:1px solid var(--border);">
+        <div style="font-size:10px;font-weight:600;color:var(--red);margin-bottom:6px;">Negativo ↓</div>
+        <code style="display:block;background:#0f172a;color:#fca5a5;padding:6px 10px;border-radius:4px;font-size:11px;">(Ref. Óptima / Valor Real) × 10</code>
       </div>
-      <p class="text-[10px] text-stone-400 text-center pb-0.5">Ambas recortadas entre 0 y 10</p>
+      <p style="font-size:10px;color:var(--text-3);text-align:center;padding-bottom:2px;">Ambas recortadas entre 0 y 10</p>
     </div>
   </div>
 </aside>
 
 <!-- ── MAIN ────────────────────────────────────────────────────── -->
-<main class="flex-grow flex flex-col overflow-hidden bg-stone-50/50 w-full relative min-h-0">
+<main class="flex-grow flex flex-col overflow-hidden w-full relative min-h-0" style="background:var(--bg-page);">
 
-  <header class="bg-white px-6 py-4 border-b border-stone-200 flex justify-between items-center flex-shrink-0 shadow-sm">
+  <header class="bg-white px-6 py-4 flex justify-between items-center flex-shrink-0" style="border-bottom:1px solid var(--border);">
     <div>
-      <h2 class="text-xl font-bold text-stone-800" id="view-title">Resumen del Índice</h2>
-      <p class="text-sm text-stone-500 mt-0.5" id="view-desc">Consolidado general de todas las dimensiones.</p>
+      <h2 class="font-semibold" style="font-size:18px;color:var(--text-1);" id="view-title">Resumen del Índice</h2>
+      <p style="font-size:13px;color:var(--text-2);margin-top:1px;" id="view-desc">Consolidado general de todas las dimensiones.</p>
     </div>
     <div id="dim-badge" class="hidden text-right">
-      <p class="text-[10px] font-bold text-stone-400 uppercase tracking-wider">Puntaje Promedio</p>
-      <p class="text-3xl font-black" id="dim-score">0.00</p>
+      <p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Puntaje Promedio</p>
+      <p class="kpi" style="font-size:28px;color:var(--text-1);" id="dim-score">0.00</p>
     </div>
   </header>
 
-  <div class="flex-grow overflow-y-auto p-5 lg:p-7" id="main-scroll-area">
+  <div class="flex-grow overflow-y-auto" style="padding:24px 28px;" id="main-scroll-area">
 
-    <div id="chart-section" class="bg-white p-5 rounded-2xl shadow-sm border border-stone-200 mb-6">
-      <h3 class="text-sm font-bold text-stone-700 mb-3 uppercase tracking-wider" id="chart-title">Desempeño Visual (0 a 10)</h3>
+    <div id="chart-section" style="background:var(--bg-card);padding:20px;border-radius:8px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:20px;">
+      <h3 style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-2);margin-bottom:12px;" id="chart-title">Desempeño Visual (0 a 10)</h3>
       <div class="chart-container"><canvas id="mainChart"></canvas></div>
     </div>
 
-    <div id="table-card" class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
-      <div id="table-header" class="px-5 py-3 border-b border-stone-100 bg-stone-50 flex justify-between items-center">
-        <h3 class="text-sm font-bold text-stone-700" id="table-title">Datos</h3>
+    <div id="table-card" style="background:var(--bg-card);border-radius:8px;border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;">
+      <div id="table-header" class="flex justify-between items-center" style="padding:12px 20px;border-bottom:1px solid var(--border-sub);background:var(--bg-subtle);">
+        <h3 style="font-size:13px;font-weight:600;color:var(--text-1);" id="table-title">Datos</h3>
       </div>
       <div class="overflow-x-auto tbl" id="data-container">
-        <div class="p-10 text-center text-stone-400">Cargando…</div>
+        <div style="padding:40px;text-align:center;color:var(--text-3);">Cargando…</div>
       </div>
     </div>
 
-    <div id="interp-card" class="hidden bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden mt-6">
-      <div class="px-5 py-3 border-b border-stone-100 bg-stone-50">
-        <h3 class="text-sm font-bold text-stone-700">&#x1F4CB; Tabla de Interpretación del Índice Compuesto</h3>
+    <div id="interp-card" class="hidden" style="background:var(--bg-card);border-radius:8px;border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;margin-top:20px;">
+      <div style="padding:12px 20px;border-bottom:1px solid var(--border-sub);background:var(--bg-subtle);display:flex;align-items:center;gap:8px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-2);flex-shrink:0;"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>
+        <h3 style="font-size:13px;font-weight:600;color:var(--text-1);">Tabla de Interpretación del Índice Compuesto</h3>
       </div>
       <div class="overflow-x-auto tbl" id="interp-body"></div>
     </div>
@@ -112,6 +197,18 @@
 </main>
 
 <script>
+// ── Lucide icon strings (16px, currentColor) ──────────────────────
+const ICO = {
+  x:          `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+  arrowLeft:  `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>`,
+  arrowRight: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>`,
+  barChart:   `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>`,
+  scale:      `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>`,
+  clipboard:  `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>`,
+  trophy:     `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>`,
+  award:      `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>`,
+};
+
 // ═══════════════════════════════════════════════════════════════════
 // DATA — 60 indicadores · 6 dimensiones · 10 ciudades
 // ═══════════════════════════════════════════════════════════════════
@@ -221,12 +318,12 @@ const CITIES = CITIES_META.map(m => ({
 const DIMS = ['Frontera','Economía','Capital Humano','Cohesión Social','Gobernanza','Medio Ambiente'];
 const W    = {Frontera:0.20,Economía:0.16,'Capital Humano':0.16,'Cohesión Social':0.16,Gobernanza:0.16,'Medio Ambiente':0.16};
 const C    = {
-  Frontera:         {bg:'bg-rose-50',    text:'text-rose-700',    border:'border-rose-200',    hex:'#e11d48'},
-  Economía:         {bg:'bg-blue-50',    text:'text-blue-700',    border:'border-blue-200',    hex:'#2563eb'},
-  'Capital Humano': {bg:'bg-indigo-50',  text:'text-indigo-700',  border:'border-indigo-200',  hex:'#4f46e5'},
-  'Cohesión Social':{bg:'bg-fuchsia-50', text:'text-fuchsia-700', border:'border-fuchsia-200', hex:'#c026d3'},
-  Gobernanza:       {bg:'bg-amber-50',   text:'text-amber-700',   border:'border-amber-200',   hex:'#d97706'},
-  'Medio Ambiente': {bg:'bg-emerald-50', text:'text-emerald-700', border:'border-emerald-200', hex:'#10b981'}
+  Frontera:         {bg:'bg-slate-50', text:'text-slate-800', border:'border-slate-200', hex:'#e11d48'},
+  Economía:         {bg:'bg-slate-50', text:'text-slate-800', border:'border-slate-200', hex:'#2563eb'},
+  'Capital Humano': {bg:'bg-slate-50', text:'text-slate-800', border:'border-slate-200', hex:'#7c3aed'},
+  'Cohesión Social':{bg:'bg-slate-50', text:'text-slate-800', border:'border-slate-200', hex:'#0891b2'},
+  Gobernanza:       {bg:'bg-slate-50', text:'text-slate-800', border:'border-slate-200', hex:'#d97706'},
+  'Medio Ambiente': {bg:'bg-slate-50', text:'text-slate-800', border:'border-slate-200', hex:'#16a34a'}
 };
 const DESC = {
   Resumen:'Consolidado general del Índice con cálculos en tiempo real.',
@@ -243,11 +340,11 @@ const DESC = {
 };
 
 const BANDS = [
-  {range:'0.0 – 3.9', level:'Bajo',       desc:'Ciudad con desafíos críticos en múltiples dimensiones.',  bg:'bg-red-50',    text:'text-red-700',    border:'border-red-400',    dot:'bg-red-500'},
-  {range:'4.0 – 5.9', level:'Medio-Bajo', desc:'Avances parciales; requiere mejoras sustanciales.',       bg:'bg-orange-50', text:'text-orange-700', border:'border-orange-400', dot:'bg-orange-500'},
-  {range:'6.0 – 7.4', level:'Medio',      desc:'Ciudad en desarrollo con fortalezas sectoriales.',        bg:'bg-amber-50',  text:'text-amber-700',  border:'border-amber-400',  dot:'bg-amber-500'},
-  {range:'7.5 – 8.9', level:'Alto',       desc:'Ciudad inteligente consolidada con buenas prácticas.',    bg:'bg-emerald-50',text:'text-emerald-700',border:'border-emerald-500',dot:'bg-emerald-500'},
-  {range:'9.0 – 10.0',level:'Muy Alto',   desc:'Ciudad de referencia global en inteligencia urbana.',     bg:'bg-green-50',  text:'text-green-800',  border:'border-green-600',  dot:'bg-green-600'},
+  {range:'0.0 – 3.9', level:'Bajo',       desc:'Ciudad con desafíos críticos en múltiples dimensiones.',  bg:'bg-white', text:'text-red-600',   border:'border-red-200',   dot:'bg-red-500'},
+  {range:'4.0 – 5.9', level:'Medio-Bajo', desc:'Avances parciales; requiere mejoras sustanciales.',       bg:'bg-white', text:'text-amber-600', border:'border-amber-200', dot:'bg-amber-500'},
+  {range:'6.0 – 7.4', level:'Medio',      desc:'Ciudad en desarrollo con fortalezas sectoriales.',        bg:'bg-white', text:'text-amber-700', border:'border-amber-300', dot:'bg-amber-400'},
+  {range:'7.5 – 8.9', level:'Alto',       desc:'Ciudad inteligente consolidada con buenas prácticas.',    bg:'bg-white', text:'text-green-700', border:'border-green-200', dot:'bg-green-500'},
+  {range:'9.0 – 10.0',level:'Muy Alto',   desc:'Ciudad de referencia global en inteligencia urbana.',     bg:'bg-white', text:'text-green-800', border:'border-green-300', dot:'bg-green-600'},
 ];
 function interpretBand(s) { return s < 4 ? 0 : s < 6 ? 1 : s < 7.5 ? 2 : s < 9 ? 3 : 4; }
 
@@ -260,7 +357,7 @@ function calcScore(tipo, val, ref) {
   if (tipo === 'pos' && ref === 0) return 0;
   return Math.min(10, Math.max(0, tipo === 'pos' ? (val / ref) * 10 : (ref / val) * 10));
 }
-function sColor(s) { return s >= 8 ? 'text-emerald-600' : s >= 5 ? 'text-amber-500' : 'text-red-500'; }
+function sColor(s) { return s >= 8 ? 's-good' : s >= 5 ? 's-mid' : 's-low'; }
 function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function dimAvgs(inds) {
   const acc = {};
@@ -287,7 +384,7 @@ const st = { tab:'Ranking', cityIdx:null, cmpA:0, cmpB:1, barChart:null, radarCh
 // LISTA DE PAÍSES — usada en filtro del ranking
 // ═══════════════════════════════════════════════════════════════════
 const countryList = (() => {
-  const list = [{ label: '🌎 Todos los países', value: '' }];
+  const list = [{ label: 'Todos los países', value: '' }];
   [...new Set(CITIES_META.map(c => c.country))]
     .sort((a, b) => a.localeCompare(b, 'es'))
     .forEach(country => {
@@ -307,24 +404,24 @@ function renderSidebar() {
   const city  = CITIES[st.cityIdx];
   const score = composite(city.indicators);
   const band  = BANDS[interpretBand(score)];
-  const sc    = score >= 7 ? '#22c55e' : score >= 4 ? '#eab308' : '#ef4444';
+  const sc    = score >= 7 ? '#16a34a' : score >= 4 ? '#d97706' : '#dc2626';
   section.classList.remove('hidden');
   card.innerHTML = `
-    <div class="flex items-center gap-2 mb-2">
-      <span class="text-2xl leading-none">${city.flag}</span>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <span style="font-size:20px;line-height:1;">${city.flag}</span>
       <div>
-        <div class="font-bold text-stone-800 text-sm leading-tight">${city.name}</div>
-        <div class="text-[10px] text-stone-500">${city.country}</div>
+        <div style="font-weight:600;font-size:13px;color:#0f172a;line-height:1.3;">${city.name}</div>
+        <div style="font-size:11px;color:#94a3b8;">${city.country}</div>
       </div>
     </div>
-    <div class="flex items-center justify-between mb-2.5">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
       <div>
-        <div class="text-[10px] uppercase font-bold text-stone-400 tracking-wider mb-0.5">Puntaje total</div>
-        <div class="font-mono font-black text-2xl leading-none" style="color:${sc};">${score.toFixed(2)}<span class="text-stone-300 text-xs font-normal">/10</span></div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:2px;">Puntaje total</div>
+        <div class="kpi" style="font-size:22px;color:${sc};">${score.toFixed(2)}<span style="color:#cbd5e1;font-size:11px;font-weight:400;">/10</span></div>
       </div>
-      <span class="text-[10px] font-bold px-2 py-1 rounded-full border whitespace-nowrap ${band.text} ${band.bg} ${band.border}">${band.level}</span>
+      <span class="badge ${band.text} ${band.bg} ${band.border}">${band.level}</span>
     </div>
-    <button onclick="deselectCity()" class="w-full text-center text-[11px] font-bold text-stone-500 hover:text-red-600 bg-white hover:bg-red-50 border border-stone-200 hover:border-red-200 rounded-lg py-1.5 transition-colors">✕ Deseleccionar</button>
+    <button onclick="deselectCity()" style="width:100%;display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:11px;font-weight:500;color:#64748b;background:#fff;border:1px solid #e5e7eb;border-radius:6px;padding:6px;cursor:pointer;transition:background .15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'">${ICO.x} Deseleccionar</button>
   `;
 }
 
@@ -365,25 +462,13 @@ document.addEventListener('DOMContentLoaded', function() {
 // ═══════════════════════════════════════════════════════════════════
 // NAV ACTIVE
 // ═══════════════════════════════════════════════════════════════════
-const ALL_CLS = [
-  'bg-sky-100','text-sky-700','border-sky-200',
-  'bg-teal-100','text-teal-700','border-teal-200',
-  'bg-violet-100','text-violet-700','border-violet-200',
-  'shadow-sm','bg-white','text-stone-600','border-transparent'
-];
+const ALL_CLS = ['tab-active'];
 
 function setActive() {
   const navTab = (st.tab === 'Resumen') ? 'Ranking' : st.tab;
   document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.classList.remove(...ALL_CLS);
-    const t = btn.dataset.tab;
-    if (t === navTab) {
-      if      (t === 'Ranking')  btn.classList.add('bg-sky-100','text-sky-700','border-sky-200','shadow-sm');
-      else if (t === 'Mapa')     btn.classList.add('bg-teal-100','text-teal-700','border-teal-200','shadow-sm');
-      else if (t === 'Comparar') btn.classList.add('bg-violet-100','text-violet-700','border-violet-200','shadow-sm');
-    } else {
-      btn.classList.add('bg-white','text-stone-600','border-transparent');
-    }
+    btn.classList.remove('tab-active');
+    if (btn.dataset.tab === navTab) btn.classList.add('tab-active');
   });
 
   const titles = {
@@ -407,14 +492,14 @@ function setActive() {
 // SEMÁFORO
 // ═══════════════════════════════════════════════════════════════════
 function trafficLight(score) {
-  if (score === null) return { color:'#9ca3af', tooltip:'Sin dato disponible' };
-  if (score >= 7.0)   return { color:'#22c55e', tooltip:'Buen desempeño' };
-  if (score >= 4.0)   return { color:'#eab308', tooltip:'Desempeño medio' };
-  return                     { color:'#ef4444', tooltip:'Requiere atención' };
+  if (score === null) return { color:'#94a3b8', tooltip:'Sin dato disponible' };
+  if (score >= 7.0)   return { color:'#16a34a', tooltip:'Buen desempeño' };
+  if (score >= 4.0)   return { color:'#d97706', tooltip:'Desempeño medio' };
+  return                     { color:'#dc2626', tooltip:'Requiere atención' };
 }
 function trafficDot(score) {
   const tl = trafficLight(score);
-  return `<span class="traffic-dot" style="background:${tl.color};box-shadow:0 0 5px 2px ${tl.color}55;" title="${tl.tooltip}" aria-label="${tl.tooltip}"></span>`;
+  return `<span class="traffic-dot" style="background:${tl.color};" title="${tl.tooltip}" aria-label="${tl.tooltip}"></span>`;
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -461,12 +546,12 @@ function renderBar() {
     type: 'bar',
     data: {
       labels: DIMS,
-      datasets: [{ label:'Puntaje', data: DIMS.map(d => +avgs[d].toFixed(4)), backgroundColor: DIMS.map(d => C[d].hex), borderRadius:4, maxBarThickness:60 }]
+      datasets: [{ label:'Puntaje', data: DIMS.map(d => +avgs[d].toFixed(4)), backgroundColor: DIMS.map(d => C[d].hex+'cc'), borderRadius:4, maxBarThickness:60 }]
     },
     options: {
       responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{ display:false } },
-      scales:{ y:{ beginAtZero:true, max:10, grid:{ color:'#f5f5f4' } }, x:{ grid:{ display:false }, ticks:{ maxRotation:45 } } }
+      scales:{ y:{ beginAtZero:true, max:10, grid:{ color:'#f1f5f9' }, ticks:{ font:{family:'Inter,ui-sans-serif,system-ui,sans-serif',size:11}, color:'#94a3b8' } }, x:{ grid:{ display:false }, ticks:{ maxRotation:45, font:{family:'Inter,ui-sans-serif,system-ui,sans-serif',size:11}, color:'#64748b' } } }
     }
   });
 }
@@ -484,18 +569,18 @@ function renderResumen() {
   const avgs  = dimAvgs(inds);
   const total = composite(inds);
   const band  = BANDS[interpretBand(total)];
-  const sc    = total >= 7 ? '#22c55e' : total >= 4 ? '#eab308' : '#ef4444';
+  const sc    = total >= 7 ? '#16a34a' : total >= 4 ? '#d97706' : '#dc2626';
 
   // Filas de la tabla consolidada
   let dimRowsHtml = '';
   DIMS.forEach(dim => {
     const avg = avgs[dim]; const w = W[dim];
-    dimRowsHtml += `<tr class="border-b border-stone-100 hover:bg-stone-50">
-      <td class="px-6 py-4 font-bold text-stone-700">${dim}</td>
-      <td class="px-5 py-4 text-center text-stone-500">${inds.filter(i => i.dim === dim).length}</td>
-      <td class="px-5 py-4 text-right font-mono ${sColor(avg)} font-bold text-lg">${avg.toFixed(4)}</td>
-      <td class="px-5 py-4 text-center text-stone-500 font-bold">${(w*100)}%</td>
-      <td class="px-5 py-4 text-right font-mono font-bold text-stone-700 text-lg">${(avg*w).toFixed(4)}</td>
+    dimRowsHtml += `<tr style="border-bottom:1px solid #f1f5f9;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
+      <td class="px-6 py-4 font-bold" style="color:#0f172a;">${dim}</td>
+      <td class="px-5 py-4 text-center" style="color:#64748b;">${inds.filter(i => i.dim === dim).length}</td>
+      <td class="px-5 py-4 text-right font-mono font-bold ${sColor(avg)}" style="font-size:15px;">${avg.toFixed(4)}</td>
+      <td class="px-5 py-4 text-center font-bold" style="color:#64748b;">${(w*100)}%</td>
+      <td class="px-5 py-4 text-right font-mono font-bold" style="color:#0f172a;font-size:15px;">${(avg*w).toFixed(4)}</td>
     </tr>`;
   });
 
@@ -504,21 +589,21 @@ function renderResumen() {
   let interpHtml = '';
   BANDS.forEach((b, i) => {
     if (i === activeBand) {
-      interpHtml += `<tr class="${b.bg} border-l-4 ${b.border}">
-        <td class="px-6 py-3.5 font-mono font-semibold text-stone-700 whitespace-nowrap">${b.range}</td>
+      interpHtml += `<tr style="background:#f8fafc;">
+        <td class="px-6 py-3.5 font-mono font-semibold whitespace-nowrap" style="color:#0f172a;">${b.range}</td>
         <td class="px-5 py-3.5 whitespace-nowrap"><span class="${b.text} font-bold flex items-center gap-2">
           <span class="w-2.5 h-2.5 rounded-full ${b.dot} flex-shrink-0"></span>${b.level}
-          <span class="text-[10px] font-bold bg-stone-800 text-white px-2 py-0.5 rounded-full ml-1">&#x2190; Ciudad actual</span>
+          <span style="font-size:10px;font-weight:600;background:#0f172a;color:#fff;padding:1px 8px;border-radius:4px;margin-left:4px;">Ciudad actual</span>
         </span></td>
-        <td class="px-5 py-3.5 ${b.text} font-medium">${b.desc}</td>
+        <td class="px-5 py-3.5 font-medium" style="color:#475569;">${b.desc}</td>
       </tr>`;
     } else {
-      interpHtml += `<tr class="border-b border-stone-100 hover:bg-stone-50">
-        <td class="px-6 py-3 font-mono text-stone-500 whitespace-nowrap">${b.range}</td>
+      interpHtml += `<tr style="border-bottom:1px solid #f1f5f9;">
+        <td class="px-6 py-3 font-mono whitespace-nowrap" style="color:#64748b;">${b.range}</td>
         <td class="px-5 py-3 whitespace-nowrap"><span class="${b.text} font-medium flex items-center gap-2">
           <span class="w-2 h-2 rounded-full ${b.dot} flex-shrink-0"></span>${b.level}
         </span></td>
-        <td class="px-5 py-3 text-stone-500">${b.desc}</td>
+        <td class="px-5 py-3" style="color:#64748b;">${b.desc}</td>
       </tr>`;
     }
   });
@@ -531,45 +616,48 @@ function renderResumen() {
     inds.filter(i => i.dim === dim).forEach(item => {
       const score = calcScore(item.tipo, item.val, item.ref);
       const scoreCell = score === null
-        ? '<span class="text-stone-300 text-sm">N/D</span>'
-        : `<span class="font-mono font-bold text-base ${sColor(score)}">${score.toFixed(2)}</span>`;
-      const valDisplay = item.val === null ? '<span class="text-stone-300">N/D</span>' : escHtml(String(item.val));
+        ? '<span style="color:#cbd5e1;font-size:13px;">N/D</span>'
+        : `<span class="kpi ${sColor(score)}" style="font-size:14px;">${score.toFixed(2)}</span>`;
+      const valDisplay = item.val === null ? '<span style="color:#cbd5e1;">N/D</span>' : escHtml(String(item.val));
       const arrow = item.tipo === 'pos'
-        ? '<span class="text-[9px] px-1 py-0.5 bg-emerald-100 text-emerald-700 rounded font-bold flex-shrink-0">↑</span>'
-        : '<span class="text-[9px] px-1 py-0.5 bg-red-100 text-red-700 rounded font-bold flex-shrink-0">↓</span>';
-      indRows += `<tr class="border-b border-stone-100 hover:bg-stone-50/80">
+        ? '<span style="font-size:9px;padding:1px 5px;background:#dcfce7;color:#16a34a;border-radius:3px;font-weight:600;flex-shrink:0;">↑</span>'
+        : '<span style="font-size:9px;padding:1px 5px;background:#fee2e2;color:#dc2626;border-radius:3px;font-weight:600;flex-shrink:0;">↓</span>';
+      indRows += `<tr class="ind-row">
         <td class="px-4 py-3">
-          <div class="flex items-start gap-2">
+          <div style="display:flex;align-items:flex-start;gap:8px;">
             ${trafficDot(score)}
             <div>
-              <div class="font-semibold text-stone-800 text-sm flex items-center gap-1.5 flex-wrap">${item.name} ${arrow}</div>
-              <div class="text-[10px] text-stone-400 mt-0.5 leading-tight">${escHtml(item.desc)}</div>
+              <div style="font-weight:600;font-size:13px;color:#0f172a;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${item.name} ${arrow}</div>
+              <div style="font-size:10px;color:#94a3b8;margin-top:2px;line-height:1.4;">${escHtml(item.desc)}</div>
             </div>
           </div>
         </td>
         <td class="px-3 py-3 text-right align-top">
-          <div class="font-mono text-sm text-stone-700 font-semibold">${valDisplay}</div>
-          <div class="text-[10px] text-stone-400">${escHtml(item.unit)}</div>
+          <div style="font-family:monospace;font-size:13px;font-weight:600;color:#0f172a;">${valDisplay}</div>
+          <div style="font-size:10px;color:#94a3b8;">${escHtml(item.unit)}</div>
         </td>
-        <td class="px-3 py-3 text-right align-top font-mono text-sm text-stone-400">${item.ref}</td>
+        <td class="px-3 py-3 text-right align-top" style="font-family:monospace;font-size:13px;color:#94a3b8;">${item.ref}</td>
         <td class="px-3 py-3 text-right align-top">${scoreCell}</td>
       </tr>`;
     });
-    dimDetailsHtml += `<div class="bg-white rounded-2xl border ${col.border} shadow-sm mb-5 overflow-hidden">
-      <div class="${col.bg} px-5 py-3.5 border-b ${col.border} flex items-center justify-between flex-wrap gap-2">
-        <h4 class="font-black text-base ${col.text}">${dim}</h4>
-        <div class="flex items-center gap-3 text-sm">
-          <span class="text-stone-500 font-medium">Peso <strong>${(W[dim]*100)}%</strong></span>
-          <span class="font-mono font-black text-xl ${sColor(avg)}">${avg.toFixed(2)}<span class="text-stone-400 text-xs font-normal">/10</span></span>
+    dimDetailsHtml += `<div style="background:#fff;border-radius:8px;border:1px solid #e5e7eb;box-shadow:var(--shadow,0 1px 3px rgba(0,0,0,.05));margin-bottom:16px;overflow:hidden;">
+      <div style="background:#f8fafc;padding:12px 20px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <h4 style="font-size:13px;font-weight:600;color:#0f172a;display:flex;align-items:center;gap:8px;">
+          <span style="width:10px;height:10px;border-radius:50%;background:${col.hex};flex-shrink:0;display:inline-block;"></span>
+          ${dim}
+        </h4>
+        <div style="display:flex;align-items:center;gap:12px;font-size:13px;">
+          <span style="color:#64748b;">Peso <strong>${(W[dim]*100)}%</strong></span>
+          <span class="kpi ${sColor(avg)}" style="font-size:18px;">${avg.toFixed(2)}<span style="color:#cbd5e1;font-size:11px;font-weight:400;">/10</span></span>
         </div>
       </div>
       <div class="overflow-x-auto tbl">
         <table class="w-full text-left border-collapse min-w-[520px]">
-          <thead><tr class="bg-stone-50 text-stone-400 text-[10px] uppercase tracking-wider font-semibold border-b border-stone-200">
-            <th class="px-4 py-2.5">Indicador · descripción</th>
-            <th class="px-3 py-2.5 text-right">Valor real</th>
-            <th class="px-3 py-2.5 text-right">Ref. óptima</th>
-            <th class="px-3 py-2.5 text-right">Puntaje</th>
+          <thead><tr style="background:#f8fafc;">
+            <th class="px-4 py-2.5" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Indicador · descripción</th>
+            <th class="px-3 py-2.5 text-right" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Valor real</th>
+            <th class="px-3 py-2.5 text-right" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Ref. óptima</th>
+            <th class="px-3 py-2.5 text-right" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Puntaje</th>
           </tr></thead>
           <tbody>${indRows}</tbody>
         </table>
@@ -577,70 +665,76 @@ function renderResumen() {
     </div>`;
   });
 
-  container.innerHTML = `<div class="p-5 lg:p-7 pb-10">
+  container.innerHTML = `<div style="padding:24px 28px;padding-bottom:40px;">
 
-    <div class="bg-white rounded-2xl border border-stone-200 shadow-sm p-5 mb-6">
-      <button onclick="backToRanking()" class="inline-flex items-center gap-2 px-4 py-2 mb-5 rounded-xl bg-stone-800 hover:bg-stone-700 active:bg-stone-900 text-white text-sm font-bold shadow transition-colors">&#8592; Volver al Ranking</button>
-      <div class="flex items-center justify-between flex-wrap gap-4">
-        <div class="flex items-center gap-4">
-          <span class="text-5xl leading-none">${city.flag}</span>
+    <div style="background:#fff;border-radius:8px;border:1px solid #e5e7eb;box-shadow:0 1px 3px rgba(0,0,0,.05);padding:20px;margin-bottom:20px;">
+      <button onclick="backToRanking()" class="btn-primary" style="margin-bottom:20px;">${ICO.arrowLeft} Volver al Ranking</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <span style="font-size:36px;line-height:1;">${city.flag}</span>
           <div>
-            <h2 class="text-2xl font-black text-stone-800">${escHtml(city.name)}</h2>
-            <p class="text-stone-500 text-sm">${escHtml(city.country)} · ${escHtml(city.region)}</p>
+            <h2 style="font-size:20px;font-weight:700;color:#0f172a;margin:0 0 2px;">${escHtml(city.name)}</h2>
+            <p style="color:#64748b;font-size:13px;margin:0;">${escHtml(city.country)} · ${escHtml(city.region)}</p>
           </div>
         </div>
-        <div class="flex items-center gap-3">
-          <div class="text-right">
-            <div class="text-[10px] uppercase font-bold text-stone-400 tracking-wider">Índice Compuesto</div>
-            <div class="font-mono font-black text-4xl leading-none" style="color:${sc};">${total.toFixed(2)}<span class="text-stone-300 text-lg font-normal">/10</span></div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="text-align:right;">
+            <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:2px;">Índice Compuesto</div>
+            <div class="kpi" style="font-size:32px;color:${sc};">${total.toFixed(2)}<span style="color:#cbd5e1;font-size:14px;font-weight:400;">/10</span></div>
           </div>
-          <span class="text-sm font-bold px-3 py-1.5 rounded-full border ${band.text} ${band.bg} ${band.border}">${band.level}</span>
+          <span class="badge ${band.text} ${band.bg} ${band.border}">${band.level}</span>
         </div>
       </div>
     </div>
 
-    <div class="bg-white p-5 rounded-2xl shadow-sm border border-stone-200 mb-6">
-      <h3 class="text-sm font-bold text-stone-700 mb-3 uppercase tracking-wider">Desempeño por Dimensión (0 a 10)</h3>
+    <div style="background:#fff;padding:20px;border-radius:8px;border:1px solid #e5e7eb;box-shadow:0 1px 3px rgba(0,0,0,.05);margin-bottom:20px;">
+      <h3 style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#64748b;margin-bottom:12px;">Desempeño por Dimensión (0 a 10)</h3>
       <div class="chart-container"><canvas id="dimensionChart" height="300"></canvas></div>
     </div>
 
-    <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden mb-6">
-      <div class="px-5 py-3 border-b border-stone-100 bg-stone-50">
-        <h3 class="text-sm font-bold text-stone-700">&#x1F4CA; Consolidado &mdash; ${escHtml(city.name)}</h3>
+    <div style="background:#fff;border-radius:8px;border:1px solid #e5e7eb;box-shadow:0 1px 3px rgba(0,0,0,.05);overflow:hidden;margin-bottom:20px;">
+      <div style="padding:12px 20px;border-bottom:1px solid #f1f5f9;background:#f8fafc;display:flex;align-items:center;gap:8px;">
+        ${ICO.barChart}
+        <h3 style="font-size:13px;font-weight:600;color:#0f172a;margin:0;">Consolidado — ${escHtml(city.name)}</h3>
       </div>
       <div class="overflow-x-auto tbl">
         <table class="w-full text-left border-collapse min-w-[600px]">
-          <thead><tr class="bg-stone-100 text-stone-500 text-[11px] uppercase tracking-wider font-semibold border-b border-stone-200">
-            <th class="px-6 py-4">Dimensión</th><th class="px-5 py-4 text-center">Inds.</th>
-            <th class="px-5 py-4 text-right">Promedio (0-10)</th><th class="px-5 py-4 text-center">Peso</th>
-            <th class="px-5 py-4 text-right">Puntaje Ponderado</th>
+          <thead><tr style="background:#f8fafc;">
+            <th class="px-6 py-3" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Dimensión</th>
+            <th class="px-5 py-3 text-center" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Inds.</th>
+            <th class="px-5 py-3 text-right" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Promedio (0-10)</th>
+            <th class="px-5 py-3 text-center" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Peso</th>
+            <th class="px-5 py-3 text-right" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Puntaje Ponderado</th>
           </tr></thead>
           <tbody class="text-sm">
             ${dimRowsHtml}
-            <tr class="bg-stone-800 text-white font-bold border-t-4 border-emerald-500">
-              <td colspan="4" class="px-6 py-5 text-right uppercase tracking-wider text-xs">ÍNDICE COMPUESTO FINAL:</td>
-              <td class="px-6 py-5 text-right font-mono text-emerald-400 text-3xl">${total.toFixed(4)}</td>
+            <tr style="background:#0f172a;color:#fff;font-weight:700;">
+              <td colspan="4" class="px-6 py-4 text-right" style="font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;">Índice Compuesto Final:</td>
+              <td class="px-6 py-4 text-right font-mono kpi" style="font-size:24px;color:#86efac;">${total.toFixed(4)}</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden mb-6">
-      <div class="px-5 py-3 border-b border-stone-100 bg-stone-50">
-        <h3 class="text-sm font-bold text-stone-700">&#x1F4CB; Tabla de Interpretación del Índice Compuesto</h3>
+    <div style="background:#fff;border-radius:8px;border:1px solid #e5e7eb;box-shadow:0 1px 3px rgba(0,0,0,.05);overflow:hidden;margin-bottom:20px;">
+      <div style="padding:12px 20px;border-bottom:1px solid #f1f5f9;background:#f8fafc;display:flex;align-items:center;gap:8px;">
+        ${ICO.clipboard}
+        <h3 style="font-size:13px;font-weight:600;color:#0f172a;margin:0;">Tabla de Interpretación del Índice Compuesto</h3>
       </div>
       <div class="overflow-x-auto tbl">
         <table class="w-full text-left border-collapse min-w-[500px]">
-          <thead><tr class="bg-stone-100 text-stone-500 text-[11px] uppercase tracking-wider font-semibold border-b border-stone-200">
-            <th class="px-6 py-3">Rango</th><th class="px-5 py-3">Nivel</th><th class="px-5 py-3">Interpretación</th>
+          <thead><tr style="background:#f8fafc;">
+            <th class="px-6 py-3" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Rango</th>
+            <th class="px-5 py-3" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Nivel</th>
+            <th class="px-5 py-3" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Interpretación</th>
           </tr></thead>
           <tbody class="text-sm">${interpHtml}</tbody>
         </table>
       </div>
     </div>
 
-    <p class="text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-4 px-1">Detalle por Dimensión</p>
+    <p style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:16px;padding:0 4px;">Detalle por Dimensión</p>
     ${dimDetailsHtml}
   </div>`;
 
@@ -703,87 +797,85 @@ function renderRanking() {
         const isDisabled = !isChecked && selCount >= 2;
         const band = BANDS[interpretBand(city.score)];
         const pct = Math.min(100, city.score / 10 * 100).toFixed(1);
-        const barColor = city.score >= 7 ? '#22c55e' : city.score >= 4 ? '#eab308' : '#ef4444';
+        const barColor = city.score >= 7 ? '#16a34a' : city.score >= 4 ? '#d97706' : '#dc2626';
         const pos = rank <= 3
           ? `<span class="text-2xl leading-none">${medals[rank-1]}</span>`
           : `<span class="text-base font-black text-stone-500">${rank}°</span>`;
-        const rowBg = isActive
-          ? 'bg-sky-50'
-          : (fi % 2 === 0 ? 'bg-white hover:bg-stone-50' : 'bg-stone-50 hover:bg-stone-100');
-        const activeBorder = isActive ? ' style="box-shadow:inset 4px 0 0 #38bdf8;"' : '';
+        const rowBg = isActive ? 'row-active' : '';
 
-        return `<tr class="ranking-row border-b border-stone-100 cursor-pointer transition-colors ${rowBg}" data-city-idx="${city.idx}"${activeBorder}>
+        return `<tr class="ranking-row pro-row cursor-pointer transition-colors ${rowBg}" data-city-idx="${city.idx}">
           <td class="px-3 py-3 w-10 text-center">
-            <input type="checkbox" class="ranking-cb w-4 h-4 rounded accent-sky-500 ${isDisabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}" data-city-idx="${city.idx}" ${isChecked ? 'checked' : ''} ${isDisabled ? 'disabled title="Máximo 2 ciudades para comparar"' : ''}>
+            <input type="checkbox" class="ranking-cb" data-city-idx="${city.idx}" ${isChecked ? 'checked' : ''} ${isDisabled ? 'disabled title="Máximo 2 ciudades para comparar"' : ''}>
           </td>
           <td class="px-2 py-3 text-center w-12">${pos}</td>
           <td class="px-3 py-3">
             <div class="flex items-center gap-2">
-              <span class="text-xl leading-none">${city.flag}</span>
+              <span style="font-size:18px;line-height:1;">${city.flag}</span>
               <div>
-                <div class="font-bold text-stone-800 text-sm leading-tight flex items-center gap-1 flex-wrap">
+                <div style="font-weight:600;font-size:13px;color:#0f172a;line-height:1.3;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                   ${city.name}
-                  ${isActive ? '<span class="text-[9px] bg-sky-500 text-white px-1.5 py-0.5 rounded-full font-bold tracking-wide">Ciudad activa</span>' : ''}
+                  ${isActive ? '<span style="font-size:9px;font-weight:600;background:#0f172a;color:#fff;padding:1px 6px;border-radius:4px;">activa</span>' : ''}
                 </div>
-                <div class="text-[10px] text-stone-400">${city.country}</div>
+                <div style="font-size:11px;color:#94a3b8;">${city.country}</div>
               </div>
             </div>
           </td>
           <td class="px-3 py-3 min-w-[90px]">
-            <div class="bg-stone-100 rounded-full h-2 overflow-hidden">
-              <div class="h-2 rounded-full" style="width:${pct}%;background:${barColor};"></div>
+            <div style="background:#f1f5f9;border-radius:99px;height:4px;overflow:hidden;">
+              <div style="height:4px;border-radius:99px;width:${pct}%;background:${barColor};"></div>
             </div>
           </td>
           <td class="px-3 py-3 text-right whitespace-nowrap">
-            <span class="font-mono font-black text-base" style="color:${barColor};">${city.score.toFixed(2)}</span>
-            <span class="text-stone-300 text-xs">/10</span>
+            <span class="kpi" style="font-size:14px;color:${barColor};">${city.score.toFixed(2)}</span>
+            <span style="color:#cbd5e1;font-size:11px;">/10</span>
           </td>
           <td class="px-3 py-3">
-            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border whitespace-nowrap ${band.text} ${band.bg} ${band.border}">${band.level}</span>
+            <span class="badge ${band.text} ${band.bg} ${band.border}">${band.level}</span>
           </td>
-          <td class="px-2 py-3 w-8 text-center text-stone-300 text-xs select-none">⋯</td>
+          <td class="px-2 py-3 w-8 text-center" style="color:#cbd5e1;font-size:11px;user-select:none;">···</td>
         </tr>`;
       }).join('');
 
 
   container.innerHTML = `
-    <div class="p-5 pb-28">
-      <div class="text-center mb-5">
-        <h2 class="text-2xl font-black text-stone-800">&#x1F3C6; Ranking de Ciudades Inteligentes</h2>
-        <p class="text-stone-400 text-xs mt-1">${CITIES.length} ciudades · ordenadas por Índice Compuesto ponderado${st.cityIdx !== null ? ' · <span class="text-sky-600 font-semibold">ciudad seleccionada</span>' : ''}</p>
+    <div style="padding:24px 28px;padding-bottom:112px;">
+      <div style="margin-bottom:20px;">
+        <h2 style="font-size:18px;font-weight:600;color:#0f172a;margin:0 0 4px;">Ranking de Ciudades Inteligentes</h2>
+        <p style="font-size:13px;color:#94a3b8;margin:0;">${CITIES.length} ciudades · ordenadas por Índice Compuesto ponderado${st.cityIdx !== null ? ' · <span style="color:#0f172a;font-weight:600;">ciudad seleccionada</span>' : ''}</p>
       </div>
 
-      <div class="bg-white rounded-2xl border border-stone-200 p-4 mb-3 flex flex-wrap gap-3 items-end shadow-sm">
-        <div class="flex-1 min-w-[150px]">
-          <label class="text-[10px] uppercase font-bold text-stone-400 tracking-wider block mb-1">Buscar ciudad</label>
+      <div style="background:#fff;border-radius:8px;border:1px solid #e5e7eb;padding:16px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+        <div style="flex:1;min-width:150px;">
+          <label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;display:block;margin-bottom:4px;">Buscar ciudad</label>
           <input id="rk-search" type="text" placeholder="Nombre de ciudad…" value="${escHtml(st.rankingSearch)}"
-            class="w-full px-3 py-2 rounded-lg border border-stone-200 text-sm text-stone-700 bg-stone-50 focus:outline-none focus:ring-2 focus:ring-sky-300">
+            style="width:100%;padding:7px 12px;border-radius:6px;border:1px solid #e5e7eb;font-size:13px;color:#0f172a;background:#f8fafc;outline:none;font-family:inherit;"
+            onfocus="this.style.borderColor='#94a3b8'" onblur="this.style.borderColor='#e5e7eb'">
         </div>
-        <div class="flex-1 min-w-[150px]">
-          <label class="text-[10px] uppercase font-bold text-stone-400 tracking-wider block mb-1">País</label>
-          <select id="rk-country" class="w-full px-3 py-2 rounded-lg border border-stone-200 text-sm text-stone-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-300">${countryOpts}</select>
+        <div style="flex:1;min-width:150px;">
+          <label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;display:block;margin-bottom:4px;">País</label>
+          <select id="rk-country" style="width:100%;padding:7px 12px;border-radius:6px;border:1px solid #e5e7eb;font-size:13px;color:#0f172a;background:#fff;outline:none;font-family:inherit;">${countryOpts}</select>
         </div>
-        ${hasFilters ? `<button id="rk-clear" class="px-4 py-2 rounded-lg border border-stone-200 text-sm text-stone-600 hover:bg-stone-50 font-medium transition-colors whitespace-nowrap self-end">✕ Limpiar filtros</button>` : ''}
+        ${hasFilters ? `<button id="rk-clear" class="btn-secondary" style="align-self:flex-end;white-space:nowrap;">${ICO.x} Limpiar filtros</button>` : ''}
       </div>
 
-      ${hasFilters ? `<div class="mb-3 text-center"><button id="rk-showall" class="px-5 py-2.5 bg-sky-50 border border-sky-200 text-sky-700 text-sm font-bold rounded-xl hover:bg-sky-100 transition-colors">↩ Ver todas las ciudades</button></div>` : ''}
+      ${hasFilters ? `<div style="margin-bottom:12px;text-align:center;"><button id="rk-showall" class="btn-secondary">${ICO.arrowLeft} Ver todas las ciudades</button></div>` : ''}
 
-      <div class="flex justify-between items-center mb-2 text-xs text-stone-500 px-1">
-        <span>Mostrando <strong class="text-stone-700">${filtered.length}</strong> de <strong class="text-stone-700">${CITIES.length}</strong> ciudades</span>
-        ${selCount > 0 ? `<span class="text-sky-600 font-bold">${selCount} seleccionada${selCount !== 1 ? 's' : ''}</span>` : ''}
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px;color:#64748b;padding:0 4px;">
+        <span>Mostrando <strong style="color:#0f172a;">${filtered.length}</strong> de <strong style="color:#0f172a;">${CITIES.length}</strong> ciudades</span>
+        ${selCount > 0 ? `<span style="color:#0f172a;font-weight:600;">${selCount} seleccionada${selCount !== 1 ? 's' : ''}</span>` : ''}
       </div>
 
-      <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
+      <div style="background:#fff;border-radius:8px;border:1px solid #e5e7eb;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04);">
         <table class="w-full text-left border-collapse min-w-[480px]">
           <thead>
-            <tr class="bg-stone-100 text-stone-400 text-[10px] uppercase tracking-wider font-semibold border-b border-stone-200">
-              <th class="px-3 py-3 w-10"></th>
-              <th class="px-2 py-3 text-center">#</th>
-              <th class="px-3 py-3">Ciudad</th>
-              <th class="px-3 py-3">Puntaje</th>
-              <th class="px-3 py-3 text-right">Total</th>
-              <th class="px-3 py-3">Nivel</th>
-              <th class="px-2 py-3 w-8 text-center" title="Pasa el cursor sobre una fila para ver las 6 dimensiones">⋯</th>
+            <tr style="background:#f8fafc;">
+              <th class="px-3 py-3 w-10" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;"></th>
+              <th class="px-2 py-3 text-center" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">#</th>
+              <th class="px-3 py-3" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Ciudad</th>
+              <th class="px-3 py-3" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Puntaje</th>
+              <th class="px-3 py-3 text-right" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Total</th>
+              <th class="px-3 py-3" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Nivel</th>
+              <th class="px-2 py-3 w-8 text-center" style="font-size:11px;font-weight:600;color:#64748b;border-bottom:1px solid #e5e7eb;" title="Pasa el cursor sobre una fila para ver las 6 dimensiones">···</th>
             </tr>
           </thead>
           <tbody>${rowsHtml}</tbody>
@@ -841,16 +933,16 @@ function renderRanking() {
     if (!city) return;
     row.addEventListener('mouseenter', e => {
       tip.innerHTML =
-        `<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#a8a29e;margin-bottom:8px;">${city.flag} ${city.name} · Dimensiones</div>` +
+        `<div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;margin-bottom:10px;">${city.flag} ${city.name} · Dimensiones</div>` +
         DIMS.map(dim => {
           const s = city.avgs[dim];
-          const bc = s >= 7 ? '#22c55e' : s >= 4 ? '#eab308' : '#ef4444';
-          return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-            <span style="width:110px;font-size:10px;color:#78716c;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${dim}</span>
-            <div style="flex:1;background:#e7e5e4;border-radius:4px;height:5px;overflow:hidden;min-width:55px;">
-              <div style="background:${bc};height:5px;width:${Math.min(100,s/10*100).toFixed(1)}%;border-radius:4px;"></div>
+          const bc = s >= 7 ? '#16a34a' : s >= 4 ? '#d97706' : '#dc2626';
+          return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">
+            <span style="width:110px;font-size:11px;color:#64748b;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${dim}</span>
+            <div style="flex:1;background:#f1f5f9;border-radius:4px;height:4px;overflow:hidden;min-width:55px;">
+              <div style="background:${bc};height:4px;width:${Math.min(100,s/10*100).toFixed(1)}%;border-radius:4px;"></div>
             </div>
-            <span style="width:28px;text-align:right;font-size:10px;font-family:monospace;font-weight:700;">${s.toFixed(1)}</span>
+            <span style="width:28px;text-align:right;font-size:11px;font-family:monospace;font-weight:700;color:#0f172a;">${s.toFixed(1)}</span>
           </div>`;
         }).join('');
       tip.style.display = 'block';
@@ -866,7 +958,7 @@ function renderRanking() {
 function rkGetTip() {
   if (!st._rkTip) {
     st._rkTip = document.createElement('div');
-    st._rkTip.style.cssText = 'position:fixed;z-index:9999;background:#fff;border:1px solid #e7e5e4;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.14);padding:12px 14px;min-width:230px;pointer-events:none;display:none;';
+    st._rkTip.style.cssText = 'position:fixed;z-index:9999;background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,.10);padding:14px 16px;min-width:230px;pointer-events:none;display:none;font-family:Inter,ui-sans-serif,system-ui,sans-serif;';
     document.body.appendChild(st._rkTip);
   }
   return st._rkTip;
@@ -925,9 +1017,9 @@ function updateRankingFloatBtn() {
   if (selCount === 1) {
     const selectedIdx = [...st.rankingSelected][0];
     const city = CITIES[selectedIdx];
-    btn.innerHTML = `<div onclick="window.checkboxGoToResumen()" class="flex items-center gap-2 bg-sky-600 text-white px-6 py-3.5 rounded-full shadow-2xl font-bold text-sm cursor-pointer hover:bg-sky-700 active:scale-95 transition-colors select-none" style="box-shadow:0 8px 25px rgba(14,165,233,.4);">&#x1F4CA; Ver Resumen de ${escHtml(city.name)} &#x2192;</div>`;
+    btn.innerHTML = `<div onclick="window.checkboxGoToResumen()" style="display:inline-flex;align-items:center;gap:8px;background:#0f172a;color:#fff;padding:10px 20px;border-radius:24px;box-shadow:0 4px 20px rgba(15,23,42,.35);font-weight:600;font-size:13px;cursor:pointer;user-select:none;transition:background .15s;" onmouseover="this.style.background='#1e293b'" onmouseout="this.style.background='#0f172a'">${ICO.barChart} Ver Resumen de ${escHtml(city.name)} ${ICO.arrowRight}</div>`;
   } else if (selCount === 2) {
-    btn.innerHTML = `<div onclick="window.goToCompareSelected()" class="flex items-center gap-2 bg-violet-600 text-white px-6 py-3.5 rounded-full shadow-2xl font-bold text-sm cursor-pointer hover:bg-violet-700 active:scale-95 transition-colors select-none" style="box-shadow:0 8px 25px rgba(109,40,217,.4);">&#x2696;&#xFE0F; Comparar seleccionadas <span class="bg-violet-800 text-violet-200 text-xs px-2 py-0.5 rounded-full ml-1">2</span></div>`;
+    btn.innerHTML = `<div onclick="window.goToCompareSelected()" style="display:inline-flex;align-items:center;gap:8px;background:#0f172a;color:#fff;padding:10px 20px;border-radius:24px;box-shadow:0 4px 20px rgba(15,23,42,.35);font-weight:600;font-size:13px;cursor:pointer;user-select:none;transition:background .15s;" onmouseover="this.style.background='#1e293b'" onmouseout="this.style.background='#0f172a'">${ICO.scale} Comparar seleccionadas <span style="background:#334155;color:#94a3b8;font-size:11px;padding:1px 8px;border-radius:4px;margin-left:2px;">2</span></div>`;
   }
 }
 
@@ -943,31 +1035,31 @@ function renderComparar() {
   document.getElementById('interp-card').classList.add('hidden');
   const container = document.getElementById('data-container');
 
-  function searchInputHtml(side, borderCls, ringCls) {
+  function searchInputHtml(side, accentColor) {
     const idx = side === 'a' ? st.cmpA : st.cmpB;
     const val = (idx !== null && idx !== undefined) ? `${CITIES[idx].flag} ${CITIES[idx].name}` : '';
     const hasSel = idx !== null && idx !== undefined;
-    return `<div class="flex-1" id="cmp-${side}-wrap">
-      <label class="block text-[10px] uppercase tracking-widest text-stone-400 font-bold mb-2">Ciudad ${side === 'a' ? 'A' : 'B'}</label>
-      <div class="relative">
+    return `<div style="flex:1;" id="cmp-${side}-wrap">
+      <label style="display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:6px;">Ciudad ${side === 'a' ? 'A' : 'B'}</label>
+      <div style="position:relative;">
         <input id="cmp-${side}-input" type="text" placeholder="Buscar ciudad…" autocomplete="off"
           value="${escHtml(val)}"
-          class="w-full px-4 py-3 pr-9 rounded-xl border ${borderCls} text-stone-700 bg-white focus:outline-none focus:ring-2 ${ringCls} font-medium text-sm">
+          style="width:100%;padding:8px 36px 8px 12px;border-radius:6px;border:1px solid ${accentColor};font-size:13px;color:#0f172a;background:#fff;outline:none;font-family:inherit;"
+          onfocus="this.style.borderColor='${accentColor}';this.style.boxShadow='0 0 0 3px ${accentColor}22'" onblur="this.style.boxShadow='none'">
         <button id="cmp-${side}-clear"
-          class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 text-sm leading-none transition-opacity ${hasSel ? 'opacity-100' : 'opacity-0 pointer-events-none'}"
-          title="Limpiar selección" type="button">✕</button>
+          style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#94a3b8;background:none;border:none;cursor:pointer;padding:2px;display:flex;align-items:center;opacity:${hasSel ? '1' : '0'};pointer-events:${hasSel ? 'auto' : 'none'};"
+          title="Limpiar selección" type="button">${ICO.x}</button>
         <div id="cmp-${side}-dropdown"
-          class="absolute left-0 right-0 bg-white rounded-xl border border-stone-200 shadow-xl mt-1 hidden overflow-y-auto"
-          style="max-height:220px;top:100%;z-index:200;"></div>
+          style="position:absolute;left:0;right:0;background:#fff;border-radius:8px;border:1px solid #e5e7eb;box-shadow:0 8px 24px rgba(0,0,0,.12);margin-top:4px;display:none;overflow-y:auto;max-height:220px;top:100%;z-index:200;"></div>
       </div>
     </div>`;
   }
 
-  container.innerHTML = `<div class="p-6">
-    <div class="flex flex-col md:flex-row gap-4 mb-7 items-end">
-      ${searchInputHtml('a', 'border-blue-300', 'focus:ring-blue-400')}
-      <div class="pb-3 text-stone-300 text-2xl font-light hidden md:block">vs</div>
-      ${searchInputHtml('b', 'border-rose-300', 'focus:ring-rose-400')}
+  container.innerHTML = `<div style="padding:24px 28px;">
+    <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:28px;align-items:flex-end;">
+      ${searchInputHtml('a', '#2563eb')}
+      <div style="padding-bottom:10px;color:#cbd5e1;font-size:20px;font-weight:300;display:none;" class="md:block">vs</div>
+      ${searchInputHtml('b', '#e11d48')}
     </div>
     <div id="cmp-content"></div>
   </div>`;
@@ -992,9 +1084,8 @@ function setupCmpSearch(side) {
   function syncClearBtn() {
     if (!clearBtn) return;
     const hasSel = getVal() !== null && getVal() !== undefined;
-    clearBtn.classList.toggle('opacity-0', !hasSel);
-    clearBtn.classList.toggle('pointer-events-none', !hasSel);
-    clearBtn.classList.toggle('opacity-100', hasSel);
+    clearBtn.style.opacity = hasSel ? '1' : '0';
+    clearBtn.style.pointerEvents = hasSel ? 'auto' : 'none';
   }
 
   function showDropdown(query) {
@@ -1003,14 +1094,14 @@ function setupCmpSearch(side) {
       .map((c, i) => ({ ...c, idx: i }))
       .filter(c => c.idx !== otherIdx && normStr(c.name).includes(normStr(query)));
     if (results.length === 0) {
-      dropdown.innerHTML = `<div class="px-4 py-3 text-sm text-stone-400 text-center">Sin resultados</div>`;
+      dropdown.innerHTML = `<div style="padding:12px 16px;font-size:13px;color:#94a3b8;text-align:center;">Sin resultados</div>`;
     } else {
       dropdown.innerHTML = results.map(c =>
-        `<div class="cmp-sug flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-stone-50 transition-colors border-b border-stone-100 last:border-0" data-idx="${c.idx}">
-          <span class="text-xl leading-none flex-shrink-0">${c.flag}</span>
+        `<div class="cmp-sug" data-idx="${c.idx}" style="display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;border-bottom:1px solid #f1f5f9;transition:background .1s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
+          <span style="font-size:18px;line-height:1;flex-shrink:0;">${c.flag}</span>
           <div>
-            <div class="font-semibold text-stone-800 text-sm">${escHtml(c.name)}</div>
-            <div class="text-[10px] text-stone-400">${escHtml(c.country)}</div>
+            <div style="font-weight:600;font-size:13px;color:#0f172a;">${escHtml(c.name)}</div>
+            <div style="font-size:11px;color:#94a3b8;">${escHtml(c.country)}</div>
           </div>
         </div>`
       ).join('');
@@ -1021,12 +1112,12 @@ function setupCmpSearch(side) {
           setVal(idx);
           input.value = `${CITIES[idx].flag} ${CITIES[idx].name}`;
           syncClearBtn();
-          dropdown.classList.add('hidden');
+          dropdown.style.display = 'none';
           updateComparar();
         });
       });
     }
-    dropdown.classList.remove('hidden');
+    dropdown.style.display = 'block';
   }
 
   input.addEventListener('focus', function() {
@@ -1045,7 +1136,7 @@ function setupCmpSearch(side) {
 
   input.addEventListener('blur', function() {
     setTimeout(() => {
-      dropdown.classList.add('hidden');
+      dropdown.style.display = 'none';
       const cur = getVal();
       if (cur === null || cur === undefined) {
         this.value = '';
@@ -1060,7 +1151,7 @@ function setupCmpSearch(side) {
       setVal(null);
       input.value = '';
       syncClearBtn();
-      dropdown.classList.add('hidden');
+      dropdown.style.display = 'none';
       updateComparar();
     });
   }
@@ -1084,11 +1175,11 @@ function updateComparar() {
   const rows = DIMS.map(dim => {
     const v1 = s1[dim], v2 = s2[dim];
     const w  = v1 > v2 ? 1 : v2 > v1 ? 2 : 0;
-    return `<tr class="border-b border-stone-100 hover:bg-stone-50">
-      <td class="px-5 py-3 text-sm font-medium text-stone-600">${dim}</td>
-      <td class="px-5 py-3 text-right font-mono font-bold text-lg ${w===1?'text-blue-600':'text-stone-400'}">${v1.toFixed(2)}</td>
-      <td class="px-3 py-3 text-center text-stone-300 text-xs">${w===1?'◀':w===2?'▶':'—'}</td>
-      <td class="px-5 py-3 text-left  font-mono font-bold text-lg ${w===2?'text-rose-600':'text-stone-400'}">${v2.toFixed(2)}</td>
+    return `<tr style="border-bottom:1px solid #f1f5f9;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
+      <td style="padding:10px 20px;font-size:13px;font-weight:500;color:#475569;">${dim}</td>
+      <td style="padding:10px 20px;text-align:right;font-family:monospace;font-weight:700;font-size:15px;color:${w===1?'#2563eb':'#94a3b8'};">${v1.toFixed(2)}</td>
+      <td style="padding:10px 12px;text-align:center;font-size:11px;color:#cbd5e1;">${w===1?'◀':w===2?'▶':'—'}</td>
+      <td style="padding:10px 20px;text-align:left;font-family:monospace;font-weight:700;font-size:15px;color:${w===2?'#e11d48':'#94a3b8'};">${v2.toFixed(2)}</td>
     </tr>`;
   }).join('');
 
@@ -1101,36 +1192,36 @@ function updateComparar() {
   `).join('');
 
   cnt.innerHTML = `
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div class="bg-stone-50 rounded-2xl border border-stone-200 p-5">
-        <h4 class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-4">Radar de Dimensiones</h4>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div style="background:#f8fafc;border-radius:8px;border:1px solid #e5e7eb;padding:20px;">
+        <h4 style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:16px;">Radar de Dimensiones</h4>
         <div style="position:relative;height:300px;"><canvas id="radar-cv"></canvas></div>
       </div>
-      <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden">
-        <div class="px-5 py-3 bg-stone-50 border-b border-stone-200 flex justify-between text-sm font-bold">
-          <span class="text-blue-600">${ca.flag} ${ca.name}</span>
-          <span class="text-rose-600">${cb.flag} ${cb.name}</span>
+      <div style="background:#fff;border-radius:8px;border:1px solid #e5e7eb;overflow:hidden;">
+        <div style="padding:12px 20px;background:#f8fafc;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;font-size:13px;font-weight:600;">
+          <span style="color:#2563eb;">${ca.flag} ${ca.name}</span>
+          <span style="color:#e11d48;">${cb.flag} ${cb.name}</span>
         </div>
         <table class="w-full"><tbody>${rows}</tbody>
-          <tfoot><tr class="bg-stone-800 text-white">
-            <td class="px-5 py-4 text-[10px] uppercase tracking-widest font-bold">Índice Compuesto</td>
-            <td class="px-5 py-4 text-right font-mono text-xl ${win===1?'text-emerald-400 font-black':'text-stone-400'}">${t1.toFixed(2)}</td>
-            <td class="px-3 py-4 text-center">${win===1?'&#x1F3C6;':''}</td>
-            <td class="px-5 py-4 text-left  font-mono text-xl ${win===2?'text-emerald-400 font-black':'text-stone-400'}">${t2.toFixed(2)}</td>
+          <tfoot><tr style="background:#0f172a;color:#fff;">
+            <td class="px-5 py-4" style="font-size:10px;text-transform:uppercase;letter-spacing:.07em;font-weight:600;color:#64748b;">Índice Compuesto</td>
+            <td class="px-5 py-4 text-right font-mono kpi" style="font-size:18px;color:${win===1?'#86efac':'#475569'};">${t1.toFixed(2)}</td>
+            <td class="px-3 py-4 text-center" style="font-size:11px;color:#475569;">${win===1?'▲':win===2?'▼':'—'}</td>
+            <td class="px-5 py-4 text-left font-mono kpi" style="font-size:18px;color:${win===2?'#86efac':'#475569'};">${t2.toFixed(2)}</td>
           </tr></tfoot>
         </table>
       </div>
     </div>
 
-    <div class="mt-8 mb-4">
-      <div class="flex items-center gap-3">
-        <span class="text-xl">&#x1F4CA;</span>
-        <h4 class="text-base font-bold text-stone-700">Comparación por Dimensión e Indicador</h4>
+    <div style="margin-top:32px;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        ${ICO.barChart}
+        <h4 style="font-size:14px;font-weight:600;color:#0f172a;margin:0;">Comparación por Dimensión e Indicador</h4>
       </div>
-      <div class="border-t border-stone-200 mt-3"></div>
+      <div style="border-top:1px solid #e5e7eb;margin-top:12px;"></div>
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 pb-4">
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 pb-4">
       ${dimChartCards}
     </div>
   `;
@@ -1152,8 +1243,8 @@ function updateComparar() {
     },
     options: {
       responsive:true, maintainAspectRatio:false,
-      scales:{ r:{ min:0, max:10, ticks:{ stepSize:2, font:{size:9} }, pointLabels:{ font:{size:10} } } },
-      plugins:{ legend:{ position:'bottom', labels:{ font:{size:11}, padding:12 } } }
+      scales:{ r:{ min:0, max:10, ticks:{ stepSize:2, font:{size:9,family:'Inter,ui-sans-serif,system-ui,sans-serif'}, color:'#94a3b8' }, pointLabels:{ font:{size:10,family:'Inter,ui-sans-serif,system-ui,sans-serif'}, color:'#64748b' }, grid:{ color:'#f1f5f9' } } },
+      plugins:{ legend:{ position:'bottom', labels:{ font:{size:11,family:'Inter,ui-sans-serif,system-ui,sans-serif'}, padding:12, color:'#64748b' } } }
     }
   }); } catch(e) { console.error('Radar error:', e); }
 
@@ -1201,12 +1292,12 @@ function updateComparar() {
           responsive: true,
           maintainAspectRatio: false,
           scales: {
-            x: { min:0, max:10, ticks:{ stepSize:2, font:{size:9} }, grid:{ color:'rgba(0,0,0,0.06)' } },
-            y: { ticks:{ font:{size:9}, padding:3 }, grid:{ display:false } }
+            x: { min:0, max:10, ticks:{ stepSize:2, font:{size:9,family:'Inter,ui-sans-serif,system-ui,sans-serif'}, color:'#94a3b8' }, grid:{ color:'#f1f5f9' } },
+            y: { ticks:{ font:{size:9,family:'Inter,ui-sans-serif,system-ui,sans-serif'}, padding:3, color:'#64748b' }, grid:{ display:false } }
           },
           plugins: {
-            legend: { position:'top', labels:{ font:{size:10}, padding:10, boxWidth:12 } },
-            title:  { display:true, text:`${dim} — ${ca.name}: ${avg1} | ${cb.name}: ${avg2}`, font:{size:11,weight:'bold'}, color:'#44403c', padding:{bottom:6} },
+            legend: { position:'top', labels:{ font:{size:10,family:'Inter,ui-sans-serif,system-ui,sans-serif'}, padding:10, boxWidth:12, color:'#64748b' } },
+            title:  { display:true, text:`${dim} — ${ca.name}: ${avg1} | ${cb.name}: ${avg2}`, font:{size:11,weight:'600',family:'Inter,ui-sans-serif,system-ui,sans-serif'}, color:'#0f172a', padding:{bottom:6} },
             tooltip: {
               callbacks: {
                 title:  (items) => dimInds[items[0].dataIndex].name,
@@ -1251,7 +1342,7 @@ function updateMapMarkers() {
   CITIES.forEach((city, i) => {
     const score   = composite(city.indicators);
     const avgs    = dimAvgs(city.indicators);
-    const color   = score >= 7.0 ? '#22c55e' : score >= 4.0 ? '#eab308' : '#ef4444';
+    const color   = score >= 7.0 ? '#16a34a' : score >= 4.0 ? '#d97706' : '#dc2626';
     const isActive = i === st.cityIdx;
     const sz      = isActive ? 24 : 18;
     const border  = isActive ? 3 : 2;
@@ -1266,27 +1357,27 @@ function updateMapMarkers() {
 
     const pct      = (score / 10 * 100).toFixed(1);
     const dimRows  = DIMS.map(d =>
-      `<div style="display:flex;justify-content:space-between;margin-bottom:3px;">` +
-      `<span style="color:#78716c;font-size:11px;">${d}</span>` +
-      `<span style="font-weight:700;color:#1c1917;font-size:11px;font-family:monospace;">${avgs[d].toFixed(2)}</span>` +
+      `<div style="display:flex;justify-content:space-between;margin-bottom:4px;">` +
+      `<span style="color:#94a3b8;font-size:11px;">${d}</span>` +
+      `<span style="font-weight:700;color:#0f172a;font-size:11px;font-family:monospace;">${avgs[d].toFixed(2)}</span>` +
       `</div>`
     ).join('');
 
     const popupHtml =
-      `<div style="font-family:sans-serif;min-width:230px;max-width:260px;padding:2px 0;">` +
-        `<div style="font-size:16px;font-weight:900;margin-bottom:2px;">${city.flag} ${city.name}</div>` +
-        `<div style="color:#78716c;font-size:11px;margin-bottom:8px;">${city.country} &middot; ${city.region}</div>` +
-        `<div style="margin-bottom:6px;">` +
-          `<span style="font-size:22px;font-weight:900;color:${color};font-family:monospace;">${score.toFixed(2)}</span>` +
-          `<span style="color:#a8a29e;font-size:12px;"> / 10</span>` +
+      `<div style="font-family:Inter,ui-sans-serif,system-ui,sans-serif;min-width:230px;max-width:260px;padding:2px 0;">` +
+        `<div style="font-size:15px;font-weight:700;margin-bottom:2px;color:#0f172a;">${city.flag} ${city.name}</div>` +
+        `<div style="color:#94a3b8;font-size:11px;margin-bottom:10px;">${city.country} &middot; ${city.region}</div>` +
+        `<div style="margin-bottom:8px;">` +
+          `<span style="font-size:20px;font-weight:700;color:${color};font-family:monospace;">${score.toFixed(2)}</span>` +
+          `<span style="color:#cbd5e1;font-size:11px;"> / 10</span>` +
         `</div>` +
-        `<div style="background:#e7e5e4;border-radius:99px;height:8px;margin-bottom:10px;overflow:hidden;">` +
-          `<div style="background:${color};height:8px;width:${pct}%;border-radius:99px;"></div>` +
+        `<div style="background:#f1f5f9;border-radius:99px;height:5px;margin-bottom:12px;overflow:hidden;">` +
+          `<div style="background:${color};height:5px;width:${pct}%;border-radius:99px;"></div>` +
         `</div>` +
-        `<div style="border-top:1px solid #e7e5e4;padding-top:8px;margin-bottom:10px;">${dimRows}</div>` +
+        `<div style="border-top:1px solid #f1f5f9;padding-top:10px;margin-bottom:12px;">${dimRows}</div>` +
         `<button onclick="goToCity(${i})" ` +
-          `style="width:100%;padding:8px 12px;background:#1c1917;color:white;border:none;border-radius:8px;` +
-          `font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.03em;">` +
+          `style="width:100%;padding:8px 12px;background:#0f172a;color:#fff;border:none;border-radius:6px;` +
+          `font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.02em;font-family:inherit;">` +
           `Ver detalle &rarr;` +
         `</button>` +
       `</div>`;
