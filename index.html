@@ -207,6 +207,7 @@ const ICO = {
   clipboard:  `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>`,
   trophy:     `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>`,
   award:      `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>`,
+  externalLink:`<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`,
 };
 
 // ═══════════════════════════════════════════════════════════════════
@@ -317,6 +318,9 @@ const CITIES = CITIES_META.map(m => ({
 // ═══════════════════════════════════════════════════════════════════
 const DIMS = ['Frontera','Economía','Capital Humano','Cohesión Social','Gobernanza','Medio Ambiente'];
 const W    = {Frontera:0.20,Economía:0.16,'Capital Humano':0.16,'Cohesión Social':0.16,Gobernanza:0.16,'Medio Ambiente':0.16};
+const DIM_NAME_TO_KEY = {'Capital Humano':'capital_humano','Cohesión Social':'cohesion_social',Economía:'economia',Gobernanza:'gobernanza','Medio Ambiente':'medio_ambiente',Frontera:'frontera'};
+const DIM_ORDER_KEYS  = ['capital_humano','cohesion_social','economia','gobernanza','medio_ambiente','frontera'];
+const DIM_KEY_TO_DISPLAY = {capital_humano:'Capital Humano',cohesion_social:'Cohesión Social',economia:'Economía',gobernanza:'Gobernanza',medio_ambiente:'Medio Ambiente',frontera:'Frontera'};
 const C    = {
   Frontera:         {bg:'bg-slate-50', text:'text-slate-800', border:'border-slate-200', hex:'#e11d48'},
   Economía:         {bg:'bg-slate-50', text:'text-slate-800', border:'border-slate-200', hex:'#2563eb'},
@@ -379,6 +383,25 @@ function composite(inds) {
 // STATE
 // ═══════════════════════════════════════════════════════════════════
 const st = { tab:'Ranking', cityIdx:null, cmpA:0, cmpB:1, barChart:null, radarChart:null, dimCharts:[], leafletMap:null, markers:[] };
+
+// ── API cache ────────────────────────────────────────────────────
+window._apiCitiesMap     = {}; // city.name → API response (incl. _id, dimensiones)
+window._apiCitiesLoaded  = false;
+window._apiCitiesLoading = false;
+async function preloadApiCities() {
+  if (window._apiCitiesLoading || window._apiCitiesLoaded) return;
+  window._apiCitiesLoading = true;
+  try {
+    const resp = await fetch('/api/cities');
+    if (resp.ok) {
+      const result = await resp.json();
+      if (result.success && result.data) result.data.forEach(c => { window._apiCitiesMap[c.name] = c; });
+    }
+  } catch(e) { /* API offline — frontend hardcoded data used as fallback */ }
+  window._apiCitiesLoaded  = true;
+  window._apiCitiesLoading = false;
+}
+preloadApiCities(); // non-blocking
 
 // ═══════════════════════════════════════════════════════════════════
 // LISTA DE PAÍSES — usada en filtro del ranking
@@ -536,12 +559,12 @@ function render() {
 // ═══════════════════════════════════════════════════════════════════
 // BAR CHART — llamado desde renderResumen tras crear el canvas
 // ═══════════════════════════════════════════════════════════════════
-function renderBar() {
+function renderBar(avgsOverride) {
   if (st.cityIdx === null) return;
   const canvasEl = document.getElementById('dimensionChart');
   if (!canvasEl) return;
   if (st.barChart) { st.barChart.destroy(); st.barChart = null; }
-  const avgs = dimAvgs(CITIES[st.cityIdx].indicators);
+  const avgs = avgsOverride || dimAvgs(CITIES[st.cityIdx].indicators);
   st.barChart = new Chart(canvasEl.getContext('2d'), {
     type: 'bar',
     data: {
@@ -564,27 +587,75 @@ function renderResumen() {
   document.getElementById('table-header').style.display = 'none';
   document.getElementById('interp-card').classList.add('hidden');
   const container = document.getElementById('data-container');
-  const city  = CITIES[st.cityIdx];
-  const inds  = city.indicators;
-  const avgs  = dimAvgs(inds);
-  const total = composite(inds);
-  const band  = BANDS[interpretBand(total)];
-  const sc    = total >= 7 ? '#16a34a' : total >= 4 ? '#d97706' : '#dc2626';
+  const city = CITIES[st.cityIdx];
 
-  // Filas de la tabla consolidada
+  // Use API dimensiones when available (Cúcuta v5.3 official model)
+  const apiCity = window._apiCitiesMap[city.name];
+  const dimData = apiCity && apiCity.dimensiones ? apiCity.dimensiones : null;
+
+  // If API still loading, render hardcoded data and auto-refresh when done
+  if (!window._apiCitiesLoaded && window._apiCitiesLoading) {
+    _doRenderResumen(city, null, container);
+    const retryId = setInterval(() => {
+      if (!window._apiCitiesLoading || st.tab !== 'Resumen' || st.cityIdx === null) {
+        clearInterval(retryId);
+        if (st.tab === 'Resumen' && st.cityIdx !== null && CITIES[st.cityIdx].name === city.name)
+          renderResumen();
+      }
+    }, 500);
+    return;
+  }
+
+  _doRenderResumen(city, dimData, container);
+
+  // Trigger a refresh once API loads (handles the case where API wasn't ready yet)
+  if (!window._apiCitiesLoaded) {
+    preloadApiCities().then(() => {
+      if (st.tab === 'Resumen' && st.cityIdx !== null && CITIES[st.cityIdx].name === city.name)
+        renderResumen();
+    });
+  }
+}
+
+function _doRenderResumen(city, dimData, container) {
+  const useDim = !!(dimData);
+
+  // Build avgs and total
+  let avgs, total;
+  if (useDim) {
+    avgs = {}; total = 0;
+    DIM_ORDER_KEYS.forEach(key => {
+      const d = dimData[key] || { puntaje_promedio: 0, peso: 0 };
+      const name = DIM_KEY_TO_DISPLAY[key];
+      avgs[name] = d.puntaje_promedio || 0;
+      total += (d.puntaje_promedio || 0) * ((d.peso || 0) / 100);
+    });
+  } else {
+    avgs  = dimAvgs(city.indicators);
+    total = composite(city.indicators);
+  }
+
+  const band = BANDS[interpretBand(total)];
+  const sc   = total >= 7 ? '#16a34a' : total >= 4 ? '#d97706' : '#dc2626';
+
+  // ── Consolidated table rows ──────────────────────────────────────
   let dimRowsHtml = '';
   DIMS.forEach(dim => {
-    const avg = avgs[dim]; const w = W[dim];
+    const avg = avgs[dim] || 0; const w = W[dim];
+    const key   = DIM_NAME_TO_KEY[dim];
+    const count = useDim
+      ? (dimData[key]?.indicadores?.length || 0)
+      : city.indicators.filter(i => i.dim === dim).length;
     dimRowsHtml += `<tr style="border-bottom:1px solid #f1f5f9;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
       <td class="px-6 py-4 font-bold" style="color:#0f172a;">${dim}</td>
-      <td class="px-5 py-4 text-center" style="color:#64748b;">${inds.filter(i => i.dim === dim).length}</td>
+      <td class="px-5 py-4 text-center" style="color:#64748b;">${count}</td>
       <td class="px-5 py-4 text-right font-mono font-bold ${sColor(avg)}" style="font-size:15px;">${avg.toFixed(4)}</td>
       <td class="px-5 py-4 text-center font-bold" style="color:#64748b;">${(w*100)}%</td>
       <td class="px-5 py-4 text-right font-mono font-bold" style="color:#0f172a;font-size:15px;">${(avg*w).toFixed(4)}</td>
     </tr>`;
   });
 
-  // Tabla de interpretación
+  // ── Interpretation table ─────────────────────────────────────────
   const activeBand = interpretBand(total);
   let interpHtml = '';
   BANDS.forEach((b, i) => {
@@ -608,62 +679,138 @@ function renderResumen() {
     }
   });
 
-  // Detalle por dimensión con indicadores
+  // ── Dimension detail with indicators ────────────────────────────
   let dimDetailsHtml = '';
-  DIMS.forEach(dim => {
-    const col = C[dim]; const avg = avgs[dim];
-    let indRows = '';
-    inds.filter(i => i.dim === dim).forEach(item => {
-      const score = calcScore(item.tipo, item.val, item.ref);
-      const scoreCell = score === null
-        ? '<span style="color:#cbd5e1;font-size:13px;">N/D</span>'
-        : `<span class="kpi ${sColor(score)}" style="font-size:14px;">${score.toFixed(2)}</span>`;
-      const valDisplay = item.val === null ? '<span style="color:#cbd5e1;">N/D</span>' : escHtml(String(item.val));
-      const arrow = item.tipo === 'pos'
-        ? '<span style="font-size:9px;padding:1px 5px;background:#dcfce7;color:#16a34a;border-radius:3px;font-weight:600;flex-shrink:0;">↑</span>'
-        : '<span style="font-size:9px;padding:1px 5px;background:#fee2e2;color:#dc2626;border-radius:3px;font-weight:600;flex-shrink:0;">↓</span>';
-      indRows += `<tr class="ind-row">
-        <td class="px-4 py-3">
-          <div style="display:flex;align-items:flex-start;gap:8px;">
-            ${trafficDot(score)}
-            <div>
-              <div style="font-weight:600;font-size:13px;color:#0f172a;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${item.name} ${arrow}</div>
-              <div style="font-size:10px;color:#94a3b8;margin-top:2px;line-height:1.4;">${escHtml(item.desc)}</div>
+  if (useDim) {
+    // RICH VIEW — Official 60-indicator model from MongoDB (v5.3)
+    DIM_ORDER_KEYS.forEach(key => {
+      const dimObj = dimData[key]; if (!dimObj) return;
+      const dim = DIM_KEY_TO_DISPLAY[key]; const col = C[dim];
+      const avg = dimObj.puntaje_promedio || 0;
+      let indRows = '';
+      (dimObj.indicadores || []).forEach(item => {
+        const score = item.puntaje || 0;
+        const sc2 = score >= 7 ? '#16a34a' : score >= 4 ? '#d97706' : '#dc2626';
+        const tipoBadge = item.tipo === 'Positivo'
+          ? '<span style="font-size:9px;padding:1px 6px;background:#dcfce7;color:#16a34a;border-radius:3px;font-weight:600;flex-shrink:0;">↑ Positivo</span>'
+          : '<span style="font-size:9px;padding:1px 6px;background:#fee2e2;color:#dc2626;border-radius:3px;font-weight:600;flex-shrink:0;">↓ Negativo</span>';
+        const linkHtml = item.fuente_url && item.fuente_url.startsWith('http')
+          ? `<a href="${escHtml(item.fuente_url)}" target="_blank" rel="noopener noreferrer" title="Ver fuente" style="color:#94a3b8;text-decoration:none;flex-shrink:0;display:inline-flex;align-items:center;" onmouseover="this.style.color='#475569'" onmouseout="this.style.color='#94a3b8'">${ICO.externalLink}</a>`
+          : '';
+        const barPct = Math.min(100, score * 10);
+        indRows += `<tr class="ind-row">
+          <td class="px-4 py-3">
+            <div style="display:flex;align-items:flex-start;gap:8px;">
+              ${trafficDot(score)}
+              <div style="min-width:0;flex:1;">
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;">
+                  <span style="font-weight:600;font-size:13px;color:#0f172a;">${escHtml(item.nombre)}</span>
+                  ${tipoBadge}
+                  ${item.año ? `<span style="font-size:10px;color:#94a3b8;">${escHtml(String(item.año))}</span>` : ''}
+                </div>
+                <p style="font-size:11px;color:#64748b;margin:0;line-height:1.55;">${escHtml(item.descripcion)}</p>
+              </div>
             </div>
+          </td>
+          <td class="px-3 py-3 text-right align-top" style="white-space:nowrap;min-width:90px;">
+            <div style="font-family:monospace;font-size:13px;font-weight:600;color:#0f172a;">${item.valor_real != null ? item.valor_real : 'N/D'}</div>
+            <div style="font-size:10px;color:#94a3b8;margin-top:1px;">Ref: ${item.referencia_optima != null ? item.referencia_optima : '—'}</div>
+          </td>
+          <td class="px-3 py-3 align-top" style="min-width:130px;">
+            <div style="display:flex;align-items:center;gap:5px;justify-content:flex-end;margin-bottom:3px;">
+              <div style="flex:1;max-width:72px;background:#f1f5f9;border-radius:3px;height:5px;overflow:hidden;">
+                <div style="width:${barPct}%;background:${sc2};border-radius:3px;height:5px;"></div>
+              </div>
+              <span class="kpi" style="font-size:14px;color:${sc2};min-width:34px;text-align:right;">${score.toFixed(2)}</span>
+              ${linkHtml}
+            </div>
+          </td>
+        </tr>`;
+      });
+      dimDetailsHtml += `<div style="background:#fff;border-radius:8px;border:1px solid #e5e7eb;box-shadow:var(--shadow,0 1px 3px rgba(0,0,0,.05));margin-bottom:16px;overflow:hidden;">
+        <div style="background:#f8fafc;padding:12px 20px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+          <h4 style="font-size:13px;font-weight:600;color:#0f172a;display:flex;align-items:center;gap:8px;margin:0;">
+            <span style="width:10px;height:10px;border-radius:50%;background:${col.hex};flex-shrink:0;display:inline-block;"></span>
+            ${dim}
+          </h4>
+          <div style="display:flex;align-items:center;gap:12px;font-size:13px;">
+            <span style="color:#64748b;">${(dimObj.indicadores||[]).length} ind. · Peso <strong>${dimObj.peso}%</strong></span>
+            <span class="kpi ${sColor(avg)}" style="font-size:18px;">${avg.toFixed(2)}<span style="color:#cbd5e1;font-size:11px;font-weight:400;">/10</span></span>
           </div>
-        </td>
-        <td class="px-3 py-3 text-right align-top">
-          <div style="font-family:monospace;font-size:13px;font-weight:600;color:#0f172a;">${valDisplay}</div>
-          <div style="font-size:10px;color:#94a3b8;">${escHtml(item.unit)}</div>
-        </td>
-        <td class="px-3 py-3 text-right align-top" style="font-family:monospace;font-size:13px;color:#94a3b8;">${item.ref}</td>
-        <td class="px-3 py-3 text-right align-top">${scoreCell}</td>
-      </tr>`;
-    });
-    dimDetailsHtml += `<div style="background:#fff;border-radius:8px;border:1px solid #e5e7eb;box-shadow:var(--shadow,0 1px 3px rgba(0,0,0,.05));margin-bottom:16px;overflow:hidden;">
-      <div style="background:#f8fafc;padding:12px 20px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-        <h4 style="font-size:13px;font-weight:600;color:#0f172a;display:flex;align-items:center;gap:8px;">
-          <span style="width:10px;height:10px;border-radius:50%;background:${col.hex};flex-shrink:0;display:inline-block;"></span>
-          ${dim}
-        </h4>
-        <div style="display:flex;align-items:center;gap:12px;font-size:13px;">
-          <span style="color:#64748b;">Peso <strong>${(W[dim]*100)}%</strong></span>
-          <span class="kpi ${sColor(avg)}" style="font-size:18px;">${avg.toFixed(2)}<span style="color:#cbd5e1;font-size:11px;font-weight:400;">/10</span></span>
         </div>
-      </div>
-      <div class="overflow-x-auto tbl">
-        <table class="w-full text-left border-collapse min-w-[520px]">
-          <thead><tr style="background:#f8fafc;">
-            <th class="px-4 py-2.5" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Indicador · descripción</th>
-            <th class="px-3 py-2.5 text-right" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Valor real</th>
-            <th class="px-3 py-2.5 text-right" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Ref. óptima</th>
-            <th class="px-3 py-2.5 text-right" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Puntaje</th>
-          </tr></thead>
-          <tbody>${indRows}</tbody>
-        </table>
-      </div>
-    </div>`;
-  });
+        <div class="overflow-x-auto tbl">
+          <table class="w-full text-left border-collapse min-w-[540px]">
+            <thead><tr style="background:#f8fafc;">
+              <th class="px-4 py-2.5" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Indicador · descripción · año</th>
+              <th class="px-3 py-2.5 text-right" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Valor / Ref.</th>
+              <th class="px-3 py-2.5 text-right" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Puntaje</th>
+            </tr></thead>
+            <tbody>${indRows}</tbody>
+          </table>
+        </div>
+      </div>`;
+    });
+  } else {
+    // LEGACY VIEW — hardcoded indicators (other cities or API unavailable)
+    DIMS.forEach(dim => {
+      const col = C[dim]; const avg = avgs[dim] || 0;
+      let indRows = '';
+      city.indicators.filter(i => i.dim === dim).forEach(item => {
+        const score = calcScore(item.tipo, item.val, item.ref);
+        const scoreCell = score === null
+          ? '<span style="color:#cbd5e1;font-size:13px;">N/D</span>'
+          : `<span class="kpi ${sColor(score)}" style="font-size:14px;">${score.toFixed(2)}</span>`;
+        const valDisplay = item.val === null ? '<span style="color:#cbd5e1;">N/D</span>' : escHtml(String(item.val));
+        const arrow = item.tipo === 'pos'
+          ? '<span style="font-size:9px;padding:1px 5px;background:#dcfce7;color:#16a34a;border-radius:3px;font-weight:600;flex-shrink:0;">↑</span>'
+          : '<span style="font-size:9px;padding:1px 5px;background:#fee2e2;color:#dc2626;border-radius:3px;font-weight:600;flex-shrink:0;">↓</span>';
+        indRows += `<tr class="ind-row">
+          <td class="px-4 py-3">
+            <div style="display:flex;align-items:flex-start;gap:8px;">
+              ${trafficDot(score)}
+              <div>
+                <div style="font-weight:600;font-size:13px;color:#0f172a;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${item.name} ${arrow}</div>
+                <div style="font-size:10px;color:#94a3b8;margin-top:2px;line-height:1.4;">${escHtml(item.desc)}</div>
+              </div>
+            </div>
+          </td>
+          <td class="px-3 py-3 text-right align-top">
+            <div style="font-family:monospace;font-size:13px;font-weight:600;color:#0f172a;">${valDisplay}</div>
+            <div style="font-size:10px;color:#94a3b8;">${escHtml(item.unit)}</div>
+          </td>
+          <td class="px-3 py-3 text-right align-top" style="font-family:monospace;font-size:13px;color:#94a3b8;">${item.ref}</td>
+          <td class="px-3 py-3 text-right align-top">${scoreCell}</td>
+        </tr>`;
+      });
+      dimDetailsHtml += `<div style="background:#fff;border-radius:8px;border:1px solid #e5e7eb;box-shadow:var(--shadow,0 1px 3px rgba(0,0,0,.05));margin-bottom:16px;overflow:hidden;">
+        <div style="background:#f8fafc;padding:12px 20px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+          <h4 style="font-size:13px;font-weight:600;color:#0f172a;display:flex;align-items:center;gap:8px;">
+            <span style="width:10px;height:10px;border-radius:50%;background:${col.hex};flex-shrink:0;display:inline-block;"></span>
+            ${dim}
+          </h4>
+          <div style="display:flex;align-items:center;gap:12px;font-size:13px;">
+            <span style="color:#64748b;">Peso <strong>${(W[dim]*100)}%</strong></span>
+            <span class="kpi ${sColor(avg)}" style="font-size:18px;">${avg.toFixed(2)}<span style="color:#cbd5e1;font-size:11px;font-weight:400;">/10</span></span>
+          </div>
+        </div>
+        <div class="overflow-x-auto tbl">
+          <table class="w-full text-left border-collapse min-w-[520px]">
+            <thead><tr style="background:#f8fafc;">
+              <th class="px-4 py-2.5" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Indicador · descripción</th>
+              <th class="px-3 py-2.5 text-right" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Valor real</th>
+              <th class="px-3 py-2.5 text-right" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Ref. óptima</th>
+              <th class="px-3 py-2.5 text-right" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #e5e7eb;">Puntaje</th>
+            </tr></thead>
+            <tbody>${indRows}</tbody>
+          </table>
+        </div>
+      </div>`;
+    });
+  }
+
+  const sourceBadge = useDim
+    ? `<span style="font-size:10px;background:#dcfce7;color:#16a34a;border:1px solid #bbf7d0;border-radius:4px;padding:2px 8px;font-weight:600;margin-left:8px;">Modelo v5.3 oficial · 60 indicadores</span>`
+    : '';
 
   container.innerHTML = `<div style="padding:24px 28px;padding-bottom:40px;">
 
@@ -734,11 +881,13 @@ function renderResumen() {
       </div>
     </div>
 
-    <p style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:16px;padding:0 4px;">Detalle por Dimensión</p>
+    <p style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:16px;padding:0 4px;display:flex;align-items:center;">
+      Detalle por Dimensión${sourceBadge}
+    </p>
     ${dimDetailsHtml}
   </div>`;
 
-  setTimeout(() => { renderBar(); }, 50);
+  setTimeout(() => { renderBar(avgs); }, 50);
 }
 
 window.backToRanking = function() {

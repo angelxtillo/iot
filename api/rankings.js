@@ -1,5 +1,5 @@
 const clientPromise = require('../lib/db');
-const { calculateCompositeScore, calculateDimScores } = require('../lib/score');
+const { calculateScores } = require('../lib/score');
 
 const DB  = 'smart-city';
 const COL = 'cities';
@@ -20,16 +20,19 @@ module.exports = async (req, res) => {
     const cities     = await collection.find({}).toArray();
 
     const ranked = cities
-      .map(city => ({
-        _id:            city._id,
-        name:           city.name,
-        country:        city.country,
-        flag:           city.flag,
-        population:     city.population,
-        region:         city.region,
-        compositeScore: parseFloat(calculateCompositeScore(city.indicators || []).toFixed(4)),
-        dimScores:      calculateDimScores(city.indicators || [])
-      }))
+      .map(city => {
+        const { compositeScore, dimScores } = calculateScores(city);
+        return {
+          _id:            city._id,
+          name:           city.name,
+          country:        city.country,
+          flag:           city.flag,
+          population:     city.population,
+          region:         city.region,
+          compositeScore: parseFloat(compositeScore.toFixed(4)),
+          dimScores
+        };
+      })
       .sort((a, b) => b.compositeScore - a.compositeScore)
       .slice(0, 3);
 

@@ -1,6 +1,6 @@
 const { ObjectId } = require('mongodb');
 const clientPromise = require('../../lib/db');
-const { calculateCompositeScore, calculateDimScores } = require('../../lib/score');
+const { calculateScores } = require('../../lib/score');
 
 const DB  = 'smart-city';
 const COL = 'cities';
@@ -25,12 +25,13 @@ module.exports = async (req, res) => {
       const city = await collection.findOne({ _id });
       if (!city) return res.status(404).json({ success: false, error: 'Ciudad no encontrada' });
 
+      const { compositeScore, dimScores } = calculateScores(city);
       return res.status(200).json({
         success: true,
         data: {
           ...city,
-          compositeScore: parseFloat(calculateCompositeScore(city.indicators || []).toFixed(4)),
-          dimScores:      calculateDimScores(city.indicators || [])
+          compositeScore: parseFloat(compositeScore.toFixed(4)),
+          dimScores
         }
       });
     }
@@ -46,12 +47,13 @@ module.exports = async (req, res) => {
       );
       if (!result) return res.status(404).json({ success: false, error: 'Ciudad no encontrada' });
 
+      const { compositeScore, dimScores } = calculateScores(result);
       return res.status(200).json({
         success: true,
         data: {
           ...result,
-          compositeScore: parseFloat(calculateCompositeScore(result.indicators || []).toFixed(4)),
-          dimScores:      calculateDimScores(result.indicators || [])
+          compositeScore: parseFloat(compositeScore.toFixed(4)),
+          dimScores
         }
       });
     }

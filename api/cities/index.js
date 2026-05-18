@@ -1,5 +1,5 @@
 const clientPromise = require('../../lib/db');
-const { calculateCompositeScore } = require('../../lib/score');
+const { calculateScores } = require('../../lib/score');
 
 const DB   = 'smart-city';
 const COL  = 'cities';
@@ -17,16 +17,22 @@ module.exports = async (req, res) => {
     if (req.method === 'GET') {
       const cities = await collection.find({}).toArray();
 
-      const data = cities.map(city => ({
-        _id:            city._id,
-        name:           city.name,
-        country:        city.country,
-        flag:           city.flag,
-        population:     city.population,
-        region:         city.region,
-        compositeScore: parseFloat(calculateCompositeScore(city.indicators || []).toFixed(4)),
-        updatedAt:      city.updatedAt
-      }));
+      const data = cities.map(city => {
+        const { compositeScore, dimScores } = calculateScores(city);
+        return {
+          _id:            city._id,
+          name:           city.name,
+          country:        city.country,
+          flag:           city.flag,
+          population:     city.population,
+          region:         city.region,
+          compositeScore: parseFloat(compositeScore.toFixed(4)),
+          dimScores,
+          // Include dimensiones when present so the frontend can render the rich detail view
+          dimensiones:    city.dimensiones || null,
+          updatedAt:      city.updatedAt
+        };
+      });
 
       return res.status(200).json({ success: true, data });
     }

@@ -4,11 +4,13 @@
   "description": "Modelo de Ciudad Inteligente - Cúcuta, Colombia",
   "scripts": {
     "dev": "vercel dev",
-    "seed": "node scripts/seed.js"
+    "seed": "node scripts/seed.js",
+    "seed-cucuta": "node scripts/seed-cucuta-v5.js"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
     "mongodb": "^6.8.0",
-    "dotenv": "^16.4.5"
+    "xlsx": "^0.18.5"
   },
   "engines": {
     "node": ">=18.x"
