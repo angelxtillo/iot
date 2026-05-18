@@ -1,4 +1,9 @@
 require('dotenv').config();
+// El ISP local bloquea las consultas SRV de MongoDB Atlas.
+// Usamos Google DNS (8.8.8.8) para resolverlas correctamente.
+const dns = require('dns');
+dns.setServers(['8.8.8.8', '1.1.1.1']);
+
 const { MongoClient } = require('mongodb');
 const XLSX = require('xlsx');
 const path = require('path');
