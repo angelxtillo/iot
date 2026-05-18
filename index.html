@@ -211,7 +211,7 @@ const ICO = {
 };
 
 // ═══════════════════════════════════════════════════════════════════
-// DATA — 60 indicadores · 6 dimensiones · 10 ciudades
+// DATA — 60 indicadores · 6 dimensiones · 6 ciudades
 // ═══════════════════════════════════════════════════════════════════
 const BASE_IND = [
   // CAPITAL HUMANO
@@ -289,10 +289,6 @@ const CV = {
   leticia:   {ch1:36,ch2:32,ch3:8,ch4:28,ch5:75,ch6:55,ch7:95,ch8:12,ch9:18,ch10:3,cs1:13.2,cs2:12,cs3:48,cs4:0.46,cs5:5.9,cs6:42,cs7:35,cs8:480,cs9:72,cs10:1,ec1:2100,ec2:1.4,ec3:67,ec4:15,ec5:0.62,ec6:16,ec7:1,ec8:10,ec9:5.2,ec10:0.3,go1:0.74,go2:5,go3:18,go4:5,go5:45,go6:4.2,go7:0,go8:0.73,go9:0.59,go10:2,ma1:18.5,ma2:22,ma3:3,ma4:68,ma5:25,ma6:0.8,ma7:3,ma8:42.9,ma9:62,ma10:280,fr1:85,fr2:850000,fr3:48,fr4:3,fr5:35,fr6:3,fr7:8,fr8:1,fr9:28,fr10:3},
   pacaraima:   {ch1:48,ch2:35,ch3:18,ch4:40,ch5:88,ch6:30,ch7:180,ch8:18,ch9:22,ch10:3,cs1:14.5,cs2:28,cs3:58,cs4:0.49,cs5:6.1,cs6:55,cs7:40,cs8:480,cs9:80,cs10:2,ec1:4200,ec2:2.2,ec3:55,ec4:17,ec5:0.82,ec6:28,ec7:2,ec8:22,ec9:8.8,ec10:0.7,go1:0.78,go2:6,go3:45,go4:18,go5:65,go6:5.8,go7:0,go8:0.80,go9:0.76,go10:5,ma1:12,ma2:30,ma3:5,ma4:82,ma5:42,ma6:1.4,ma7:4,ma8:52.8,ma9:68,ma10:285,fr1:420,fr2:1800000,fr3:68,fr4:6,fr5:45,fr6:6,fr7:null,fr8:3,fr9:55,fr10:4},
   juarez:      {ch1:52,ch2:25,ch3:28,ch4:58,ch5:72,ch6:28,ch7:320,ch8:48,ch9:55,ch10:12,cs1:3.2,cs2:2.8,cs3:74,cs4:3.2,cs5:6.0,cs6:58,cs7:42,cs8:520,cs9:92,cs10:4,ec1:8500,ec2:2.8,ec3:58,ec4:8,ec5:0.95,ec6:42,ec7:0,ec8:42000,ec9:320,ec10:null,go1:0.76,go2:7,go3:38,go4:22,go5:280,go6:6.2,go7:0,go8:0.80,go9:0.72,go10:45,ma1:4.2,ma2:48,ma3:9,ma4:22,ma5:62,ma6:3.8,ma7:5,ma8:47.2,ma9:48,ma10:380,fr1:42000,fr2:25000000,fr3:35,fr4:7,fr5:55,fr6:3,fr7:5,fr8:8,fr9:null,fr10:9},
-  tijuana:     {ch1:58,ch2:30,ch3:35,ch4:62,ch5:75,ch6:22,ch7:380,ch8:65,ch9:62,ch10:18,cs1:2.8,cs2:3.2,cs3:70,cs4:3.2,cs5:6.0,cs6:62,cs7:46,cs8:480,cs9:94,cs10:6,ec1:9200,ec2:3.1,ec3:58,ec4:7,ec5:1.05,ec6:48,ec7:1,ec8:52000,ec9:350,ec10:null,go1:0.76,go2:8,go3:42,go4:28,go5:320,go6:6.5,go7:0,go8:0.80,go9:0.72,go10:52,ma1:5.8,ma2:42,ma3:8,ma4:22,ma5:68,ma6:3.5,ma7:4,ma8:47.2,ma9:55,ma10:340,fr1:52000,fr2:50000000,fr3:28,fr4:8,fr5:68,fr6:2,fr7:5,fr8:10,fr9:null,fr10:10},
-  foz:         {ch1:55,ch2:32,ch3:22,ch4:45,ch5:88,ch6:25,ch7:220,ch8:42,ch9:48,ch10:8,cs1:5.8,cs2:2.2,cs3:58,cs4:2.7,cs5:6.1,cs6:62,cs7:48,cs8:420,cs9:88,cs10:5,ec1:6800,ec2:2.4,ec3:55,ec4:14,ec5:0.88,ec6:35,ec7:0,ec8:8500,ec9:280,ec10:null,go1:0.78,go2:7,go3:48,go4:22,go5:180,go6:6.0,go7:0,go8:0.80,go9:0.76,go10:18,ma1:8.5,ma2:32,ma3:5,ma4:85,ma5:78,ma6:1.8,ma7:3,ma8:52.8,ma9:72,ma10:295,fr1:8500,fr2:8000000,fr3:42,fr4:7,fr5:72,fr6:3,fr7:12,fr8:5,fr9:62,fr10:7},
-  tacna:       {ch1:52,ch2:28,ch3:35,ch4:32,ch5:85,ch6:18,ch7:180,ch8:35,ch9:42,ch10:6,cs1:2.8,cs2:1.8,cs3:48,cs4:3.5,cs5:6.2,cs6:58,cs7:52,cs8:380,cs9:85,cs10:3,ec1:5200,ec2:2.1,ec3:68,ec4:12,ec5:0.75,ec6:28,ec7:0,ec8:2800,ec9:180,ec10:null,go1:0.72,go2:6,go3:35,go4:18,go5:120,go6:5.5,go7:0,go8:0.75,go9:0.68,go10:12,ma1:6.2,ma2:35,ma3:5,ma4:58,ma5:55,ma6:2.2,ma7:4,ma8:48.5,ma9:62,ma10:315,fr1:2800,fr2:4500000,fr3:38,fr4:7,fr5:65,fr6:2,fr7:8,fr8:4,fr9:null,fr10:6},
-  tulcan:      {ch1:48,ch2:28,ch3:32,ch4:25,ch5:80,ch6:35,ch7:140,ch8:28,ch9:32,ch10:5,cs1:2.5,cs2:1.5,cs3:45,cs4:3.8,cs5:6.1,cs6:52,cs7:42,cs8:410,cs9:82,cs10:2,ec1:3800,ec2:1.8,ec3:78,ec4:14,ec5:0.72,ec6:22,ec7:0,ec8:1200,ec9:120,ec10:null,go1:0.75,go2:5,go3:28,go4:12,go5:95,go6:5.2,go7:0,go8:0.78,go9:0.70,go10:8,ma1:7.2,ma2:30,ma3:4,ma4:48,ma5:42,ma6:1.9,ma7:4,ma8:46.8,ma9:68,ma10:325,fr1:1200,fr2:3800000,fr3:48,fr4:6,fr5:62,fr6:3,fr7:8,fr8:3,fr9:null,fr10:5}
 };
 
 const CITIES_META = [
@@ -302,10 +298,6 @@ const CITIES_META = [
   {key:'leticia',    name:'Leticia',                   country:'Colombia',  flag:'🇨🇴', population:45000,   region:'Amazonas',            lat:-4.2153,  lng:-69.9406},
   {key:'pacaraima',  name:'Pacaraima',                 country:'Brasil',    flag:'🇧🇷', population:18000,   region:'Roraima',             lat:4.4772,   lng:-61.1503},
   {key:'juarez',    name:'Ciudad Juárez',             country:'México',    flag:'🇲🇽', population:1500000, region:'Chihuahua',           lat:31.6904,  lng:-106.4245},
-  {key:'tijuana',   name:'Tijuana',                   country:'México',    flag:'🇲🇽', population:2000000, region:'Baja California',     lat:32.5149,  lng:-117.0382},
-  {key:'foz',       name:'Foz do Iguaçu',             country:'Brasil',    flag:'🇧🇷', population:230000,  region:'Paraná',              lat:-25.5469, lng:-54.5882},
-  {key:'tacna',     name:'Tacna',                     country:'Perú',      flag:'🇵🇪', population:370000,  region:'Tacna',               lat:-18.0066, lng:-70.2508},
-  {key:'tulcan',    name:'Tulcán',                    country:'Ecuador',   flag:'🇪🇨', population:60000,   region:'Carchi',              lat:0.8117,   lng:-77.7170}
 ];
 
 const CITIES = CITIES_META.map(m => ({
@@ -331,8 +323,8 @@ const C    = {
 };
 const DESC = {
   Resumen:'Consolidado general del Índice con cálculos en tiempo real.',
-  Ranking:'Clasificación completa de las 10 ciudades por Índice Compuesto ponderado.',
-  Mapa:'Visualización geográfica interactiva de las 10 ciudades con sus puntajes.',
+  Ranking:'Clasificación completa de las 6 ciudades por Índice Compuesto ponderado.',
+  Mapa:'Visualización geográfica interactiva de las 6 ciudades con sus puntajes.',
   Comparar:'Compara el desempeño por dimensiones de dos ciudades en un radar.',
   Formulas:'Catálogo exhaustivo con fórmulas, variables y fuentes.',
   Frontera:'Métricas de comercio binacional, flujo migratorio e integración (Peso: 20%).',
@@ -512,8 +504,8 @@ function setActive() {
     Resumen:  st.cityIdx !== null ? `${CITIES[st.cityIdx].flag} ${CITIES[st.cityIdx].name}` : 'Resumen'
   };
   const descs = {
-    Ranking:  'Clasificación completa de las 10 ciudades por Índice Compuesto ponderado.',
-    Mapa:     'Visualización geográfica interactiva de las 10 ciudades con sus puntajes.',
+    Ranking:  'Clasificación completa de las 6 ciudades por Índice Compuesto ponderado.',
+    Mapa:     'Visualización geográfica interactiva de las 6 ciudades con sus puntajes.',
     Comparar: 'Compara el desempeño por dimensiones de dos ciudades en un radar.',
     Resumen:  'Consolidado general del Índice con cálculos en tiempo real.'
   };
@@ -1340,11 +1332,38 @@ function updateComparar() {
   }
   const ca  = CITIES[st.cmpA];
   const cb  = CITIES[st.cmpB];
-  const s1  = dimAvgs(ca.indicators);
-  const s2  = dimAvgs(cb.indicators);
-  const t1  = composite(ca.indicators);
-  const t2  = composite(cb.indicators);
+
+  // Prefer accurate MongoDB data; fall back to hardcoded CV values for cities not yet seeded
+  const apiA = window._apiCitiesMap && window._apiCitiesMap[toSlug(ca.name)];
+  const apiB = window._apiCitiesMap && window._apiCitiesMap[toSlug(cb.name)];
+
+  function getDimAvgs(apiEntry, fallbackInds) {
+    const r = {};
+    DIMS.forEach(d => {
+      const k = DIM_NAME_TO_KEY[d];
+      r[d] = (apiEntry?.dimensiones?.[k]?.puntaje_promedio != null)
+        ? apiEntry.dimensiones[k].puntaje_promedio
+        : dimAvgs(fallbackInds)[d];
+    });
+    return r;
+  }
+
+  const s1  = getDimAvgs(apiA, ca.indicators);
+  const s2  = getDimAvgs(apiB, cb.indicators);
+  const t1  = apiA?.indice_compuesto_final ?? composite(ca.indicators);
+  const t2  = apiB?.indice_compuesto_final ?? composite(cb.indicators);
   const win = t1 >= t2 ? 1 : 2;
+
+  const DIM_ORDER = ['Capital Humano','Cohesión Social','Economía','Gobernanza','Medio Ambiente','Frontera'];
+
+  // Dynamic chart heights: 38px per indicator row, minimum 320px
+  const dimHeights = DIM_ORDER.map(dim => {
+    const k = DIM_NAME_TO_KEY[dim];
+    const n = apiA?.dimensiones?.[k]?.indicadores?.length
+           || apiB?.dimensiones?.[k]?.indicadores?.length
+           || BASE_IND.filter(b => b.dim === dim).length;
+    return Math.max(320, n * 38);
+  });
 
   const rows = DIMS.map(dim => {
     const v1 = s1[dim], v2 = s2[dim];
@@ -1357,11 +1376,9 @@ function updateComparar() {
     </tr>`;
   }).join('');
 
-  const DIM_ORDER = ['Capital Humano','Cohesión Social','Economía','Gobernanza','Medio Ambiente','Frontera'];
-
   const dimChartCards = DIM_ORDER.map((dim, i) => `
     <div class="bg-white rounded-2xl shadow-sm border border-stone-200 p-5">
-      <div style="position:relative;height:320px;"><canvas id="dim-chart-${i}"></canvas></div>
+      <div style="position:relative;height:${dimHeights[i]}px;"><canvas id="dim-chart-${i}"></canvas></div>
     </div>
   `).join('');
 
@@ -1442,12 +1459,59 @@ function updateComparar() {
   };
 
   DIM_ORDER.forEach((dim, i) => {
-    const dimInds = BASE_IND.filter(b => b.dim === dim);
-    const labels  = dimInds.map(b => b.name.length > 35 ? b.name.substring(0,34) + '…' : b.name);
-    const scores1 = dimInds.map(b => { const ind = ca.indicators.find(x => x.id === b.id); const s = calcScore(ind.tipo, ind.val, ind.ref); return s !== null ? +s.toFixed(2) : null; });
-    const scores2 = dimInds.map(b => { const ind = cb.indicators.find(x => x.id === b.id); const s = calcScore(ind.tipo, ind.val, ind.ref); return s !== null ? +s.toFixed(2) : null; });
-    const avg1 = s1[dim].toFixed(2);
-    const avg2 = s2[dim].toFixed(2);
+    const key      = DIM_NAME_TO_KEY[dim];
+    const apiIndsA = apiA?.dimensiones?.[key]?.indicadores;
+    const apiIndsB = apiB?.dimensiones?.[key]?.indicadores;
+    const useApi   = !!(apiIndsA && apiIndsB);
+
+    let labels, scores1, scores2, titleA, titleB, tooltipCallbacks;
+
+    if (useApi) {
+      // Use real MongoDB indicators (13/13/6/7/11/10 per dimension)
+      labels  = apiIndsA.map(ind => ind.nombre.length > 40 ? ind.nombre.substring(0,39)+'…' : ind.nombre);
+      scores1 = apiIndsA.map(ind => +ind.puntaje.toFixed(2));
+      scores2 = apiIndsA.map(ind => {
+        const m = apiIndsB.find(j => j.numero === ind.numero);
+        return m ? +m.puntaje.toFixed(2) : 0;
+      });
+      titleA  = (apiA.dimensiones[key].puntaje_promedio).toFixed(2);
+      titleB  = (apiB.dimensiones[key].puntaje_promedio).toFixed(2);
+      tooltipCallbacks = {
+        title: (items) => apiIndsA[items[0].dataIndex]?.nombre,
+        label: (item)  => {
+          const srcInds = item.datasetIndex === 0 ? apiIndsA : apiIndsB;
+          const ref     = apiIndsA[item.dataIndex];
+          const ind     = ref ? srcInds.find(j => j.numero === ref.numero) || srcInds[item.dataIndex] : srcInds[item.dataIndex];
+          if (!ind) return [];
+          return [
+            `Valor: ${ind.valor_real != null ? ind.valor_real : 'N/D'}`,
+            `Puntaje: ${item.raw}/10`,
+            ind.tipo === 'Positivo' ? 'Positivo ↑' : 'Negativo ↓',
+            ind.exacto ? '[DATO]' : '[ESTIMADO]'
+          ];
+        }
+      };
+    } else {
+      // Fallback: old 10-indicator-per-dim hardcoded system
+      const dimInds = BASE_IND.filter(b => b.dim === dim);
+      labels  = dimInds.map(b => b.name.length > 35 ? b.name.substring(0,34)+'…' : b.name);
+      scores1 = dimInds.map(b => { const ind = ca.indicators.find(x => x.id === b.id); const s = calcScore(ind.tipo, ind.val, ind.ref); return s !== null ? +s.toFixed(2) : null; });
+      scores2 = dimInds.map(b => { const ind = cb.indicators.find(x => x.id === b.id); const s = calcScore(ind.tipo, ind.val, ind.ref); return s !== null ? +s.toFixed(2) : null; });
+      titleA  = s1[dim].toFixed(2);
+      titleB  = s2[dim].toFixed(2);
+      tooltipCallbacks = {
+        title: (items) => dimInds[items[0].dataIndex].name,
+        label: (item)  => {
+          const cityObj = item.datasetIndex === 0 ? ca : cb;
+          const ind     = dimInds[item.dataIndex];
+          const cityInd = cityObj.indicators.find(x => x.id === ind.id);
+          const valStr  = cityInd.val !== null ? `${cityInd.val} ${ind.unit}` : 'Sin dato';
+          const scoreStr = item.raw !== null ? `${item.raw}/10` : 'N/D';
+          return [`Valor: ${valStr}`, `Puntaje: ${scoreStr}`, ind.tipo === 'pos' ? 'Positivo ↑' : 'Negativo ↓'];
+        }
+      };
+    }
+
     const canvas = document.getElementById(`dim-chart-${i}`);
     if (!canvas) return;
     try {
@@ -1471,20 +1535,8 @@ function updateComparar() {
           },
           plugins: {
             legend: { position:'top', labels:{ font:{size:10,family:'Inter,ui-sans-serif,system-ui,sans-serif'}, padding:10, boxWidth:12, color:'#64748b' } },
-            title:  { display:true, text:`${dim} — ${ca.name}: ${avg1} | ${cb.name}: ${avg2}`, font:{size:11,weight:'600',family:'Inter,ui-sans-serif,system-ui,sans-serif'}, color:'#0f172a', padding:{bottom:6} },
-            tooltip: {
-              callbacks: {
-                title:  (items) => dimInds[items[0].dataIndex].name,
-                label:  (item)  => {
-                  const cityObj = item.datasetIndex === 0 ? ca : cb;
-                  const ind     = dimInds[item.dataIndex];
-                  const cityInd = cityObj.indicators.find(x => x.id === ind.id);
-                  const valStr  = cityInd.val !== null ? `${cityInd.val} ${ind.unit}` : 'Sin dato';
-                  const scoreStr = item.raw !== null ? `${item.raw}/10` : 'N/D';
-                  return [`Valor: ${valStr}`, `Puntaje: ${scoreStr}`, ind.tipo === 'pos' ? 'Positivo ↑' : 'Negativo ↓'];
-                }
-              }
-            }
+            title:  { display:true, text:`${dim} — ${ca.name}: ${titleA} | ${cb.name}: ${titleB}`, font:{size:11,weight:'600',family:'Inter,ui-sans-serif,system-ui,sans-serif'}, color:'#0f172a', padding:{bottom:6} },
+            tooltip: { callbacks: tooltipCallbacks }
           }
         }
       });

@@ -410,13 +410,14 @@ const DIMENSIONES_RAW = {
         justificacion:'ESTIMADO — FII Venezuela: 28.000 ton/día ÷ 28M hab = 365 kg/hab/año. San Antonio: menor consumo por crisis económica → 300 kg/hab/año.',
         fuente_url:'https://www.fii.gob.ve/gestion-integral-de-residuos-solidos-urbanos-en-venezuela-del-problema-a-la-oportunidad-parte-1-situacion-de-los-residuos-solidos/', año:'2022' },
 
-      // No.7 — ESTIMADO: MINEA Venezuela: red de monitoreo ambiental muy limitada.
-      //         Sin estación confirmada en San Antonio; estimación 1 regional.
+      // No.7 — DATO DEPARTAMENTAL: La Patilla 2024 — "el último reporte oficial de calidad
+      //         del aire en Venezuela data de 2010; en Táchira había 2 estaciones de
+      //         monitoreo ambiental; actualmente dañadas, obsoletas o robadas" → 0 activas.
       { numero:7,  nombre:'Estaciones de monitoreo ambiental activas',
-        tipo:'Positivo', valor_real:1,     referencia_optima:8,
-        exacto:false,
-        justificacion:'ESTIMADO — MINEA Venezuela: red de monitoreo ambiental muy reducida. Sin estación confirmada oficialmente en San Antonio; estimación 1 estación de área Táchira.',
-        fuente_url:'https://ecopoliticavenezuela.org/gestion-eficiente-de-los-desechosun-asunto-pendiente/', año:'2022' },
+        tipo:'Positivo', valor_real:0,     referencia_optima:8,
+        exacto:true,
+        justificacion:'DATO DEPARTAMENTAL (Estado Táchira) — La Patilla 2024: último reporte calidad del aire VZ data de 2010; en Táchira había 2 estaciones de monitoreo; actualmente dañadas, obsoletas o robadas → 0 estaciones activas ca. 2023.',
+        fuente_url:'https://www.lapatilla.com/2024/01/20/venezuela-sin-monitoreo-calidad-del-aire/', año:'2024' },
 
       // No.8 — ESTIMADO: Venezuela: inversión mínima en solar (foco en petróleo).
       //         Algunos paneles en edificios públicos y residencias → ~0.5 MW.
@@ -426,14 +427,14 @@ const DIMENSIONES_RAW = {
         justificacion:'ESTIMADO — Venezuela: inversión mínima en energía solar (política energética centrada en petróleo). Paneles residenciales y algunos edificios públicos → ~0.5 MW.',
         fuente_url:'https://ecopoliticavenezuela.org/gestion-eficiente-de-los-desechosun-asunto-pendiente/', año:'2022' },
 
-      // No.9 — ESTIMADO: HIDROSUROESTE: sirve 1.25M hab Táchira. ENCOVI 2020: 91.4%
-      //         conexión nacional. Deterioro post-2020 + racionamiento documentado.
-      //         San Antonio: 78% (menos que capital estado San Cristóbal).
+      // No.9 — DATO DEPARTAMENTAL: HIDROSUROESTE — "Planta Cordero suministra el 75% de
+      //         la población del estado Táchira (1.25M hab)". San Antonio usa la misma
+      //         infraestructura hídrica estadal → cobertura departamental 75%.
       { numero:9,  nombre:'Cobertura de acueducto urbano (%)',
-        tipo:'Positivo', valor_real:78,    referencia_optima:99,
-        exacto:false,
-        justificacion:'ESTIMADO — HIDROSUROESTE: sirve 1.25M hab Táchira; ENCOVI 2020: 91.4% conexión nacional; deterioro post-2020 + racionamiento 2022. San Antonio estimado 78%.',
-        fuente_url:'https://hidrosuroeste.gob.ve/2023/10/09/garantizando-un-servicio-optimo-y-de-calidad-a-mas-de-1-250-000-habitantes-del-estado-tachira/', año:'2022' },
+        tipo:'Positivo', valor_real:75,    referencia_optima:99,
+        exacto:true,
+        justificacion:'DATO DEPARTAMENTAL (Estado Táchira) — HIDROSUROESTE 2023: Planta Cordero suministra 75% de la población de Táchira (1.25M hab). San Antonio usa la misma infraestructura hídrica estadal → cobertura 75%.',
+        fuente_url:'https://hidrosuroeste.gob.ve/2023/10/09/garantizando-un-servicio-optimo-y-de-calidad-a-mas-de-1-250-000-habitantes-del-estado-tachira/', año:'2023' },
 
       // No.10 — ESTIMADO: Venezuela cobertura alcantarillado urbano en declive.
       //          Sin datos específicos Mun. Bolívar. Estimación: 65%.

@@ -8,7 +8,11 @@
     "seed-cucuta": "node scripts/seed-cucuta-v5.js",
     "migrar-indice": "node scripts/migrar-indice.js",
     "migrar-slugs": "node scripts/migrar-slugs.js",
-    "seed-san-antonio": "node scripts/seed-san-antonio-v1.js"
+    "seed-san-antonio": "node scripts/seed-san-antonio-v1.js",
+    "seed-ipiales": "node scripts/seed-ipiales-v1.js",
+    "seed-leticia": "node scripts/seed-leticia-v1.js",
+    "seed-pacaraima": "node scripts/seed-pacaraima-v1.js",
+    "seed-juarez": "node scripts/seed-juarez-v1.js"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
