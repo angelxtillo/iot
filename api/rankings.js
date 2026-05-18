@@ -22,6 +22,10 @@ module.exports = async (req, res) => {
     const ranked = cities
       .map(city => {
         const { compositeScore, dimScores } = calculateScores(city);
+        // Prefer stored indice_compuesto_final for consistency with Resumen view
+        const finalScore = (city.indice_compuesto_final != null)
+          ? city.indice_compuesto_final
+          : parseFloat(compositeScore.toFixed(4));
         return {
           _id:            city._id,
           name:           city.name,
@@ -29,7 +33,8 @@ module.exports = async (req, res) => {
           flag:           city.flag,
           population:     city.population,
           region:         city.region,
-          compositeScore: parseFloat(compositeScore.toFixed(4)),
+          indice_compuesto_final: finalScore,
+          compositeScore: finalScore,
           dimScores
         };
       })

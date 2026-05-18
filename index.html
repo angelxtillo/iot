@@ -918,9 +918,15 @@ function renderRanking() {
   if (st.rankingCountry === undefined) st.rankingCountry = '';
   if (!st.rankingSelected) st.rankingSelected = new Set();
 
-  // Build full ranked list
+  // Build full ranked list — use stored indice_compuesto_final when available for consistency with Resumen
   const allRanked = CITIES
-    .map((c, idx) => ({ ...c, idx, score: composite(c.indicators), avgs: dimAvgs(c.indicators) }))
+    .map((c, idx) => {
+      const apiCity = window._apiCitiesMap && window._apiCitiesMap[c.name];
+      const score = (apiCity && apiCity.indice_compuesto_final != null)
+        ? apiCity.indice_compuesto_final
+        : composite(c.indicators);
+      return { ...c, idx, score, avgs: dimAvgs(c.indicators) };
+    })
     .sort((a, b) => b.score - a.score);
 
   // Apply filters
@@ -950,7 +956,7 @@ function renderRanking() {
         const pos = rank <= 3
           ? `<span class="text-2xl leading-none">${medals[rank-1]}</span>`
           : `<span class="text-base font-black text-stone-500">${rank}°</span>`;
-        const rowBg = isActive ? 'row-active' : '';
+        const rowBg = isChecked ? 'row-active' : '';
 
         return `<tr class="ranking-row pro-row cursor-pointer transition-colors ${rowBg}" data-city-idx="${city.idx}">
           <td class="px-3 py-3 w-10 text-center">
@@ -1047,14 +1053,17 @@ function renderRanking() {
   const showAllEl = document.getElementById('rk-showall');
   if (showAllEl) showAllEl.addEventListener('click', () => { st.rankingSearch = ''; st.rankingCountry = ''; renderRanking(); });
 
-  // Row click → set active city + show floating "Ver Resumen" button
+  // Row click → toggle checkbox selection (same logic as checking the checkbox directly)
   container.querySelectorAll('.ranking-row').forEach(row => {
     row.addEventListener('click', function(e) {
       if (e.target.classList.contains('ranking-cb')) return;
       const idx = +this.dataset.cityIdx;
-      st.cityIdx = idx;
-      renderSidebar();
-      setActive();
+      if (st.rankingSelected.has(idx)) {
+        st.rankingSelected.delete(idx);
+      } else {
+        if (st.rankingSelected.size >= 2) return;
+        st.rankingSelected.add(idx);
+      }
       renderRanking();
     });
   });
