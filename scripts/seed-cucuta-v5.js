@@ -11,7 +11,7 @@ const path = require('path');
 const uri = process.env.MONGODB_URI;
 if (!uri) { console.error('MONGODB_URI no está definida en .env'); process.exit(1); }
 
-const EXCEL_PATH = path.join(__dirname, '..', 'ModeloCiudadInteligenteCucuta_v5_3.xlsx');
+const EXCEL_PATH = path.join(__dirname, '..', 'ModeloCiudadInteligenteCucuta_v5_4.xlsx');
 
 const DIMENSION_SHEETS = [
   { nombre: 'Capital Humano',  key: 'capital_humano',  peso: 16 },
@@ -28,32 +28,50 @@ function pf(val) {
   return isNaN(n) ? null : n;
 }
 
-function parseDimensionSheet(worksheet, sheetNombre) {
-  const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: null, raw: false });
+// Calcula puntaje desde val/ref/tipo en lugar de leer la celda de fórmula.
+// La col G del Excel usa fórmulas que XLSX.js no evalúa; el valor cacheado
+// puede ser 0 o nulo. Replicamos aquí la misma fórmula del Excel:
+// Positivo: MIN(10, MAX(0, val/ref*10)), Negativo: MIN(10, MAX(0, ref/val*10))
+function calcPuntaje(tipo, val, ref) {
+  if (val === null || ref === null) return 0;
+  if (tipo === 'Negativo' && val === 0) return 0;
+  if (tipo === 'Positivo' && ref === 0) return 0;
+  const raw = tipo === 'Positivo' ? (val / ref) * 10 : (ref / val) * 10;
+  return Math.min(Math.max(raw, 0), 10);
+}
 
-  // Last non-empty row = PUNTAJE PROMEDIO row
-  const nonEmpty = rows.filter(r => r && r.some(c => c !== null && c !== '' && c !== undefined));
-  const promedioRow = nonEmpty[nonEmpty.length - 1];
-  const puntaje_promedio = pf(promedioRow[6]);
+function parseDimensionSheet(worksheet) {
+  // raw:true → los números llegan como número, no como string
+  const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: null, raw: true });
 
-  // Data rows: keep only rows where col 0 is a positive integer (the No. column)
-  const indicadores = nonEmpty
+  // Data rows: col 0 es entero positivo (campo No.)
+  const indicadores = rows
     .filter(row => {
       const no = row[0];
-      return no !== null && no !== undefined && !isNaN(Number(no)) && Number(no) > 0;
+      return no !== null && no !== undefined && typeof no === 'number' && Number.isInteger(no) && no > 0;
     })
-    .map(row => ({
-      numero:           Number(row[0]),
-      nombre:           String(row[1] || '').trim(),
-      descripcion:      String(row[2] || '').trim(),
-      tipo:             String(row[3] || '').includes('↑') ? 'Positivo' : 'Negativo',
-      valor_real:       pf(row[4]),
-      referencia_optima: pf(row[5]),
-      puntaje:          pf(row[6]),
-      justificacion:    String(row[7] || '').trim(),
-      fuente_url:       String(row[8] || '').trim(),
-      año:              String(row[9] || '').trim(),
-    }));
+    .map(row => {
+      const tipo = String(row[3] || '').includes('↑') ? 'Positivo' : 'Negativo';
+      const val  = pf(row[4]);
+      const ref  = pf(row[5]);
+      return {
+        numero:            Number(row[0]),
+        nombre:            String(row[1] || '').trim(),
+        descripcion:       String(row[2] || '').trim(),
+        tipo,
+        valor_real:        val,
+        referencia_optima: ref,
+        puntaje:           parseFloat(calcPuntaje(tipo, val, ref).toFixed(4)),
+        justificacion:     String(row[7] || '').trim(),
+        fuente_url:        String(row[8] || '').trim(),
+        año:               String(row[9] || '').trim(),
+      };
+    });
+
+  // puntaje_promedio calculado desde los puntajes individuales
+  const puntaje_promedio = indicadores.length > 0
+    ? indicadores.reduce((s, i) => s + i.puntaje, 0) / indicadores.length
+    : 0;
 
   return { indicadores, puntaje_promedio };
 }
@@ -74,7 +92,7 @@ async function main() {
     }
     if (!ws) throw new Error(`Hoja no encontrada: "${nombre}". Disponibles: ${wb.SheetNames.join(', ')}`);
 
-    const { indicadores, puntaje_promedio } = parseDimensionSheet(ws, nombre);
+    const { indicadores, puntaje_promedio } = parseDimensionSheet(ws);
     dimensiones[key] = { peso, puntaje_promedio, indicadores };
     console.log(`  ${nombre}: ${indicadores.length} indicadores, promedio ${puntaje_promedio}`);
   }
