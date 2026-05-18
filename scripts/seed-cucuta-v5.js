@@ -100,6 +100,7 @@ async function main() {
 
   const doc = {
     name:                  'Cúcuta',
+    slug:                  'cucuta',
     ciudad:                'Cúcuta',
     pais:                  'Colombia',
     country:               'Colombia',

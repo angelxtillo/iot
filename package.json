@@ -6,7 +6,8 @@
     "dev": "vercel dev",
     "seed": "node scripts/seed.js",
     "seed-cucuta": "node scripts/seed-cucuta-v5.js",
-    "migrar-indice": "node scripts/migrar-indice.js"
+    "migrar-indice": "node scripts/migrar-indice.js",
+    "migrar-slugs": "node scripts/migrar-slugs.js"
   },
   "dependencies": {
     "dotenv": "^16.4.5",

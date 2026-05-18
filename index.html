@@ -379,13 +379,21 @@ function composite(inds) {
   return DIMS.reduce((s, d) => s + a[d] * W[d], 0);
 }
 
+// Normaliza un nombre de ciudad a slug: minúsculas, sin tildes, guiones por espacios.
+// Ejemplo: "Foz do Iguaçu" → "foz-do-iguacu", "San Antonio del Táchira" → "san-antonio-del-tachira"
+function toSlug(name) {
+  return (name || '')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════════
 const st = { tab:'Ranking', cityIdx:null, cmpA:0, cmpB:1, barChart:null, radarChart:null, dimCharts:[], leafletMap:null, markers:[] };
 
 // ── API cache ────────────────────────────────────────────────────
-window._apiCitiesMap     = {}; // city.name → API response (incl. _id, dimensiones)
+window._apiCitiesMap     = {}; // slug → API response (incl. _id, dimensiones, indice_compuesto_final)
 window._apiCitiesLoaded  = false;
 window._apiCitiesLoading = false;
 async function preloadApiCities() {
@@ -395,7 +403,7 @@ async function preloadApiCities() {
     const resp = await fetch('/api/cities');
     if (resp.ok) {
       const result = await resp.json();
-      if (result.success && result.data) result.data.forEach(c => { window._apiCitiesMap[c.name] = c; });
+      if (result.success && result.data) result.data.forEach(c => { window._apiCitiesMap[c.slug || toSlug(c.name)] = c; });
     }
   } catch(e) { /* API offline — frontend hardcoded data used as fallback */ }
   window._apiCitiesLoaded  = true;
@@ -424,8 +432,11 @@ function renderSidebar() {
   const section = document.getElementById('city-active-section');
   const card    = document.getElementById('active-city-card');
   if (st.cityIdx === null) { section.classList.add('hidden'); return; }
-  const city  = CITIES[st.cityIdx];
-  const score = composite(city.indicators);
+  const city      = CITIES[st.cityIdx];
+  const apiEntry  = window._apiCitiesMap && window._apiCitiesMap[toSlug(city.name)];
+  const score     = (apiEntry && apiEntry.indice_compuesto_final != null)
+    ? apiEntry.indice_compuesto_final
+    : composite(city.indicators);
   const band  = BANDS[interpretBand(score)];
   const sc    = score >= 7 ? '#16a34a' : score >= 4 ? '#d97706' : '#dc2626';
   section.classList.remove('hidden');
@@ -590,7 +601,7 @@ function renderResumen() {
   const city = CITIES[st.cityIdx];
 
   // Use API dimensiones when available (Cúcuta v5.3 official model)
-  const apiCity = window._apiCitiesMap[city.name];
+  const apiCity = window._apiCitiesMap[toSlug(city.name)];
   const dimData = apiCity && apiCity.dimensiones ? apiCity.dimensiones : null;
 
   // If API still loading, render hardcoded data and auto-refresh when done
@@ -631,8 +642,9 @@ function _doRenderResumen(city, dimData, container) {
       total += (d.puntaje_promedio || 0) * ((d.peso || 0) / 100);
     });
     // Usa el campo almacenado como única fuente de verdad si está disponible
-    if (apiCity && apiCity.indice_compuesto_final != null) {
-      total = apiCity.indice_compuesto_final;
+    const _apiEntry = window._apiCitiesMap && window._apiCitiesMap[toSlug(city.name)];
+    if (_apiEntry && _apiEntry.indice_compuesto_final != null) {
+      total = _apiEntry.indice_compuesto_final;
     }
   } else {
     avgs  = dimAvgs(city.indicators);
@@ -925,7 +937,7 @@ function renderRanking() {
   // Build full ranked list — indice_compuesto_final es la única fuente de verdad
   const allRanked = CITIES
     .map((c, idx) => {
-      const apiCity = window._apiCitiesMap && window._apiCitiesMap[c.name];
+      const apiCity = window._apiCitiesMap && window._apiCitiesMap[toSlug(c.name)];
       const score = apiCity
         ? (apiCity.indice_compuesto_final ?? apiCity.compositeScore ?? composite(c.indicators))
         : composite(c.indicators);

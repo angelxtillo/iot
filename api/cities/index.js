@@ -2,6 +2,12 @@ const clientPromise = require('../../lib/db');
 const { calculateScores } = require('../../lib/score');
 const { calcularIndice } = require('../../lib/calcular-indice');
 
+function toSlug(name) {
+  return (name || '')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+}
+
 const DB   = 'smart-city';
 const COL  = 'cities';
 
@@ -24,6 +30,7 @@ module.exports = async (req, res) => {
         return {
           _id:                    city._id,
           name:                   city.name,
+          slug:                   city.slug || toSlug(city.name),
           country:                city.country,
           flag:                   city.flag,
           population:             city.population,
