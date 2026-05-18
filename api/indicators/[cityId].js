@@ -1,6 +1,7 @@
 const { ObjectId } = require('mongodb');
 const clientPromise = require('../../lib/db');
 const { calculateScore } = require('../../lib/score');
+const { calcularIndice } = require('../../lib/calcular-indice');
 
 const DB  = 'smart-city';
 const COL = 'cities';
@@ -46,16 +47,19 @@ module.exports = async (req, res) => {
         updateMap.has(ind.id) ? { ...ind, val: updateMap.get(ind.id) } : ind
       );
 
+      const updatedCity = { ...city, indicators: updatedIndicators };
+      const indice = calcularIndice(updatedCity);
+
       await collection.updateOne(
         { _id },
-        { $set: { indicators: updatedIndicators, updatedAt: new Date() } }
+        { $set: { indicators: updatedIndicators, indice_compuesto_final: indice, updatedAt: new Date() } }
       );
 
       const data = updatedIndicators.map(ind => ({
         ...ind,
         score: parseFloat(calculateScore(ind.tipo, ind.val, ind.ref).toFixed(4))
       }));
-      return res.status(200).json({ success: true, data });
+      return res.status(200).json({ success: true, indice_compuesto_final: indice, data });
     }
 
     return res.status(405).json({ success: false, error: 'Método no permitido' });

@@ -1,5 +1,6 @@
 const clientPromise = require('../../lib/db');
 const { calculateScores } = require('../../lib/score');
+const { calcularIndice } = require('../../lib/calcular-indice');
 
 const DB   = 'smart-city';
 const COL  = 'cities';
@@ -19,18 +20,19 @@ module.exports = async (req, res) => {
 
       const data = cities.map(city => {
         const { compositeScore, dimScores } = calculateScores(city);
+        const indice = city.indice_compuesto_final ?? parseFloat(compositeScore.toFixed(4));
         return {
-          _id:            city._id,
-          name:           city.name,
-          country:        city.country,
-          flag:           city.flag,
-          population:     city.population,
-          region:         city.region,
-          compositeScore: parseFloat(compositeScore.toFixed(4)),
+          _id:                    city._id,
+          name:                   city.name,
+          country:                city.country,
+          flag:                   city.flag,
+          population:             city.population,
+          region:                 city.region,
+          indice_compuesto_final: indice,
+          compositeScore:         indice,
           dimScores,
-          // Include dimensiones when present so the frontend can render the rich detail view
-          dimensiones:    city.dimensiones || null,
-          updatedAt:      city.updatedAt
+          dimensiones:            city.dimensiones || null,
+          updatedAt:              city.updatedAt
         };
       });
 

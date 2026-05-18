@@ -630,6 +630,10 @@ function _doRenderResumen(city, dimData, container) {
       avgs[name] = d.puntaje_promedio || 0;
       total += (d.puntaje_promedio || 0) * ((d.peso || 0) / 100);
     });
+    // Usa el campo almacenado como única fuente de verdad si está disponible
+    if (apiCity && apiCity.indice_compuesto_final != null) {
+      total = apiCity.indice_compuesto_final;
+    }
   } else {
     avgs  = dimAvgs(city.indicators);
     total = composite(city.indicators);
@@ -918,12 +922,12 @@ function renderRanking() {
   if (st.rankingCountry === undefined) st.rankingCountry = '';
   if (!st.rankingSelected) st.rankingSelected = new Set();
 
-  // Build full ranked list — use stored indice_compuesto_final when available for consistency with Resumen
+  // Build full ranked list — indice_compuesto_final es la única fuente de verdad
   const allRanked = CITIES
     .map((c, idx) => {
       const apiCity = window._apiCitiesMap && window._apiCitiesMap[c.name];
-      const score = (apiCity && apiCity.indice_compuesto_final != null)
-        ? apiCity.indice_compuesto_final
+      const score = apiCity
+        ? (apiCity.indice_compuesto_final ?? apiCity.compositeScore ?? composite(c.indicators))
         : composite(c.indicators);
       return { ...c, idx, score, avgs: dimAvgs(c.indicators) };
     })

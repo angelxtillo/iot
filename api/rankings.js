@@ -1,5 +1,5 @@
 const clientPromise = require('../lib/db');
-const { calculateScores } = require('../lib/score');
+const { calcularIndice } = require('../lib/calcular-indice');
 
 const DB  = 'smart-city';
 const COL = 'cities';
@@ -21,24 +21,20 @@ module.exports = async (req, res) => {
 
     const ranked = cities
       .map(city => {
-        const { compositeScore, dimScores } = calculateScores(city);
-        // Prefer stored indice_compuesto_final for consistency with Resumen view
-        const finalScore = (city.indice_compuesto_final != null)
-          ? city.indice_compuesto_final
-          : parseFloat(compositeScore.toFixed(4));
+        // Lee indice_compuesto_final almacenado; si falta, calcula con la función única
+        const finalScore = city.indice_compuesto_final ?? calcularIndice(city);
         return {
-          _id:            city._id,
-          name:           city.name,
-          country:        city.country,
-          flag:           city.flag,
-          population:     city.population,
-          region:         city.region,
+          _id:                    city._id,
+          name:                   city.name,
+          country:                city.country,
+          flag:                   city.flag,
+          population:             city.population,
+          region:                 city.region,
           indice_compuesto_final: finalScore,
-          compositeScore: finalScore,
-          dimScores
+          compositeScore:         finalScore
         };
       })
-      .sort((a, b) => b.compositeScore - a.compositeScore)
+      .sort((a, b) => b.indice_compuesto_final - a.indice_compuesto_final)
       .slice(0, 3);
 
     return res.status(200).json({ success: true, data: ranked });

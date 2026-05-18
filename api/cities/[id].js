@@ -1,6 +1,7 @@
 const { ObjectId } = require('mongodb');
 const clientPromise = require('../../lib/db');
 const { calculateScores } = require('../../lib/score');
+const { calcularIndice } = require('../../lib/calcular-indice');
 
 const DB  = 'smart-city';
 const COL = 'cities';
@@ -26,33 +27,39 @@ module.exports = async (req, res) => {
       if (!city) return res.status(404).json({ success: false, error: 'Ciudad no encontrada' });
 
       const { compositeScore, dimScores } = calculateScores(city);
+      const indice = city.indice_compuesto_final ?? parseFloat(compositeScore.toFixed(4));
       return res.status(200).json({
         success: true,
         data: {
           ...city,
-          compositeScore: parseFloat(compositeScore.toFixed(4)),
+          indice_compuesto_final: indice,
+          compositeScore: indice,
           dimScores
         }
       });
     }
 
     if (req.method === 'PUT') {
-      const update = { ...req.body, updatedAt: new Date() };
-      delete update._id;
+      const body = { ...req.body };
+      delete body._id;
+      const updatedDoc = { ...body, updatedAt: new Date() };
+      updatedDoc.indice_compuesto_final = calcularIndice({ ...updatedDoc });
 
       const result = await collection.findOneAndUpdate(
         { _id },
-        { $set: update },
+        { $set: updatedDoc },
         { returnDocument: 'after' }
       );
       if (!result) return res.status(404).json({ success: false, error: 'Ciudad no encontrada' });
 
       const { compositeScore, dimScores } = calculateScores(result);
+      const indice = result.indice_compuesto_final ?? parseFloat(compositeScore.toFixed(4));
       return res.status(200).json({
         success: true,
         data: {
           ...result,
-          compositeScore: parseFloat(compositeScore.toFixed(4)),
+          indice_compuesto_final: indice,
+          compositeScore: indice,
           dimScores
         }
       });
