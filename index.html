@@ -211,99 +211,127 @@ const ICO = {
 };
 
 // ═══════════════════════════════════════════════════════════════════
-// DATA — 60 indicadores · 6 dimensiones · 6 ciudades
+// DATA — Modelo v5.4 · 60 indicadores · 6 dimensiones
+// Reparto: Capital Humano 12 · Cohesión Social 13 · Economía 7 ·
+//          Gobernanza 7 · Medio Ambiente 11 · Frontera 10
+// Categorías: 44 Sostenible · 16 IoT
 // ═══════════════════════════════════════════════════════════════════
 const BASE_IND = [
-  // CAPITAL HUMANO
-  {id:"ch1",  dim:"Capital Humano",  name:"Educación secundaria y superior",     unit:"%",                tipo:"pos", ref:65,      desc:"Proporción de la población con educación secundaria y superior."},
-  {id:"ch2",  dim:"Capital Humano",  name:"Participación en actividad física",    unit:"%",                tipo:"pos", ref:40,      desc:"Porcentaje de población que practica actividad física regularmente."},
-  {id:"ch3",  dim:"Capital Humano",  name:"Colegios con salas STEM",              unit:"%",                tipo:"pos", ref:50,      desc:"Colegios equipados con laboratorios de ciencia y tecnología."},
-  {id:"ch4",  dim:"Capital Humano",  name:"Penetración internet fijo en hogares", unit:"%",                tipo:"pos", ref:65,      desc:"Hogares con conexión a internet de banda ancha."},
-  {id:"ch5",  dim:"Capital Humano",  name:"Conectividad escolar",                 unit:"%",                tipo:"pos", ref:95,      desc:"Instituciones educativas con conexión a internet activa."},
-  {id:"ch6",  dim:"Capital Humano",  name:"Brecha digital estudiantil",           unit:"%",                tipo:"neg", ref:15,      desc:"Estudiantes sin computador ni tablet en casa."},
-  {id:"ch7",  dim:"Capital Humano",  name:"Gasto privado en educación",           unit:"USD/persona/año",  tipo:"pos", ref:350,     desc:"Gasto privado anual en educación per cápita."},
-  {id:"ch8",  dim:"Capital Humano",  name:"Instalaciones deportivas oficiales",   unit:"número",           tipo:"pos", ref:50,      desc:"Instalaciones deportivas registradas oficialmente."},
-  {id:"ch9",  dim:"Capital Humano",  name:"Parques con equipamiento deportivo",   unit:"número",           tipo:"pos", ref:60,      desc:"Parques urbanos con equipamiento deportivo activo."},
-  {id:"ch10", dim:"Capital Humano",  name:"Programas universitarios en TIC",      unit:"número",           tipo:"pos", ref:20,      desc:"Programas de pregrado o posgrado en tecnología e informática."},
-  // COHESIÓN SOCIAL
-  {id:"cs1",  dim:"Cohesión Social", name:"Tasa de desempleo",                    unit:"%",                tipo:"neg", ref:8,       desc:"Porcentaje de la población económicamente activa sin empleo."},
-  {id:"cs2",  dim:"Cohesión Social", name:"Tasa de homicidios",                   unit:"por 100k hab",     tipo:"neg", ref:12,      desc:"Homicidios por cada 100.000 habitantes al año."},
-  {id:"cs3",  dim:"Cohesión Social", name:"Índice de criminalidad percibida",     unit:"Numbeo 0-100",     tipo:"neg", ref:45,      desc:"Percepción de criminalidad según Numbeo (menor = mejor)."},
-  {id:"cs4",  dim:"Cohesión Social", name:"Coeficiente de Gini",                  unit:"0-1",              tipo:"neg", ref:0.38,    desc:"Medida de desigualdad en distribución del ingreso."},
-  {id:"cs5",  dim:"Cohesión Social", name:"Índice de Felicidad",                  unit:"escala 0-10",      tipo:"pos", ref:6.5,     desc:"Nivel de bienestar subjetivo declarado por ciudadanos."},
-  {id:"cs6",  dim:"Cohesión Social", name:"Índice de salud",                      unit:"Numbeo 0-100",     tipo:"pos", ref:68,      desc:"Calidad percibida del sistema de salud según Numbeo."},
-  {id:"cs7",  dim:"Cohesión Social", name:"Tasa de empleo femenino",              unit:"%",                tipo:"pos", ref:50,      desc:"Porcentaje de mujeres en edad laboral con empleo."},
-  {id:"cs8",  dim:"Cohesión Social", name:"Tasa de mortalidad general",           unit:"por 100k hab",     tipo:"neg", ref:350,     desc:"Muertes por cada 100.000 habitantes al año."},
-  {id:"cs9",  dim:"Cohesión Social", name:"Cobertura 4G/5G urbana",               unit:"%",                tipo:"pos", ref:98,      desc:"Zona urbana con cobertura de red móvil 4G o 5G."},
-  {id:"cs10", dim:"Cohesión Social", name:"Establecimientos con telemedicina",    unit:"número",           tipo:"pos", ref:12,      desc:"Centros de salud habilitados para consulta médica remota."},
-  // ECONOMÍA
-  {id:"ec1",  dim:"Economía",        name:"PIB per cápita",                       unit:"USD",              tipo:"pos", ref:6000,    desc:"Producto Interno Bruto dividido entre la población total."},
-  {id:"ec2",  dim:"Economía",        name:"Salario por hora",                     unit:"USD",              tipo:"pos", ref:3,       desc:"Remuneración horaria promedio del trabajador formal."},
-  {id:"ec3",  dim:"Economía",        name:"Facilidad para abrir empresa",         unit:"ranking 1-190",    tipo:"neg", ref:40,      desc:"Posición en el ranking Doing Business (menor = mejor)."},
-  {id:"ec4",  dim:"Economía",        name:"Días para crear empresa",              unit:"días",             tipo:"neg", ref:7,       desc:"Días hábiles requeridos para constituir una empresa."},
-  {id:"ec5",  dim:"Economía",        name:"Motivación emprendedora",              unit:"ratio oport/nec",  tipo:"pos", ref:1.2,     desc:"Ratio entre emprendimiento por oportunidad vs. por necesidad."},
-  {id:"ec6",  dim:"Economía",        name:"Poder adquisitivo relativo",           unit:"índice NYC=100",   tipo:"pos", ref:35,      desc:"Poder de compra relativo frente a Nueva York (100)."},
-  {id:"ec7",  dim:"Economía",        name:"Startups tecnológicas activas",        unit:"número",           tipo:"pos", ref:20,      desc:"Startups con producto validado operando en el mercado."},
-  {id:"ec8",  dim:"Economía",        name:"Comercio electrónico",                 unit:"%",                tipo:"pos", ref:40,      desc:"Empresas que realizan ventas por canales digitales."},
-  {id:"ec9",  dim:"Economía",        name:"Productividad laboral",                unit:"miles USD/ocupado",tipo:"pos", ref:14,      desc:"Valor agregado por ocupado en miles de dólares al año."},
-  {id:"ec10", dim:"Economía",        name:"Inversión en I+D+TIC",                 unit:"% PIB local",      tipo:"pos", ref:1.5,     desc:"Porcentaje del PIB local destinado a I+D y tecnología."},
-  // GOBERNANZA
-  {id:"go1",  dim:"Gobernanza",      name:"Índice de E-Participación ONU",        unit:"escala 0-1",       tipo:"pos", ref:0.85,    desc:"Participación electrónica ciudadana según índice ONU."},
-  {id:"go2",  dim:"Gobernanza",      name:"Índice de Derechos Legales",           unit:"escala 0-12",      tipo:"pos", ref:9,       desc:"Solidez del marco legal para acceso a crédito y derechos."},
-  {id:"go3",  dim:"Gobernanza",      name:"Trámites municipales en línea",        unit:"%",                tipo:"pos", ref:70,      desc:"Servicios del gobierno local completables 100% en línea."},
-  {id:"go4",  dim:"Gobernanza",      name:"Datasets de datos abiertos",           unit:"número",           tipo:"pos", ref:50,      desc:"Conjuntos de datos publicados en formatos abiertos."},
-  {id:"go5",  dim:"Gobernanza",      name:"Cámaras de videovigilancia",           unit:"número",           tipo:"pos", ref:400,     desc:"Cámaras operativas conectadas al centro de monitoreo."},
-  {id:"go6",  dim:"Gobernanza",      name:"Satisfacción servicios digitales",     unit:"escala 1-10",      tipo:"pos", ref:7.5,     desc:"Valoración ciudadana de los servicios digitales municipales."},
-  {id:"go7",  dim:"Gobernanza",      name:"Certificación ISO 37120",              unit:"nivel 0-6",        tipo:"pos", ref:3,       desc:"Nivel de certificación internacional para servicios urbanos."},
-  {id:"go8",  dim:"Gobernanza",      name:"Índice Capital Humano EGDI",           unit:"escala 0-1",       tipo:"pos", ref:0.85,    desc:"Componente de capital humano del Índice de Gobierno Digital ONU."},
-  {id:"go9",  dim:"Gobernanza",      name:"Índice Infraestructura Telecom",       unit:"escala 0-1",       tipo:"pos", ref:0.8,     desc:"Componente de telecomunicaciones del EGDI de la ONU."},
-  {id:"go10", dim:"Gobernanza",      name:"Semáforos inteligentes",               unit:"número",           tipo:"pos", ref:30,      desc:"Semáforos con control adaptativo al flujo vehicular."},
-  // MEDIO AMBIENTE
-  {id:"ma1",  dim:"Medio Ambiente",  name:"Áreas verdes per cápita",              unit:"m²/hab",           tipo:"pos", ref:9,       desc:"Metros cuadrados de área verde urbana por habitante."},
-  {id:"ma2",  dim:"Medio Ambiente",  name:"Índice de Calidad del Aire (AQI)",     unit:"AQI",              tipo:"neg", ref:35,      desc:"Promedio anual del AQI (menor = mejor)."},
-  {id:"ma3",  dim:"Medio Ambiente",  name:"PM2.5 anual",                          unit:"µg/m³",            tipo:"neg", ref:5,       desc:"Concentración anual de partículas finas PM2.5 (menor = mejor)."},
-  {id:"ma4",  dim:"Medio Ambiente",  name:"Energía renovable",                    unit:"%",                tipo:"pos", ref:85,      desc:"Porcentaje de la matriz energética de fuentes renovables."},
-  {id:"ma5",  dim:"Medio Ambiente",  name:"Tratamiento aguas residuales",         unit:"%",                tipo:"pos", ref:80,      desc:"Aguas residuales tratadas antes de su vertimiento."},
-  {id:"ma6",  dim:"Medio Ambiente",  name:"Emisiones CO2 por habitante",          unit:"ton/año",          tipo:"neg", ref:1.5,     desc:"Toneladas de CO2 equivalente emitidas por habitante al año."},
-  {id:"ma7",  dim:"Medio Ambiente",  name:"Vulnerabilidad climática",             unit:"escala 1-10",      tipo:"neg", ref:4,       desc:"Nivel de exposición a riesgos climáticos (menor = mejor)."},
-  {id:"ma8",  dim:"Medio Ambiente",  name:"Índice Desempeño Ambiental (EPI)",     unit:"0-100",            tipo:"pos", ref:55,      desc:"Puntuación en el Environmental Performance Index de Yale."},
-  {id:"ma9",  dim:"Medio Ambiente",  name:"Calidad del agua potable",             unit:"Numbeo 0-100",     tipo:"pos", ref:80,      desc:"Calidad percibida del agua potable según Numbeo."},
-  {id:"ma10", dim:"Medio Ambiente",  name:"Residuos sólidos per cápita",          unit:"kg/hab/año",       tipo:"neg", ref:280,     desc:"Kilogramos de residuos sólidos por habitante al año."},
-  // FRONTERA
-  {id:"fr1",  dim:"Frontera",        name:"Volumen comercio transfronterizo",     unit:"M USD/año",        tipo:"pos", ref:800,     desc:"Valor total del comercio formal en el paso fronterizo."},
-  {id:"fr2",  dim:"Frontera",        name:"Flujo migratorio formal",              unit:"cruces/año",       tipo:"pos", ref:5000000, desc:"Cruces de frontera registrados formalmente por año."},
-  {id:"fr3",  dim:"Frontera",        name:"Informalidad laboral migrante",        unit:"%",                tipo:"neg", ref:40,      desc:"Migrantes en situación de empleo informal."},
-  {id:"fr4",  dim:"Frontera",        name:"Infraestructura fronteriza",           unit:"escala 1-10",      tipo:"pos", ref:8,       desc:"Calidad y capacidad de la infraestructura de paso fronterizo."},
-  {id:"fr5",  dim:"Frontera",        name:"Acceso a servicios para migrantes",    unit:"%",                tipo:"pos", ref:70,      desc:"Migrantes con acceso efectivo a servicios básicos."},
-  {id:"fr6",  dim:"Frontera",        name:"Tensión social fronteriza",            unit:"escala 1-10",      tipo:"neg", ref:3,       desc:"Nivel de conflictividad social en la frontera."},
-  {id:"fr7",  dim:"Frontera",        name:"Diferencial cambiario",                unit:"%",                tipo:"neg", ref:20,      desc:"Diferencia entre tipo de cambio oficial y paralelo."},
-  {id:"fr8",  dim:"Frontera",        name:"Sistemas biométricos migración",       unit:"número",           tipo:"pos", ref:4,       desc:"Puestos de control con sistemas biométricos activos."},
-  {id:"fr9",  dim:"Frontera",        name:"Migrantes con PPT digital activo",     unit:"%",                tipo:"pos", ref:80,      desc:"Migrantes con Permiso de Protección Temporal vigente."},
-  {id:"fr10", dim:"Frontera",        name:"Integración económica binacional",     unit:"escala 1-10",      tipo:"pos", ref:7,       desc:"Integración económica formal entre ciudades fronterizas."}
+  // CAPITAL HUMANO (12)
+  {id:"ch1",  dim:"Capital Humano",  name:"Cobertura neta Educación Básica Secundaria",              unit:"%",               tipo:"pos", cat:"Sostenible", ref:95,       desc:"Mide el acceso real a educación secundaria."},
+  {id:"ch2",  dim:"Capital Humano",  name:"Cobertura neta Educación Media",                          unit:"%",               tipo:"pos", cat:"Sostenible", ref:80,       desc:"Cuantifica el abandono escolar antes de grado 11."},
+  {id:"ch3",  dim:"Capital Humano",  name:"Cobertura Educación Superior",                            unit:"%",               tipo:"pos", cat:"Sostenible", ref:70,       desc:"Mide el acceso a formación profesional."},
+  {id:"ch4",  dim:"Capital Humano",  name:"Conectividad escolar",                                    unit:"%",               tipo:"pos", cat:"IoT",        ref:95,       desc:"Mide la infraestructura digital educativa."},
+  {id:"ch5",  dim:"Capital Humano",  name:"Tasa de analfabetismo",                                   unit:"%",               tipo:"neg", cat:"Sostenible", ref:2,        desc:"El analfabetismo es la barrera más básica a la inclusión digital."},
+  {id:"ch6",  dim:"Capital Humano",  name:"Participación en actividad física",                       unit:"%",               tipo:"pos", cat:"Sostenible", ref:40,       desc:"La actividad física impacta en productividad y salud."},
+  {id:"ch7",  dim:"Capital Humano",  name:"Colegios con salas STEM o laboratorios TIC",              unit:"%",               tipo:"pos", cat:"IoT",        ref:90,       desc:"Mide la infraestructura STEM de los colegios."},
+  {id:"ch8",  dim:"Capital Humano",  name:"Penetración internet fijo en hogares",                    unit:"%",               tipo:"pos", cat:"IoT",        ref:70,       desc:"La conectividad domiciliaria es infraestructura básica."},
+  {id:"ch9",  dim:"Capital Humano",  name:"Programas universitarios en TIC activos",                 unit:"Número",          tipo:"pos", cat:"IoT",        ref:15,       desc:"Mide la oferta académica en tecnología."},
+  {id:"ch10", dim:"Capital Humano",  name:"Universidades en TOP 500 mundial",                        unit:"Número",          tipo:"pos", cat:"Sostenible", ref:1,        desc:"Refleja la calidad investigativa de la ciudad."},
+  {id:"ch11", dim:"Capital Humano",  name:"Tasa de alfabetización digital",                          unit:"%",               tipo:"pos", cat:"IoT",        ref:90,       desc:"Porcentaje de población que usa internet."},
+  {id:"ch12", dim:"Capital Humano",  name:"Índice de Pobreza Multidimensional — IPM",                unit:"%",               tipo:"neg", cat:"Sostenible", ref:12,       desc:"Mide privaciones en educación, salud, trabajo y vivienda."},
+  // COHESIÓN SOCIAL (13)
+  {id:"cs1",  dim:"Cohesión Social", name:"Coeficiente de Gini",                                     unit:"Escala 0-1",      tipo:"neg", cat:"Sostenible", ref:0.35,     desc:"Mide la desigualdad en el ingreso."},
+  {id:"cs2",  dim:"Cohesión Social", name:"Tasa de informalidad laboral",                            unit:"%",               tipo:"neg", cat:"Sostenible", ref:40,       desc:"Trabajadores sin contrato formal."},
+  {id:"cs3",  dim:"Cohesión Social", name:"Tasa de desempleo",                                       unit:"%",               tipo:"neg", cat:"Sostenible", ref:8,        desc:"Porcentaje de la población económicamente activa desocupada."},
+  {id:"cs4",  dim:"Cohesión Social", name:"Tasa de empleo femenino",                                 unit:"%",               tipo:"pos", cat:"Sostenible", ref:55,       desc:"Mide la participación económica de la mujer."},
+  {id:"cs5",  dim:"Cohesión Social", name:"Tasa de homicidios",                                      unit:"Por 100.000 hab", tipo:"neg", cat:"Sostenible", ref:20,       desc:"Indicador de seguridad urbana."},
+  {id:"cs6",  dim:"Cohesión Social", name:"Violencia intrafamiliar",                                 unit:"Por 100.000 hab", tipo:"neg", cat:"Sostenible", ref:20,       desc:"Mide la violencia doméstica."},
+  {id:"cs7",  dim:"Cohesión Social", name:"Tasa de suicidios",                                       unit:"Por 100.000 hab", tipo:"neg", cat:"Sostenible", ref:4,        desc:"Indicador de salud mental poblacional."},
+  {id:"cs8",  dim:"Cohesión Social", name:"Tasa de mortalidad general",                              unit:"Por 1.000 hab",   tipo:"neg", cat:"Sostenible", ref:7,        desc:"Indica la salud general de la población."},
+  {id:"cs9",  dim:"Cohesión Social", name:"Tasa de mortalidad infantil",                             unit:"Por 1.000 nv",    tipo:"neg", cat:"Sostenible", ref:5,        desc:"Mide la calidad del sistema materno-infantil."},
+  {id:"cs10", dim:"Cohesión Social", name:"IPS públicas habilitadas con estándares de calidad",      unit:"%",               tipo:"pos", cat:"Sostenible", ref:80,       desc:"Calidad institucional del sistema de salud pública."},
+  {id:"cs11", dim:"Cohesión Social", name:"Cobertura 4G/5G en área urbana",                          unit:"%",               tipo:"pos", cat:"IoT",        ref:100,      desc:"Infraestructura móvil de la Smart City."},
+  {id:"cs12", dim:"Cohesión Social", name:"Pobreza monetaria",                                       unit:"%",               tipo:"neg", cat:"Sostenible", ref:25,       desc:"Población bajo la línea de pobreza monetaria."},
+  {id:"cs13", dim:"Cohesión Social", name:"Tasa de desempleo juvenil",                               unit:"%",               tipo:"neg", cat:"Sostenible", ref:10,       desc:"Porcentaje de jóvenes desempleados."},
+  // ECONOMÍA (7)
+  {id:"ec1",  dim:"Economía",        name:"Valor Agregado municipal",                                unit:"Millones USD",    tipo:"pos", cat:"Sostenible", ref:5000,     desc:"Termómetro económico de la ciudad."},
+  {id:"ec2",  dim:"Economía",        name:"Tasa de crecimiento económico",                           unit:"%",               tipo:"pos", cat:"Sostenible", ref:8,        desc:"Mide el dinamismo económico local."},
+  {id:"ec3",  dim:"Economía",        name:"Ingreso laboral promedio mensual",                        unit:"USD/mes",         tipo:"pos", cat:"Sostenible", ref:600,      desc:"Mide la capacidad adquisitiva real."},
+  {id:"ec4",  dim:"Economía",        name:"Días para crear una empresa",                             unit:"Número de días",  tipo:"neg", cat:"Sostenible", ref:3,        desc:"Agilidad regulatoria para el emprendimiento."},
+  {id:"ec5",  dim:"Economía",        name:"PIB per cápita",                                          unit:"Millones COP",    tipo:"pos", cat:"Sostenible", ref:30,       desc:"Capacidad económica por habitante."},
+  {id:"ec6",  dim:"Economía",        name:"Participación actividades terciarias en PIB municipal",   unit:"%",               tipo:"pos", cat:"Sostenible", ref:75,       desc:"Refleja la madurez económica de la ciudad."},
+  {id:"ec7",  dim:"Economía",        name:"Empresas nuevas registradas",                             unit:"Número",          tipo:"pos", cat:"Sostenible", ref:12000,    desc:"Vitalidad emprendedora del ecosistema local."},
+  // GOBERNANZA (7)
+  {id:"go1",  dim:"Gobernanza",      name:"Índice de Madurez Ciudad Inteligente — MMCTI",            unit:"Escala 0-5",      tipo:"pos", cat:"IoT",        ref:5,        desc:"Termómetro de la estrategia Smart City."},
+  {id:"go2",  dim:"Gobernanza",      name:"Datasets de datos abiertos publicados",                   unit:"Número",          tipo:"pos", cat:"IoT",        ref:200,      desc:"Los datos abiertos son el combustible de la innovación urbana."},
+  {id:"go3",  dim:"Gobernanza",      name:"Cámaras de videovigilancia operativas",                   unit:"Número",          tipo:"pos", cat:"IoT",        ref:500,      desc:"Columna vertebral de la seguridad urbana."},
+  {id:"go4",  dim:"Gobernanza",      name:"Inversión en tecnología y seguridad urbana",              unit:"Millones COP",    tipo:"pos", cat:"IoT",        ref:50000,    desc:"Refleja la voluntad política de transformación."},
+  {id:"go5",  dim:"Gobernanza",      name:"Índice de Gobierno Digital — IGD",                        unit:"Escala 0-100",    tipo:"pos", cat:"IoT",        ref:100,      desc:"Mide la digitalización real de los servicios."},
+  {id:"go6",  dim:"Gobernanza",      name:"Presupuesto municipal per cápita",                        unit:"USD/hab",         tipo:"pos", cat:"Sostenible", ref:1000,     desc:"Capacidad real de inversión por ciudadano."},
+  {id:"go7",  dim:"Gobernanza",      name:"Ejecución presupuestal",                                  unit:"%",               tipo:"pos", cat:"Sostenible", ref:95,       desc:"Mide si la ciudad cumple lo que planea."},
+  // MEDIO AMBIENTE (11)
+  {id:"ma1",  dim:"Medio Ambiente",  name:"Arbolado urbano con problemas fitosanitarios",            unit:"%",               tipo:"neg", cat:"Sostenible", ref:20,       desc:"Refleja la calidad del ecosistema verde."},
+  {id:"ma2",  dim:"Medio Ambiente",  name:"Índice de Calidad del Aire — AQI",                        unit:"AQI (0-500)",     tipo:"neg", cat:"IoT",        ref:30,       desc:"Mide la salud del aire."},
+  {id:"ma3",  dim:"Medio Ambiente",  name:"Tratamiento de aguas residuales",                         unit:"%",               tipo:"pos", cat:"Sostenible", ref:80,       desc:"Crítico para la sostenibilidad urbana."},
+  {id:"ma4",  dim:"Medio Ambiente",  name:"Gestión de residuos sólidos — aprovechado",               unit:"%",               tipo:"pos", cat:"Sostenible", ref:25,       desc:"Corazón de la economía circular urbana."},
+  {id:"ma5",  dim:"Medio Ambiente",  name:"PM2.5 — material particulado fino",                       unit:"µg/m³",           tipo:"neg", cat:"IoT",        ref:5,        desc:"Concentración de partículas finas."},
+  {id:"ma6",  dim:"Medio Ambiente",  name:"Residuos sólidos per cápita",                             unit:"kg/hab/año",      tipo:"neg", cat:"Sostenible", ref:200,      desc:"Presión ambiental por habitante."},
+  {id:"ma7",  dim:"Medio Ambiente",  name:"Estaciones de monitoreo ambiental activas",               unit:"Número",          tipo:"pos", cat:"IoT",        ref:8,        desc:"Los ojos ambientales de la ciudad."},
+  {id:"ma8",  dim:"Medio Ambiente",  name:"Energía solar fotovoltaica instalada",                    unit:"MW",              tipo:"pos", cat:"IoT",        ref:20,       desc:"Avance real de la transición energética local."},
+  {id:"ma9",  dim:"Medio Ambiente",  name:"Cobertura de acueducto urbano",                           unit:"%",               tipo:"pos", cat:"Sostenible", ref:99,       desc:"Acceso equitativo al agua potable."},
+  {id:"ma10", dim:"Medio Ambiente",  name:"Cobertura de alcantarillado urbano",                      unit:"%",               tipo:"pos", cat:"Sostenible", ref:100,      desc:"Gestión del agua post-consumo."},
+  {id:"ma11", dim:"Medio Ambiente",  name:"Hectáreas de áreas estratégicas para conservación hídrica",unit:"Hectáreas",      tipo:"pos", cat:"Sostenible", ref:2500,     desc:"Conservación de cuencas a largo plazo."},
+  // FRONTERA (10)
+  {id:"fr1",  dim:"Frontera",        name:"Comercio binacional total por aduana de la ciudad",       unit:"Millones USD",    tipo:"pos", cat:"Sostenible", ref:800,      desc:"Indicador más directo de la función económica fronteriza."},
+  {id:"fr2",  dim:"Frontera",        name:"Flujo migratorio fronterizo",                             unit:"Cruces/año",      tipo:"pos", cat:"Sostenible", ref:18000000, desc:"Intensidad de las relaciones binacionales."},
+  {id:"fr3",  dim:"Frontera",        name:"Migrantes con vocación de permanencia en la ciudad",      unit:"Número",          tipo:"pos", cat:"Sostenible", ref:150000,   desc:"Población extranjera que la ciudad debe integrar."},
+  {id:"fr4",  dim:"Frontera",        name:"Exportaciones por aduana de la ciudad",                   unit:"Miles USD (FOB)", tipo:"pos", cat:"Sostenible", ref:600000,   desc:"Capacidad exportadora del corredor fronterizo."},
+  {id:"fr5",  dim:"Frontera",        name:"Importaciones por aduana de la ciudad",                   unit:"Miles USD (CIF)", tipo:"pos", cat:"Sostenible", ref:150000,   desc:"Flujo de bienes entrantes a la ciudad."},
+  {id:"fr6",  dim:"Frontera",        name:"Pasos fronterizos internacionales activos en la ciudad",  unit:"Número",          tipo:"pos", cat:"Sostenible", ref:3,        desc:"Infraestructura física de la ciudad fronteriza."},
+  {id:"fr7",  dim:"Frontera",        name:"Vehículos de carga por pasos fronterizos",                unit:"Vehículos/mes",   tipo:"pos", cat:"Sostenible", ref:2000,     desc:"Intensidad del comercio físico transfronterizo."},
+  {id:"fr8",  dim:"Frontera",        name:"Puestos de Control Migratorio activos en la ciudad",      unit:"Número",          tipo:"pos", cat:"IoT",        ref:4,        desc:"Puntos de control y servicio migratorio formal."},
+  {id:"fr9",  dim:"Frontera",        name:"Extranjeros del país vecino no residentes que ingresan",  unit:"Número",          tipo:"pos", cat:"Sostenible", ref:40000,    desc:"Flujo formal de visitantes no residentes."},
+  {id:"fr10", dim:"Frontera",        name:"Balanza comercial binacional por aduana de la ciudad",    unit:"Miles USD",       tipo:"pos", cat:"Sostenible", ref:400000,   desc:"Posición comercial neta de la ciudad."}
 ];
 
+// Ciudades sin datos migrados al modelo v5.4 — todos los indicadores en null
+// hasta que se investiguen sus valores para el catálogo nuevo.
+const SIN_DATOS = Object.fromEntries(BASE_IND.map(b => [b.id, null]));
+
 const CV = {
-  cucuta:    {ch1:43,ch2:28,ch3:15,ch4:42,ch5:90,ch6:35,ch7:148,ch8:41,ch9:34,ch10:8,cs1:15.1,cs2:36,cs3:68,cs4:0.458,cs5:5.9,cs6:52,cs7:38,cs8:475,cs9:95,cs10:3,ec1:3227,ec2:1.8,ec3:67,ec4:11,ec5:0.62,ec6:22,ec7:5,ec8:15,ec9:8.4,ec10:0.5,go1:0.74,go2:5,go3:30,go4:12,go5:150,go6:5,go7:0,go8:0.73,go9:0.59,go10:5,ma1:3.2,ma2:52,ma3:10,ma4:68,ma5:38,ma6:2.3,ma7:7,ma8:42.9,ma9:55,ma10:430,fr1:320,fr2:12775000,fr3:78,fr4:5,fr5:42,fr6:7,fr7:80,fr8:2,fr9:42,fr10:3},
-  sanantonio:{ch1:38,ch2:20,ch3:4,ch4:12,ch5:65,ch6:72,ch7:45,ch8:18,ch9:15,ch10:2,cs1:28,cs2:48,cs3:72,cs4:0.52,cs5:4.2,cs6:28,cs7:22,cs8:820,cs9:35,cs10:1,ec1:980,ec2:0.3,ec3:185,ec4:32,ec5:0.18,ec6:8,ec7:1,ec8:8,ec9:2.8,ec10:0.2,go1:0.25,go2:1,go3:8,go4:2,go5:40,go6:2.1,go7:0,go8:0.38,go9:0.32,go10:2,ma1:5.8,ma2:45,ma3:8,ma4:62,ma5:18,ma6:2.1,ma7:5,ma8:41,ma9:38,ma10:410,fr1:320,fr2:12775000,fr3:85,fr4:4,fr5:22,fr6:8,fr7:82,fr8:2,fr9:null,fr10:2},
-  ipiales:   {ch1:41,ch2:30,ch3:12,ch4:35,ch5:82,ch6:42,ch7:120,ch8:22,ch9:28,ch10:4,cs1:12.5,cs2:18,cs3:52,cs4:0.44,cs5:5.9,cs6:48,cs7:40,cs8:420,cs9:88,cs10:2,ec1:2800,ec2:1.5,ec3:67,ec4:13,ec5:0.62,ec6:20,ec7:3,ec8:12,ec9:6.8,ec10:0.4,go1:0.74,go2:5,go3:22,go4:8,go5:80,go6:4.8,go7:0,go8:0.73,go9:0.59,go10:5,ma1:6.5,ma2:28,ma3:4,ma4:68,ma5:32,ma6:1.8,ma7:4.5,ma8:42.9,ma9:72,ma10:310,fr1:180,fr2:4200000,fr3:55,fr4:7,fr5:38,fr6:4,fr7:8,fr8:2,fr9:45,fr10:4},
-  leticia:   {ch1:36,ch2:32,ch3:8,ch4:28,ch5:75,ch6:55,ch7:95,ch8:12,ch9:18,ch10:3,cs1:13.2,cs2:12,cs3:48,cs4:0.46,cs5:5.9,cs6:42,cs7:35,cs8:480,cs9:72,cs10:1,ec1:2100,ec2:1.4,ec3:67,ec4:15,ec5:0.62,ec6:16,ec7:1,ec8:10,ec9:5.2,ec10:0.3,go1:0.74,go2:5,go3:18,go4:5,go5:45,go6:4.2,go7:0,go8:0.73,go9:0.59,go10:2,ma1:18.5,ma2:22,ma3:3,ma4:68,ma5:25,ma6:0.8,ma7:3,ma8:42.9,ma9:62,ma10:280,fr1:85,fr2:850000,fr3:48,fr4:3,fr5:35,fr6:3,fr7:8,fr8:1,fr9:28,fr10:3},
-  pacaraima:   {ch1:48,ch2:35,ch3:18,ch4:40,ch5:88,ch6:30,ch7:180,ch8:18,ch9:22,ch10:3,cs1:14.5,cs2:28,cs3:58,cs4:0.49,cs5:6.1,cs6:55,cs7:40,cs8:480,cs9:80,cs10:2,ec1:4200,ec2:2.2,ec3:55,ec4:17,ec5:0.82,ec6:28,ec7:2,ec8:22,ec9:8.8,ec10:0.7,go1:0.78,go2:6,go3:45,go4:18,go5:65,go6:5.8,go7:0,go8:0.80,go9:0.76,go10:5,ma1:12,ma2:30,ma3:5,ma4:82,ma5:42,ma6:1.4,ma7:4,ma8:52.8,ma9:68,ma10:285,fr1:420,fr2:1800000,fr3:68,fr4:6,fr5:45,fr6:6,fr7:null,fr8:3,fr9:55,fr10:4},
-  juarez:      {ch1:52,ch2:25,ch3:28,ch4:58,ch5:72,ch6:28,ch7:320,ch8:48,ch9:55,ch10:12,cs1:3.2,cs2:2.8,cs3:74,cs4:3.2,cs5:6.0,cs6:58,cs7:42,cs8:520,cs9:92,cs10:4,ec1:8500,ec2:2.8,ec3:58,ec4:8,ec5:0.95,ec6:42,ec7:0,ec8:42000,ec9:320,ec10:null,go1:0.76,go2:7,go3:38,go4:22,go5:280,go6:6.2,go7:0,go8:0.80,go9:0.72,go10:45,ma1:4.2,ma2:48,ma3:9,ma4:22,ma5:62,ma6:3.8,ma7:5,ma8:47.2,ma9:48,ma10:380,fr1:42000,fr2:25000000,fr3:35,fr4:7,fr5:55,fr6:3,fr7:5,fr8:8,fr9:null,fr10:9},
+  cucuta: {
+    ch1:84.3, ch2:54.7, ch3:53.94, ch4:85.3, ch5:5.7, ch6:13.4, ch7:62.5, ch8:45, ch9:9, ch10:0, ch11:73, ch12:20.5,
+    cs1:0.462, cs2:62.8, cs3:15.1, cs4:43.4, cs5:33.8, cs6:41.02, cs7:6.81, cs8:5.8, cs9:7.2, cs10:35.1, cs11:100, cs12:37.7, cs13:18.52,
+    ec1:3021, ec2:6.3, ec3:340, ec4:11, ec5:16.09, ec6:80, ec7:8057,
+    go1:3.9, go2:91, go3:311, go4:32000, go5:76.27, go6:621, go7:85.66,
+    ma1:60, ma2:50, ma3:0, ma4:3, ma5:10, ma6:333, ma7:4, ma8:5.98, ma9:94, ma10:99.2, ma11:1575,
+    fr1:286, fr2:21900000, fr3:213487, fr4:402252, fr5:77950, fr6:3, fr7:1108, fr8:2, fr9:21104, fr10:324302
+  },
+  sanantonio: { ...SIN_DATOS },
+  ipiales:    { ...SIN_DATOS },
+  leticia:    { ...SIN_DATOS },
+  pacaraima:  { ...SIN_DATOS },
+  juarez:     { ...SIN_DATOS },
 };
 
 const CITIES_META = [
-  {key:'cucuta',     name:'Cúcuta',                   country:'Colombia',  flag:'🇨🇴', population:750000,  region:'Norte de Santander', lat:7.8939,   lng:-72.5078},
-  {key:'sanantonio', name:'San Antonio del Táchira',   country:'Venezuela', flag:'🇻🇪', population:71630,   region:'Estado Táchira',      lat:7.8167,   lng:-72.4500},
-  {key:'ipiales',    name:'Ipiales',                   country:'Colombia',  flag:'🇨🇴', population:122000,  region:'Nariño',              lat:0.8294,   lng:-77.6436},
-  {key:'leticia',    name:'Leticia',                   country:'Colombia',  flag:'🇨🇴', population:45000,   region:'Amazonas',            lat:-4.2153,  lng:-69.9406},
-  {key:'pacaraima',  name:'Pacaraima',                 country:'Brasil',    flag:'🇧🇷', population:18000,   region:'Roraima',             lat:4.4772,   lng:-61.1503},
-  {key:'juarez',    name:'Ciudad Juárez',             country:'México',    flag:'🇲🇽', population:1500000, region:'Chihuahua',           lat:31.6904,  lng:-106.4245},
+  {key:'cucuta',     name:'Cúcuta',                   country:'Colombia',  flag:'🇨🇴', population:750000,  region:'Norte de Santander', lat:7.8939,   lng:-72.5078,  datosCompletos:true},
+  {key:'sanantonio', name:'San Antonio del Táchira',   country:'Venezuela', flag:'🇻🇪', population:71630,   region:'Estado Táchira',      lat:7.8167,   lng:-72.4500,  datosCompletos:false},
+  {key:'ipiales',    name:'Ipiales',                   country:'Colombia',  flag:'🇨🇴', population:122000,  region:'Nariño',              lat:0.8294,   lng:-77.6436,  datosCompletos:false},
+  {key:'leticia',    name:'Leticia',                   country:'Colombia',  flag:'🇨🇴', population:45000,   region:'Amazonas',            lat:-4.2153,  lng:-69.9406,  datosCompletos:false},
+  {key:'pacaraima',  name:'Pacaraima',                 country:'Brasil',    flag:'🇧🇷', population:18000,   region:'Roraima',             lat:4.4772,   lng:-61.1503,  datosCompletos:false},
+  {key:'juarez',    name:'Ciudad Juárez',             country:'México',    flag:'🇲🇽', population:1500000, region:'Chihuahua',           lat:31.6904,  lng:-106.4245, datosCompletos:false},
 ];
 
 const CITIES = CITIES_META.map(m => ({
   ...m,
   indicators: BASE_IND.map(b => ({ ...b, val: CV[m.key][b.id] ?? null }))
 }));
+
+// ── Contadores del modelo, derivados del catálogo ────────────────
+const IND_TOTAL     = BASE_IND.length;
+const IND_POR_DIM   = dim => BASE_IND.filter(b => b.dim === dim).length;
+const IND_POR_CAT   = cat => BASE_IND.filter(b => b.cat === cat).length;
+const N_SOSTENIBLE  = IND_POR_CAT('Sostenible');
+const N_IOT         = IND_POR_CAT('IoT');
+const CIUDADES_CON_DATOS = CITIES_META.filter(m => m.datosCompletos).length;
+const DIMS_DISPLAY_ORDER = ['Capital Humano','Cohesión Social','Economía','Gobernanza','Medio Ambiente','Frontera'];
+
+function modeloResumenTexto() {
+  const reparto = DIMS_DISPLAY_ORDER.map(d => `${d} ${IND_POR_DIM(d)}`).join(' · ');
+  return `Modelo v5.4 · ${IND_TOTAL} indicadores en ${DIMS_DISPLAY_ORDER.length} dimensiones (${reparto}) · ${N_SOSTENIBLE} Sostenible · ${N_IOT} IoT`;
+}
 
 // ═══════════════════════════════════════════════════════════════════
 // CONSTANTS
@@ -323,16 +351,16 @@ const C    = {
 };
 const DESC = {
   Resumen:'Consolidado general del Índice con cálculos en tiempo real.',
-  Ranking:'Clasificación completa de las 6 ciudades por Índice Compuesto ponderado.',
-  Mapa:'Visualización geográfica interactiva de las 6 ciudades con sus puntajes.',
+  Ranking:`Clasificación de las ${CITIES.length} ciudades por Índice Compuesto ponderado sobre ${IND_TOTAL} indicadores.`,
+  Mapa:`Visualización geográfica interactiva de las ${CITIES.length} ciudades con sus puntajes.`,
   Comparar:'Compara el desempeño por dimensiones de dos ciudades en un radar.',
   Formulas:'Catálogo exhaustivo con fórmulas, variables y fuentes.',
-  Frontera:'Métricas de comercio binacional, flujo migratorio e integración (Peso: 20%).',
-  Economía:'Competitividad, startups y digitalización del ecosistema local (Peso: 16%).',
-  'Capital Humano':'Educación, brecha digital e inversión en talento (Peso: 16%).',
-  'Cohesión Social':'Seguridad, inclusión, salud y acceso a redes TIC (Peso: 16%).',
-  Gobernanza:'Eficiencia gubernamental, transparencia e instituciones (Peso: 16%).',
-  'Medio Ambiente':'Métricas de sensores IoT, agua y sostenibilidad urbana (Peso: 16%).'
+  Frontera:`Comercio binacional, flujo migratorio e integración · ${IND_POR_DIM('Frontera')} indicadores (Peso: 20%).`,
+  Economía:`Valor agregado, ingresos y dinamismo empresarial · ${IND_POR_DIM('Economía')} indicadores (Peso: 16%).`,
+  'Capital Humano':`Educación, conectividad e inversión en talento · ${IND_POR_DIM('Capital Humano')} indicadores (Peso: 16%).`,
+  'Cohesión Social':`Seguridad, inclusión, salud y acceso a redes TIC · ${IND_POR_DIM('Cohesión Social')} indicadores (Peso: 16%).`,
+  Gobernanza:`Madurez Smart City, datos abiertos e instituciones · ${IND_POR_DIM('Gobernanza')} indicadores (Peso: 16%).`,
+  'Medio Ambiente':`Sensores IoT, agua y sostenibilidad urbana · ${IND_POR_DIM('Medio Ambiente')} indicadores (Peso: 16%).`
 };
 
 const BANDS = [
@@ -370,6 +398,11 @@ function composite(inds) {
   const a = dimAvgs(inds);
   return DIMS.reduce((s, d) => s + a[d] * W[d], 0);
 }
+// Una ciudad "en actualización" no tiene valores para el catálogo v5.4:
+// su índice no se calcula ni se muestra, se rotula como pendiente.
+function tieneDatos(city) { return !!(city && city.datosCompletos); }
+
+const BADGE_ACTUALIZACION = `<span class="badge" style="color:#94a3b8;background:#f8fafc;border-color:#e5e7eb;font-weight:500;">En actualización</span>`;
 
 // Normaliza un nombre de ciudad a slug: minúsculas, sin tildes, guiones por espacios.
 // Ejemplo: "Foz do Iguaçu" → "foz-do-iguacu", "San Antonio del Táchira" → "san-antonio-del-tachira"
@@ -385,10 +418,17 @@ function toSlug(name) {
 const st = { tab:'Ranking', cityIdx:null, cmpA:0, cmpB:1, barChart:null, radarChart:null, dimCharts:[], leafletMap:null, markers:[] };
 
 // ── API cache ────────────────────────────────────────────────────
+// MongoDB todavía almacena el modelo v5.3 (60 indicadores con IDs y nombres
+// antiguos). Mientras no se re-siembre a v5.4, el catálogo local BASE_IND/CV
+// es la única fuente de verdad: con USE_API_DATA=false el mapa queda vacío y
+// todos los cálculos caen al motor local. Volver a true tras re-seed.
+const USE_API_DATA = false;
+
 window._apiCitiesMap     = {}; // slug → API response (incl. _id, dimensiones, indice_compuesto_final)
 window._apiCitiesLoaded  = false;
 window._apiCitiesLoading = false;
 async function preloadApiCities() {
+  if (!USE_API_DATA) { window._apiCitiesLoaded = true; return; }
   if (window._apiCitiesLoading || window._apiCitiesLoaded) return;
   window._apiCitiesLoading = true;
   try {
@@ -425,13 +465,27 @@ function renderSidebar() {
   const card    = document.getElementById('active-city-card');
   if (st.cityIdx === null) { section.classList.add('hidden'); return; }
   const city      = CITIES[st.cityIdx];
+  const conDato   = tieneDatos(city);
   const apiEntry  = window._apiCitiesMap && window._apiCitiesMap[toSlug(city.name)];
   const score     = (apiEntry && apiEntry.indice_compuesto_final != null)
     ? apiEntry.indice_compuesto_final
     : composite(city.indicators);
-  const band  = BANDS[interpretBand(score)];
-  const sc    = score >= 7 ? '#16a34a' : score >= 4 ? '#d97706' : '#dc2626';
   section.classList.remove('hidden');
+  const scoreBlock = conDato
+    ? (() => {
+        const band = BANDS[interpretBand(score)];
+        const sc   = score >= 7 ? '#16a34a' : score >= 4 ? '#d97706' : '#dc2626';
+        return `<div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:2px;">Puntaje total</div>
+        <div class="kpi" style="font-size:22px;color:${sc};">${score.toFixed(2)}<span style="color:#cbd5e1;font-size:11px;font-weight:400;">/10</span></div>
+      </div>
+      <span class="badge ${band.text} ${band.bg} ${band.border}">${band.level}</span>`;
+      })()
+    : `<div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:2px;">Puntaje total</div>
+        <div class="kpi" style="font-size:22px;color:#cbd5e1;">—</div>
+      </div>
+      ${BADGE_ACTUALIZACION}`;
   card.innerHTML = `
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
       <span style="font-size:20px;line-height:1;">${city.flag}</span>
@@ -441,11 +495,7 @@ function renderSidebar() {
       </div>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-      <div>
-        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:2px;">Puntaje total</div>
-        <div class="kpi" style="font-size:22px;color:${sc};">${score.toFixed(2)}<span style="color:#cbd5e1;font-size:11px;font-weight:400;">/10</span></div>
-      </div>
-      <span class="badge ${band.text} ${band.bg} ${band.border}">${band.level}</span>
+      ${scoreBlock}
     </div>
     <button onclick="deselectCity()" style="width:100%;display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:11px;font-weight:500;color:#64748b;background:#fff;border:1px solid #e5e7eb;border-radius:6px;padding:6px;cursor:pointer;transition:background .15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'">${ICO.x} Deseleccionar</button>
   `;
@@ -504,10 +554,10 @@ function setActive() {
     Resumen:  st.cityIdx !== null ? `${CITIES[st.cityIdx].flag} ${CITIES[st.cityIdx].name}` : 'Resumen'
   };
   const descs = {
-    Ranking:  'Clasificación completa de las 6 ciudades por Índice Compuesto ponderado.',
-    Mapa:     'Visualización geográfica interactiva de las 6 ciudades con sus puntajes.',
-    Comparar: 'Compara el desempeño por dimensiones de dos ciudades en un radar.',
-    Resumen:  'Consolidado general del Índice con cálculos en tiempo real.'
+    Ranking:  DESC.Ranking,
+    Mapa:     DESC.Mapa,
+    Comparar: DESC.Comparar,
+    Resumen:  DESC.Resumen
   };
   document.getElementById('view-title').textContent = titles[st.tab] || st.tab;
   document.getElementById('view-desc').textContent  = descs[st.tab]  || '';
@@ -591,6 +641,32 @@ function renderResumen() {
   document.getElementById('interp-card').classList.add('hidden');
   const container = document.getElementById('data-container');
   const city = CITIES[st.cityIdx];
+
+  // Ciudad en actualización: sin valores v5.4 no hay índice que consolidar.
+  if (!tieneDatos(city)) {
+    if (st.barChart) { st.barChart.destroy(); st.barChart = null; }
+    container.innerHTML = `<div style="padding:24px 28px;">
+      <div style="background:#fff;border-radius:8px;border:1px solid #e5e7eb;box-shadow:0 1px 3px rgba(0,0,0,.05);padding:20px;margin-bottom:20px;">
+        <button onclick="backToRanking()" class="btn-primary" style="margin-bottom:20px;">${ICO.arrowLeft} Volver al Ranking</button>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <span style="font-size:36px;line-height:1;">${city.flag}</span>
+          <div>
+            <h2 style="font-size:20px;font-weight:700;color:#0f172a;margin:0 0 2px;">${escHtml(city.name)}</h2>
+            <p style="color:#64748b;font-size:13px;margin:0;">${escHtml(city.country)} · ${escHtml(city.region)}</p>
+          </div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:32px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+        <div style="margin-bottom:10px;">${BADGE_ACTUALIZACION}</div>
+        <p style="font-size:14px;font-weight:600;color:#0f172a;margin:0 0 6px;">Datos en actualización</p>
+        <p style="font-size:13px;color:#64748b;margin:0 auto;max-width:440px;line-height:1.6;">
+          ${escHtml(city.name)} todavía no tiene valores para el modelo v5.4 de ${IND_TOTAL} indicadores.
+          Su índice compuesto se publicará cuando se complete la investigación de los ${IND_TOTAL} indicadores del catálogo.
+        </p>
+      </div>
+    </div>`;
+    return;
+  }
 
   // Use API dimensiones when available (Cúcuta v5.3 official model)
   const apiCity = window._apiCitiesMap[toSlug(city.name)];
@@ -690,7 +766,7 @@ function _doRenderResumen(city, dimData, container) {
   // ── Dimension detail with indicators ────────────────────────────
   let dimDetailsHtml = '';
   if (useDim) {
-    // RICH VIEW — Official 60-indicator model from MongoDB (v5.3)
+    // RICH VIEW — modelo servido por MongoDB (inactivo mientras USE_API_DATA=false)
     DIM_ORDER_KEYS.forEach(key => {
       const dimObj = dimData[key]; if (!dimObj) return;
       const dim = DIM_KEY_TO_DISPLAY[key]; const col = C[dim];
@@ -772,12 +848,15 @@ function _doRenderResumen(city, dimData, container) {
         const arrow = item.tipo === 'pos'
           ? '<span style="font-size:9px;padding:1px 5px;background:#dcfce7;color:#16a34a;border-radius:3px;font-weight:600;flex-shrink:0;">↑</span>'
           : '<span style="font-size:9px;padding:1px 5px;background:#fee2e2;color:#dc2626;border-radius:3px;font-weight:600;flex-shrink:0;">↓</span>';
+        const catBadge = item.cat === 'IoT'
+          ? '<span style="font-size:9px;padding:1px 6px;background:#e0f2fe;color:#0369a1;border-radius:3px;font-weight:600;flex-shrink:0;">IoT</span>'
+          : '<span style="font-size:9px;padding:1px 6px;background:#f1f5f9;color:#64748b;border-radius:3px;font-weight:600;flex-shrink:0;">Sostenible</span>';
         indRows += `<tr class="ind-row">
           <td class="px-4 py-3">
             <div style="display:flex;align-items:flex-start;gap:8px;">
               ${trafficDot(score)}
               <div>
-                <div style="font-weight:600;font-size:13px;color:#0f172a;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${item.name} ${arrow}</div>
+                <div style="font-weight:600;font-size:13px;color:#0f172a;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${escHtml(item.name)} ${arrow} ${catBadge}</div>
                 <div style="font-size:10px;color:#94a3b8;margin-top:2px;line-height:1.4;">${escHtml(item.desc)}</div>
               </div>
             </div>
@@ -797,7 +876,7 @@ function _doRenderResumen(city, dimData, container) {
             ${dim}
           </h4>
           <div style="display:flex;align-items:center;gap:12px;font-size:13px;">
-            <span style="color:#64748b;">Peso <strong>${(W[dim]*100)}%</strong></span>
+            <span style="color:#64748b;">${IND_POR_DIM(dim)} ind. · Peso <strong>${(W[dim]*100)}%</strong></span>
             <span class="kpi ${sColor(avg)}" style="font-size:18px;">${avg.toFixed(2)}<span style="color:#cbd5e1;font-size:11px;font-weight:400;">/10</span></span>
           </div>
         </div>
@@ -816,9 +895,7 @@ function _doRenderResumen(city, dimData, container) {
     });
   }
 
-  const sourceBadge = useDim
-    ? `<span style="font-size:10px;background:#dcfce7;color:#16a34a;border:1px solid #bbf7d0;border-radius:4px;padding:2px 8px;font-weight:600;margin-left:8px;">Modelo v5.3 oficial · 60 indicadores</span>`
-    : '';
+  const sourceBadge = `<span style="font-size:10px;background:#dcfce7;color:#16a34a;border:1px solid #bbf7d0;border-radius:4px;padding:2px 8px;font-weight:600;margin-left:8px;text-transform:none;letter-spacing:0;">Modelo v5.4 · ${IND_TOTAL} indicadores · ${N_SOSTENIBLE} Sostenible · ${N_IOT} IoT</span>`;
 
   container.innerHTML = `<div style="padding:24px 28px;padding-bottom:40px;">
 
@@ -926,16 +1003,19 @@ function renderRanking() {
   if (st.rankingCountry === undefined) st.rankingCountry = '';
   if (!st.rankingSelected) st.rankingSelected = new Set();
 
-  // Build full ranked list — indice_compuesto_final es la única fuente de verdad
-  const allRanked = CITIES
-    .map((c, idx) => {
-      const apiCity = window._apiCitiesMap && window._apiCitiesMap[toSlug(c.name)];
-      const score = apiCity
-        ? (apiCity.indice_compuesto_final ?? apiCity.compositeScore ?? composite(c.indicators))
-        : composite(c.indicators);
-      return { ...c, idx, score, avgs: dimAvgs(c.indicators) };
-    })
-    .sort((a, b) => b.score - a.score);
+  // Las ciudades con datos completos se ordenan por índice; las que están
+  // en actualización van al final, sin puntaje ni posición.
+  const enriched = CITIES.map((c, idx) => {
+    const apiCity = window._apiCitiesMap && window._apiCitiesMap[toSlug(c.name)];
+    const score = tieneDatos(c)
+      ? (apiCity ? (apiCity.indice_compuesto_final ?? apiCity.compositeScore ?? composite(c.indicators)) : composite(c.indicators))
+      : null;
+    return { ...c, idx, score, avgs: tieneDatos(c) ? dimAvgs(c.indicators) : null };
+  });
+
+  const conDatos = enriched.filter(c => tieneDatos(c)).sort((a, b) => b.score - a.score);
+  const sinDatos = enriched.filter(c => !tieneDatos(c));
+  const allRanked = [...conDatos, ...sinDatos];
 
   // Apply filters
   const filtered = allRanked.filter(c =>
@@ -953,18 +1033,38 @@ function renderRanking() {
 
   const rowsHtml = filtered.length === 0
     ? `<tr><td colspan="7" class="py-16 text-center text-stone-400 text-sm">No se encontraron ciudades con estos filtros.</td></tr>`
-    : filtered.map((city, fi) => {
-        const rank = allRanked.findIndex(c => c.idx === city.idx) + 1;
+    : filtered.map(city => {
         const isActive = city.idx === st.cityIdx;
         const isChecked = st.rankingSelected.has(city.idx);
         const isDisabled = !isChecked && selCount >= 2;
-        const band = BANDS[interpretBand(city.score)];
-        const pct = Math.min(100, city.score / 10 * 100).toFixed(1);
-        const barColor = city.score >= 7 ? '#16a34a' : city.score >= 4 ? '#d97706' : '#dc2626';
-        const pos = rank <= 3
-          ? `<span class="text-2xl leading-none">${medals[rank-1]}</span>`
-          : `<span class="text-base font-black text-stone-500">${rank}°</span>`;
         const rowBg = isChecked ? 'row-active' : '';
+        const conDato = tieneDatos(city);
+
+        // Posición sólo para ciudades con datos; el resto va sin numerar.
+        const rank = conDato ? conDatos.findIndex(c => c.idx === city.idx) + 1 : null;
+        const pos = !conDato
+          ? '<span style="color:#cbd5e1;font-size:14px;">—</span>'
+          : rank <= 3
+            ? `<span class="text-2xl leading-none">${medals[rank-1]}</span>`
+            : `<span class="text-base font-black text-stone-500">${rank}°</span>`;
+
+        const nameColor = conDato ? '#0f172a' : '#94a3b8';
+        let barCell, totalCell, levelCell;
+        if (conDato) {
+          const band = BANDS[interpretBand(city.score)];
+          const pct = Math.min(100, city.score / 10 * 100).toFixed(1);
+          const barColor = city.score >= 7 ? '#16a34a' : city.score >= 4 ? '#d97706' : '#dc2626';
+          barCell = `<div style="background:#f1f5f9;border-radius:99px;height:4px;overflow:hidden;">
+              <div style="height:4px;border-radius:99px;width:${pct}%;background:${barColor};"></div>
+            </div>`;
+          totalCell = `<span class="kpi" style="font-size:14px;color:${barColor};">${city.score.toFixed(2)}</span>
+            <span style="color:#cbd5e1;font-size:11px;">/10</span>`;
+          levelCell = `<span class="badge ${band.text} ${band.bg} ${band.border}">${band.level}</span>`;
+        } else {
+          barCell   = `<div style="background:#f1f5f9;border-radius:99px;height:4px;"></div>`;
+          totalCell = `<span style="color:#cbd5e1;font-size:13px;">—</span>`;
+          levelCell = BADGE_ACTUALIZACION;
+        }
 
         return `<tr class="ranking-row pro-row cursor-pointer transition-colors ${rowBg}" data-city-idx="${city.idx}">
           <td class="px-3 py-3 w-10 text-center">
@@ -973,9 +1073,9 @@ function renderRanking() {
           <td class="px-2 py-3 text-center w-12">${pos}</td>
           <td class="px-3 py-3">
             <div class="flex items-center gap-2">
-              <span style="font-size:18px;line-height:1;">${city.flag}</span>
+              <span style="font-size:18px;line-height:1;${conDato ? '' : 'filter:grayscale(1);opacity:.6;'}">${city.flag}</span>
               <div>
-                <div style="font-weight:600;font-size:13px;color:#0f172a;line-height:1.3;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                <div style="font-weight:600;font-size:13px;color:${nameColor};line-height:1.3;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                   ${city.name}
                   ${isActive ? '<span style="font-size:9px;font-weight:600;background:#0f172a;color:#fff;padding:1px 6px;border-radius:4px;">activa</span>' : ''}
                 </div>
@@ -983,18 +1083,9 @@ function renderRanking() {
               </div>
             </div>
           </td>
-          <td class="px-3 py-3 min-w-[90px]">
-            <div style="background:#f1f5f9;border-radius:99px;height:4px;overflow:hidden;">
-              <div style="height:4px;border-radius:99px;width:${pct}%;background:${barColor};"></div>
-            </div>
-          </td>
-          <td class="px-3 py-3 text-right whitespace-nowrap">
-            <span class="kpi" style="font-size:14px;color:${barColor};">${city.score.toFixed(2)}</span>
-            <span style="color:#cbd5e1;font-size:11px;">/10</span>
-          </td>
-          <td class="px-3 py-3">
-            <span class="badge ${band.text} ${band.bg} ${band.border}">${band.level}</span>
-          </td>
+          <td class="px-3 py-3 min-w-[90px]">${barCell}</td>
+          <td class="px-3 py-3 text-right whitespace-nowrap">${totalCell}</td>
+          <td class="px-3 py-3">${levelCell}</td>
           <td class="px-2 py-3 w-8 text-center" style="color:#cbd5e1;font-size:11px;user-select:none;">···</td>
         </tr>`;
       }).join('');
@@ -1004,7 +1095,8 @@ function renderRanking() {
     <div style="padding:24px 28px;padding-bottom:112px;">
       <div style="margin-bottom:20px;">
         <h2 style="font-size:18px;font-weight:600;color:#0f172a;margin:0 0 4px;">Ranking de Ciudades Inteligentes</h2>
-        <p style="font-size:13px;color:#94a3b8;margin:0;">${CITIES.length} ciudades · ordenadas por Índice Compuesto ponderado${st.cityIdx !== null ? ' · <span style="color:#0f172a;font-weight:600;">ciudad seleccionada</span>' : ''}</p>
+        <p style="font-size:13px;color:#94a3b8;margin:0 0 6px;">${CITIES.length} ciudades · ${CIUDADES_CON_DATOS} con datos del modelo v5.4 · ${CITIES.length - CIUDADES_CON_DATOS} en actualización${st.cityIdx !== null ? ' · <span style="color:#0f172a;font-weight:600;">ciudad seleccionada</span>' : ''}</p>
+        <p style="font-size:12px;color:#94a3b8;margin:0;">${modeloResumenTexto()}</p>
       </div>
 
       <div style="background:#fff;border-radius:8px;border:1px solid #e5e7eb;padding:16px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;box-shadow:0 1px 3px rgba(0,0,0,.04);">
@@ -1098,8 +1190,14 @@ function renderRanking() {
     const city = allRanked.find(c => c.idx === idx);
     if (!city) return;
     row.addEventListener('mouseenter', e => {
-      tip.innerHTML =
-        `<div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;margin-bottom:10px;">${city.flag} ${city.name} · Dimensiones</div>` +
+      const head = `<div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;margin-bottom:10px;">${city.flag} ${city.name} · Dimensiones</div>`;
+      if (!city.avgs) {
+        tip.innerHTML = head + `<div style="font-size:12px;color:#64748b;">Datos en actualización al modelo v5.4.</div>`;
+        tip.style.display = 'block';
+        rkPosTip(e);
+        return;
+      }
+      tip.innerHTML = head +
         DIMS.map(dim => {
           const s = city.avgs[dim];
           const bc = s >= 7 ? '#16a34a' : s >= 4 ? '#d97706' : '#dc2626';
@@ -1333,6 +1431,29 @@ function updateComparar() {
   const ca  = CITIES[st.cmpA];
   const cb  = CITIES[st.cmpB];
 
+  // Se pueden seleccionar ciudades en actualización, pero no se grafican:
+  // sus indicadores están en null y el radar sólo mostraría ceros ficticios.
+  const pendientes = [ca, cb].filter(c => !tieneDatos(c));
+  if (pendientes.length) {
+    if (st.radarChart) { st.radarChart.destroy(); st.radarChart = null; }
+    st.dimCharts.forEach(c => { if (c) c.destroy(); });
+    st.dimCharts = [];
+    const nombres = pendientes.map(c => `${c.flag} ${c.name}`).join(' y ');
+    const verbo   = pendientes.length > 1 ? 'tienen' : 'tiene';
+    cnt.innerHTML = `
+      <div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:28px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+        <div style="display:inline-flex;align-items:center;gap:8px;margin-bottom:10px;">
+          ${BADGE_ACTUALIZACION}
+        </div>
+        <p style="font-size:14px;font-weight:600;color:#0f172a;margin:0 0 6px;">${escHtml(nombres)} ${verbo} datos en actualización</p>
+        <p style="font-size:13px;color:#64748b;margin:0;max-width:420px;margin-inline:auto;line-height:1.6;">
+          Todavía no hay valores disponibles para el modelo v5.4 de ${IND_TOTAL} indicadores, así que la comparación no puede calcularse.
+          Selecciona dos ciudades con datos completos para ver el radar y el detalle por indicador.
+        </p>
+      </div>`;
+    return;
+  }
+
   // Prefer accurate MongoDB data; fall back to hardcoded CV values for cities not yet seeded
   const apiA = window._apiCitiesMap && window._apiCitiesMap[toSlug(ca.name)];
   const apiB = window._apiCitiesMap && window._apiCitiesMap[toSlug(cb.name)];
@@ -1467,7 +1588,7 @@ function updateComparar() {
     let labels, scores1, scores2, titleA, titleB, tooltipCallbacks;
 
     if (useApi) {
-      // Use real MongoDB indicators (13/13/6/7/11/10 per dimension)
+      // Indicadores servidos por MongoDB (inactivo mientras USE_API_DATA=false)
       labels  = apiIndsA.map(ind => ind.nombre.length > 40 ? ind.nombre.substring(0,39)+'…' : ind.nombre);
       scores1 = apiIndsA.map(ind => +ind.puntaje.toFixed(2));
       scores2 = apiIndsA.map(ind => {
@@ -1492,7 +1613,7 @@ function updateComparar() {
         }
       };
     } else {
-      // Fallback: old 10-indicator-per-dim hardcoded system
+      // Catálogo local v5.4 (12/13/7/7/11/10 indicadores por dimensión)
       const dimInds = BASE_IND.filter(b => b.dim === dim);
       labels  = dimInds.map(b => b.name.length > 35 ? b.name.substring(0,34)+'…' : b.name);
       scores1 = dimInds.map(b => { const ind = ca.indicators.find(x => x.id === b.id); const s = calcScore(ind.tipo, ind.val, ind.ref); return s !== null ? +s.toFixed(2) : null; });
@@ -1566,9 +1687,10 @@ function updateMapMarkers() {
   st.markers = [];
 
   CITIES.forEach((city, i) => {
-    const score   = composite(city.indicators);
-    const avgs    = dimAvgs(city.indicators);
-    const color   = score >= 7.0 ? '#16a34a' : score >= 4.0 ? '#d97706' : '#dc2626';
+    const conDato = tieneDatos(city);
+    const score   = conDato ? composite(city.indicators) : null;
+    const avgs    = conDato ? dimAvgs(city.indicators) : null;
+    const color   = !conDato ? '#94a3b8' : score >= 7.0 ? '#16a34a' : score >= 4.0 ? '#d97706' : '#dc2626';
     const isActive = i === st.cityIdx;
     const sz      = isActive ? 24 : 18;
     const border  = isActive ? 3 : 2;
@@ -1581,31 +1703,40 @@ function updateMapMarkers() {
       popupAnchor:[0, -(sz / 2 + 4)]
     });
 
-    const pct      = (score / 10 * 100).toFixed(1);
-    const dimRows  = DIMS.map(d =>
-      `<div style="display:flex;justify-content:space-between;margin-bottom:4px;">` +
-      `<span style="color:#94a3b8;font-size:11px;">${d}</span>` +
-      `<span style="font-weight:700;color:#0f172a;font-size:11px;font-family:monospace;">${avgs[d].toFixed(2)}</span>` +
-      `</div>`
-    ).join('');
+    // Sin datos v5.4: el popup rotula el estado en vez de inventar un puntaje.
+    const scoreBlock = conDato
+      ? `<div style="margin-bottom:8px;">` +
+          `<span style="font-size:20px;font-weight:700;color:${color};font-family:monospace;">${score.toFixed(2)}</span>` +
+          `<span style="color:#cbd5e1;font-size:11px;"> / 10</span>` +
+        `</div>` +
+        `<div style="background:#f1f5f9;border-radius:99px;height:5px;margin-bottom:12px;overflow:hidden;">` +
+          `<div style="background:${color};height:5px;width:${(score / 10 * 100).toFixed(1)}%;border-radius:99px;"></div>` +
+        `</div>` +
+        `<div style="border-top:1px solid #f1f5f9;padding-top:10px;margin-bottom:12px;">` +
+          DIMS.map(d =>
+            `<div style="display:flex;justify-content:space-between;margin-bottom:4px;">` +
+            `<span style="color:#94a3b8;font-size:11px;">${d}</span>` +
+            `<span style="font-weight:700;color:#0f172a;font-size:11px;font-family:monospace;">${avgs[d].toFixed(2)}</span>` +
+            `</div>`
+          ).join('') +
+        `</div>`
+      : `<div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:6px;padding:10px 12px;margin-bottom:12px;">` +
+          `<div style="font-size:13px;font-weight:600;color:#64748b;">Datos en actualización</div>` +
+          `<div style="font-size:11px;color:#94a3b8;margin-top:2px;">Sin valores para el modelo v5.4 de ${IND_TOTAL} indicadores.</div>` +
+        `</div>`;
 
     const popupHtml =
       `<div style="font-family:Inter,ui-sans-serif,system-ui,sans-serif;min-width:230px;max-width:260px;padding:2px 0;">` +
         `<div style="font-size:15px;font-weight:700;margin-bottom:2px;color:#0f172a;">${city.flag} ${city.name}</div>` +
         `<div style="color:#94a3b8;font-size:11px;margin-bottom:10px;">${city.country} &middot; ${city.region}</div>` +
-        `<div style="margin-bottom:8px;">` +
-          `<span style="font-size:20px;font-weight:700;color:${color};font-family:monospace;">${score.toFixed(2)}</span>` +
-          `<span style="color:#cbd5e1;font-size:11px;"> / 10</span>` +
-        `</div>` +
-        `<div style="background:#f1f5f9;border-radius:99px;height:5px;margin-bottom:12px;overflow:hidden;">` +
-          `<div style="background:${color};height:5px;width:${pct}%;border-radius:99px;"></div>` +
-        `</div>` +
-        `<div style="border-top:1px solid #f1f5f9;padding-top:10px;margin-bottom:12px;">${dimRows}</div>` +
-        `<button onclick="goToCity(${i})" ` +
-          `style="width:100%;padding:8px 12px;background:#0f172a;color:#fff;border:none;border-radius:6px;` +
-          `font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.02em;font-family:inherit;">` +
-          `Ver detalle &rarr;` +
-        `</button>` +
+        scoreBlock +
+        (conDato
+          ? `<button onclick="goToCity(${i})" ` +
+              `style="width:100%;padding:8px 12px;background:#0f172a;color:#fff;border:none;border-radius:6px;` +
+              `font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.02em;font-family:inherit;">` +
+              `Ver detalle &rarr;` +
+            `</button>`
+          : '') +
       `</div>`;
 
     const marker = L.marker([city.lat, city.lng], { icon })
