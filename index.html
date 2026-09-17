@@ -1577,6 +1577,17 @@ function updateComparar() {
     return Math.max(320, n * 38);
   });
 
+  // En modo parcial, la ciudad con catálogo completo muestra además su puntaje
+  // sobre TODOS sus indicadores, para que se vea cuánto cambia la base común.
+  const fullA = parcial && !datosParciales(ca) ? dimAvgs(ca.indicators) : null;
+  const fullB = parcial && !datosParciales(cb) ? dimAvgs(cb.indicators) : null;
+  function notaCompleta(city, full, dim) {
+    if (!full) return '';
+    const n = city.indicators.filter(i => i.dim === dim && i.val !== null).length;
+    if (!n) return '';
+    return ` <span style="font-family:inherit;font-weight:400;font-size:11px;color:#94a3b8;">(${full[dim].toFixed(2)} con sus ${n} indicador${n === 1 ? '' : 'es'})</span>`;
+  }
+
   const rows = DIMS.map(dim => {
     const v1 = s1[dim], v2 = s2[dim];
     // Dimensión sin base común: no hay nada que comparar, se rotula en vez de mostrar 0.
@@ -1590,9 +1601,9 @@ function updateComparar() {
       : '';
     return `<tr style="border-bottom:1px solid #f1f5f9;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
       <td style="padding:10px 20px;font-size:13px;font-weight:500;color:#475569;">${dim}${sub}</td>
-      <td style="padding:10px 20px;text-align:right;font-family:monospace;font-weight:700;font-size:15px;">${cell(v1, w===1?'#2563eb':'#94a3b8')}</td>
+      <td style="padding:10px 20px;text-align:right;font-family:monospace;font-weight:700;font-size:15px;">${cell(v1, w===1?'#2563eb':'#94a3b8')}${notaCompleta(ca, fullA, dim)}</td>
       <td style="padding:10px 12px;text-align:center;font-size:11px;color:#cbd5e1;">${w===1?'◀':w===2?'▶':'—'}</td>
-      <td style="padding:10px 20px;text-align:left;font-family:monospace;font-weight:700;font-size:15px;">${cell(v2, w===2?'#e11d48':'#94a3b8')}</td>
+      <td style="padding:10px 20px;text-align:left;font-family:monospace;font-weight:700;font-size:15px;">${cell(v2, w===2?'#e11d48':'#94a3b8')}${notaCompleta(cb, fullB, dim)}</td>
     </tr>`;
   }).join('');
 
@@ -1624,6 +1635,11 @@ function updateComparar() {
     </div>`;
   }).join('');
 
+  // Subtítulo gris bajo cada nombre de ciudad en el encabezado de la tabla.
+  const SUBTITULO_BASE_COMUN = parcial
+    ? `<div style="font-size:10px;font-weight:400;color:#94a3b8;margin-top:2px;line-height:1.4;">recalculado sobre los indicadores disponibles en ambas</div>`
+    : '';
+
   cnt.innerHTML = `
     ${parcial ? parciales.map(c => AVISO_PARCIAL(c.name)).join('') : ''}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -1633,9 +1649,12 @@ function updateComparar() {
         ${parcial ? `<div style="margin-top:12px;padding-top:10px;border-top:1px solid #e5e7eb;font-size:11px;color:#94a3b8;text-align:center;">${textoComparados(nComunes, IND_TOTAL)}</div>` : ''}
       </div>
       <div style="background:#fff;border-radius:8px;border:1px solid #e5e7eb;overflow:hidden;">
-        <div style="padding:12px 20px;background:#f8fafc;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;font-size:13px;font-weight:600;">
-          <span style="color:#2563eb;">${ca.flag} ${ca.name}</span>
-          <span style="color:#e11d48;">${cb.flag} ${cb.name}</span>
+        <div style="padding:12px 20px;background:#f8fafc;border-bottom:1px solid #e5e7eb;">
+          ${parcial ? `<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:8px;">Puntaje sobre la base común de indicadores</div>` : ''}
+          <div style="display:flex;justify-content:space-between;gap:16px;font-size:13px;font-weight:600;">
+            <div style="color:#2563eb;">${ca.flag} ${ca.name}${SUBTITULO_BASE_COMUN}</div>
+            <div style="color:#e11d48;text-align:right;">${cb.flag} ${cb.name}${SUBTITULO_BASE_COMUN}</div>
+          </div>
         </div>
         <table class="w-full"><tbody>${rows}</tbody>
           <tfoot><tr style="background:#0f172a;color:#fff;">
