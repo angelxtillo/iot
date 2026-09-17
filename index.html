@@ -208,6 +208,7 @@ const ICO = {
   trophy:     `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>`,
   award:      `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>`,
   info:       `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
+  alertTriangle:`<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>`,
   externalLink:`<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`,
 };
 
@@ -469,6 +470,16 @@ function dimAvgsComunes(ca, cb) {
 }
 function textoComparados(n, total) {
   return `${n} de ${total} indicador${total === 1 ? '' : 'es'} comparado${n === 1 ? '' : 's'}`;
+}
+// Una dimensión con menos de un tercio de sus indicadores en la base común
+// da un promedio frágil: se marca en ámbar para que no se lea como concluyente.
+const BASE_REDUCIDA_MSG = 'Base de comparación reducida: el resultado de esta dimensión se apoya en pocos indicadores y no debe leerse como concluyente';
+function baseReducida(n, total) { return n > 0 && n < total / 3; }
+function contadorComparados(n, total) {
+  const alerta = baseReducida(n, total);
+  return `<span style="display:inline-flex;align-items:center;gap:4px;color:${alerta ? '#b45309' : '#94a3b8'};"` +
+         `${alerta ? ` title="${BASE_REDUCIDA_MSG}"` : ''}>` +
+         `${alerta ? ICO.alertTriangle : ''}${textoComparados(n, total)}</span>`;
 }
 const AVISO_PARCIAL = (nombre) =>
   `<div style="display:flex;gap:10px;align-items:flex-start;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 16px;margin-bottom:20px;">
@@ -1597,7 +1608,7 @@ function updateComparar() {
       ? `<span style="color:#cbd5e1;">—</span>`
       : `<span style="color:${color};">${v.toFixed(2)}</span>`;
     const sub = parcial
-      ? `<div style="font-size:10px;font-weight:400;color:#94a3b8;margin-top:1px;">${textoComparados(comunes[dim].n, comunes[dim].total)}</div>`
+      ? `<div style="font-size:10px;font-weight:400;margin-top:1px;">${contadorComparados(comunes[dim].n, comunes[dim].total)}</div>`
       : '';
     return `<tr style="border-bottom:1px solid #f1f5f9;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
       <td style="padding:10px 20px;font-size:13px;font-weight:500;color:#475569;">${dim}${sub}</td>
@@ -1629,8 +1640,8 @@ function updateComparar() {
     <div class="bg-white rounded-2xl shadow-sm border border-stone-200 p-5">
       ${n === 0 ? `<div style="font-size:11px;font-weight:600;color:#0f172a;text-align:center;margin-bottom:4px;">${dim}</div>` : ''}
       ${cuerpo}
-      <div style="margin-top:10px;padding-top:8px;border-top:1px solid #f1f5f9;font-size:11px;color:#94a3b8;text-align:center;">
-        ${textoComparados(n, total)}
+      <div style="margin-top:10px;padding-top:8px;border-top:1px solid #f1f5f9;font-size:11px;text-align:center;">
+        ${contadorComparados(n, total)}
       </div>
     </div>`;
   }).join('');
